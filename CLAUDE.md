@@ -19,6 +19,8 @@ Full spec: `./docs/architecture.md` — read before adding any infrastructure.
 - Backend: one Python 3.11+ FastAPI sidecar (uv), loopback + per-launch token
 - Storage: SQLite (WAL) + FTS5 + sqlite-vec; syllabus tree + `link` table = knowledge graph
 - AI: `LLMClient` → OmniRoute (sidecar) | Ollama | Gemini free key
+- Decision Brain: `DecisionClient` → rules | baseline | laya (only heads that win the Phase 0 bake-off)
+- Target OS: Windows 10/11 (LF endings enforced via `.gitattributes`; Python 3.11/3.12)
 - PDF: pdf.js · Spaced repetition: py-fsrs · Pet: OpenPets (external) · Vault: plain markdown
 
 ### Agent Rules
@@ -26,6 +28,10 @@ Full spec: `./docs/architecture.md` — read before adding any infrastructure.
 - DO NOT call any LLM provider directly. All LLM traffic MUST go through `LLMClient` in `apps/sidecar/jarvis/llm/`.
 - DO NOT copy code from repositories without an OSI license (`upsc-os`, `UPSC-Star`, `UPSC-Answer-Generator`, `prelimspattern`). Re-implement from the spec instead.
 - DO NOT add LightRAG, Telethon, faster-whisper, MediaPipe, open-browser-use, or an adblocker before the phase that lists them in `agents/roadmap/`.
+- DO NOT use decision heads (laya or baselines) for text generation. Access them only through `DecisionClient` with a rules/LLM fallback, and only for heads the Phase 0 bake-off adopted.
+- DO NOT commit PYQ PDFs or generated PYQ markdown while the repository is public; datasets live in gitignored `datasets/pyq/`. Every PYQ must carry an official `source_url` and `source_sha256`; never use third-party or LLM-generated PYQ sources.
+- DO NOT fill an answer key from an LLM. LLM guesses go only in `suggested_answer` (unverified) and are never used for scoring or as gold labels.
+- DO NOT write scripts that assume POSIX paths or LF/CRLF; the target OS is Windows.
 - DO NOT implement any bypass for Telegram protected/forward-restricted content, paywalls, or captchas.
 - DO NOT scrape paywalled sites. Use RSS/public pages and respect robots.txt.
 - DO NOT ship an LLM-generated MCQ without `source_chunk_id`, a verbatim `source_quote`, and a passing validation step.

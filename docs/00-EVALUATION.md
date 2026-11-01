@@ -22,6 +22,19 @@
 
 ---
 
+## 1b. Errata aur owner ke jawab (2026-11-01)
+
+| Cheez | Update |
+|---|---|
+| **Row 5 ("JEV model") sudhaar** | Maine pehle likha tha ki JEV real nahi lagta. Maine search nahi kiya tha, **galat tha**. **Jev = TypeSafe ka hosted decision API**, **Laya (`NandhaKishorM/laya`) uska open-source vikalp.** Blueprint ka full-form "Judgment, Evaluation & Verification" phir bhi unsupported hai. Laya generator nahi, decision engine hai, aur zero-shot kamzor hai, isliye **fine-tune zaroori** → `docs/06-BRAIN-DECISION-MODEL.md`. |
+| Pet | **OpenPets confirmed.** Windows installer + `@open-pets/client` IPC; official plugins use honge. |
+| OS | **Windows** (RAM/GPU abhi pata nahi). |
+| Optional | **Sociology.** |
+| Medium | **English.** |
+| PYQ | **Official site se dataset → Markdown** → `docs/07-PYQ-DATASET.md`. **Blocker:** `upsc.gov.in` cloud sandbox se blocked. |
+| Repo visibility | GitHub repo **public** hai → dataset default gitignored. GitHub default branch abhi `claude/gallant-volta-orla5n` hai (`main` nahi). |
+| Brainstorm | `docs/08-REPO-BRAINSTORM.md` |
+
 ## 2. Maine kya verify kiya (evidence)
 
 | Check | Result |
@@ -118,7 +131,7 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 | **Syllabus tree = knowledge graph**; derived artifacts (notes, MCQs, tags) ek baar bana ke store → "context baar-baar dene ki zaroorat nahi" | `docs/architecture.md`, `docs/03-FREE-AI-STRATEGY.md` |
 | 5-tier free-AI strategy + quota ledger + **Brain Context Pack** (~2k tokens ka persistent student profile) | `docs/03-FREE-AI-STRATEGY.md` |
 | **FSRS** (SM-2 se behtar spaced repetition) | `docs/architecture.md` |
-| 150 features, 16 modules, priorities aur kaise banega | `docs/01-FEATURES.md` |
+| 166 features, 16 modules, priorities aur kaise banega | `docs/01-FEATURES.md` |
 | North-Star metric **"Verified Retained Minutes"**, UX strategy, ethics check | `docs/04-UX-STRATEGY.md` |
 | Spec-first Gherkin scenarios (core loop) | `specs/*.feature` |
 | Vibe-coding playbook (copy-paste prompts) | `docs/05-VIBE-CODING-PLAYBOOK.md` |
@@ -129,16 +142,18 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 ## 9. Assumptions aur open questions
 
 **Maine ye maana (galat ho to bolo):**
-- OS: Windows ya macOS laptop, **8 GB+ RAM**, GPU nahi. Isliye local model chhota rakha hai (3–4B parameters ke aas-paas).
+- OS: **Windows** (confirmed). RAM/GPU **abhi unknown**. Maine 8 GB+ RAM aur GPU nahi maana hai; local LLM chhota (3–4B) aur laya (≈ 421M params) ka fit spike mein measure hoga.
 - Sirf aap use karoge (single user). Cloud sync/login nahi.
 - Budget ₹0. Koi paid API/billing enable nahi hogi.
 - Aapke Gemini Pro subscription se API quota milta hai ya nahi, mujhe pakka nahi pata. Meri jaankari mein subscription aur API key alag cheezein hain. Aap apne Google AI Studio account par check kar lena.
 
-**4 sawal (jawab dene par hi plan badalega, warna defaults se aage badhenge):**
-1. Aapka laptop OS aur RAM kitni hai? (local model aur Whisper ka size isi par depend karta hai.)
-2. Aapka optional subject kaun sa hai? (Optional module ka design isi se hoga.)
-3. Prelims ka target attempt kab hai? (Backward planner ke liye.)
-4. Hindi medium ya English medium? (UI aur question language.)
+**Ab bache hue sawal (jawab nahi diya to defaults se aage badhenge):**
+1. Laptop ki **RAM aur GPU** (agar hai)? (laya, Whisper aur local LLM ka size isi par depend karta hai.)
+2. Prelims ka **target attempt kab** hai? (Backward planner ke liye.)
+3. **Network:** kya aap cloud environment mein `upsc.gov.in` allow karoge (recommended), ya dataset aapke laptop par chalayenge? (`docs/07-PYQ-DATASET.md` §9)
+4. **Dataset publishing:** repo public hai. Repo private karoge, ya dataset local-only rakhenge? (default: local-only)
+
+(Pehle ke sawal "OS", "optional subject", "medium" ab answered hain, upar §1b.)
 
 ---
 

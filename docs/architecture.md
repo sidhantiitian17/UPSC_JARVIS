@@ -5,6 +5,8 @@
 ## Summary
 UPSC JARVIS ek **local-first desktop app** hai (Electron + React + TypeScript) jiske peeche **ek hi Python sidecar** (FastAPI) aur **ek SQLite file** hai. AI calls ek hi `LLMClient` se jaati hain, jo **OmniRoute** (free-tier gateway) aur **Ollama** (local model) ke upar baithta hai. Knowledge graph = **curated syllabus tree + links table**. Heavy tools (LightRAG, Postgres, browser-automation) *abhi nahi* hain, sirf measurable trigger par add honge.
 
+> **Platform (owner ne bataya, 2026-11-01):** Windows laptop · Optional: **Sociology** · **English medium**. RAM/GPU abhi pata nahi (open).
+
 ## Dimension Extraction — 9/9 confident
 
 ```
@@ -153,6 +155,11 @@ flowchart TB
 - **Why now:** Ready-made, MIT, aur actively maintained. Phase 3 mein.
 - **When to replace:** Agar API stable na ho → apni simple transparent Electron window + sprite.
 
+### Decision Brain: `DecisionClient` → rules | baseline classifier | **laya (jeete to)**
+- **Role:** Chhote typed decisions (syllabus-node tagging, MCQ grounding check, relevance score, directive type, trap flags) bina LLM quota ke, local CPU par.
+- **Why now:** Aapne `NandhaKishorM/laya` ("jev") chuna. Laya generator nahi, decision engine hai, aur zero-shot kamzor hai (docs ka khud ka claim), isliye **Phase 0 mein bake-off**, phir adopt/fine-tune. Detail: `docs/06-BRAIN-DECISION-MODEL.md`.
+- **When to replace:** Agar bake-off mein laya kisi head par baseline se **< 3 macro-F1 points** behtar ho (aur calibration barabar), us head par baseline use hoga.
+
 ### Gemini API (free key) for vision + heavy reasoning
 - **Role:** Mains handwriting OCR+evaluation, long-context tasks.
 - **Why now:** Handwriting ke liye best free option. Limits time ke saath badalte hain.
@@ -166,7 +173,7 @@ flowchart TB
 - **Surya OCR (legibility boxes)** — add when: Gemini OCR ke saath handwriting-red-box feature chahiye (Phase 5).
 - **Ghostery adblocker + Focus Browser** — add when: Phase 2 stable. Not now because: YouTube anti-adblock cat-and-mouse; bina isse bhi padhai chal sakti hai.
 - **open-browser-use (web automation)** — add when: Human-in-loop Web Assist 2 hafte use ho chuka ho aur copy-paste friction measurable ho (>5 min/day). Default OFF, experimental.
-- **LoRA fine-tune (small model)** — add when: ≥ 3000 human-verified Q/explanation pairs + baseline accuracy measured.
+- **Generative LoRA fine-tune (unsloth)** — add when: ≥ 3000 human-verified Q/explanation pairs + baseline accuracy measured. (Laya ka fine-tune alag hai aur Phase 0 mein bake-off ke baad.)
 - **Telegram Bot (phone companion)** — add when: aap bolo ki phone distraction sabse bada problem hai. Reminders + quick MCQs phone par.
 - **Syncthing / backup sync** — add when: aap 2nd device use karna shuru karo.
 - **Postgres** — add when: multi-user ho jaaye (>1 student).
@@ -175,7 +182,7 @@ flowchart TB
 
 - **PostgreSQL + Apache AGE + pgvector** — single user ke liye overkill. Reconsider when: >1 concurrent user.
 - **new-api + one-api + OmniRoute (teeno saath)** — ek hi gateway chahiye; new-api AGPL hai. Reconsider when: OmniRoute ka replacement chahiye.
-- **Scratch se SLM training** — data, GPU, time sab chahiye, aur result kamzor. Reconsider when: LoRA trigger poora ho.
+- **Scratch se SLM training** — data, GPU, time sab chahiye, aur result kamzor. (Laya jaise pre-trained checkpoint ko fine-tune karna *allowed* hai, scratch training nahi.) Reconsider when: generative LoRA trigger poora ho.
 - **Forking `upsc-os` / `UPSC-Answer-Generator` / `UPSC-Star`** — LICENSE nahi. Reconsider when: owner license add kare.
 - **sioyek** — GPL, native, embed nahi hota. Reconsider when: kabhi nahi (pdf.js use hoga).
 - **Consumer chat UI full-automation as default** — ToS/ban risk + fragile. Reconsider when: ek throwaway account ke saath opt-in experiment chalana ho.
@@ -222,7 +229,7 @@ flowchart TB
 - **Revisit when:** N/A.
 
 ### ADR-007: Pet = OpenPets as sidecar
-- **Choice:** OpenPets chalao, JARVIS usse CLI/MCP se events bheje (session start, idle, gate pass).
+- **Choice (owner ne confirm kiya):** OpenPets chalao; JARVIS ka Electron main process `@open-pets/client` (local IPC: Windows par named pipe) se events bheje (session start, idle, gate pass/fail). Pet ka text 16 KB message limit aur "koi prompt/path/secret speech mein nahi" rule follow karega. Official plugins (Focus Buddy, Mood Check-in, Water Reminder, Anxiety Aid) ready-made use honge.
 - **Why:** Pet ka animation/engine banana time-sink hai. Ready-made MIT solution hai.
 - **Tradeoff:** Upstream API badal sakti hai.
 - **Revisit when:** 2 breaking changes ek mahine mein.
@@ -257,6 +264,18 @@ flowchart TB
 - **Tradeoff:** Kuch sources par full text nahi milega.
 - **Revisit when:** Koi source RSS band kare.
 
+### ADR-013: Decision Brain = laya heads, but only after a measured bake-off
+- **Choice:** `DecisionClient` (rules | baseline | laya | LLM) per head. Phase 0: laya Windows spike, bake-off (fastembed+LR vs SetFit vs laya vs LLM teacher), gold set = owner-verified official PYQs, training set = teacher-labelled book chunks. Adopt laya per head iff ≥ 3 macro-F1 points over baseline or equal F1 with half the ECE, and ≤ 300 ms CPU latency.
+- **Why:** Laya zero-shot ≈ chance on typed decisions (its own docs); benchmarks are author-reported; weights licence and Windows CPU latency are unverified. A measured decision beats a hunch.
+- **Tradeoff:** Phase 0 effort before the Brain is used; some heads will stay on simple baselines.
+- **Revisit when:** laya releases a materially better checkpoint, or after 3 months of dogfood data (personalised heads).
+
+### ADR-014: Windows-first development
+- **Choice:** Target Windows 10/11 (owner's laptop). Pin Python 3.11/3.12; `uv`; Git for Windows (hooks run via its `sh`); `.gitattributes` forces LF for `.githooks/*` and scripts; paths via `pathlib`/`path` (no hardcoded `/`); `safeStorage` (DPAPI) for secrets; sidecar listens on `127.0.0.1`; OpenPets via named pipe; installers via Electron builder (NSIS) later.
+- **Why:** CRLF in hook scripts silently breaks Git hooks; Windows path/process differences break naive scripts.
+- **Tradeoff:** Linux-only shortcuts avoided; CI should include a Windows job once code exists (add in WU-P01-007).
+- **Revisit when:** a second OS user appears.
+
 ## Cost Estimate
 - **Monthly now:** **₹0**. Sab open-source/free tier. Disk: PDFs (GBs) + local models (2–8 GB).
 - **Monthly at next stage:** ₹0 (phir bhi single user).
@@ -271,6 +290,10 @@ flowchart TB
 - DO NOT call any LLM provider directly. All LLM traffic MUST go through `LLMClient` in `apps/sidecar/jarvis/llm/`.
 - DO NOT copy code from repositories without an OSI license (`upsc-os`, `UPSC-Star`, `UPSC-Answer-Generator`, `prelimspattern`). Re-implement from the spec instead.
 - DO NOT add LightRAG, Telethon, faster-whisper, MediaPipe, open-browser-use, or an adblocker before the phase that lists them in `agents/roadmap/`.
+- DO NOT use decision heads (laya or baselines) for text generation. Access them only through `DecisionClient` with a rules/LLM fallback, and only for heads the Phase 0 bake-off adopted.
+- DO NOT commit PYQ PDFs or generated PYQ markdown while the repository is public; datasets live in gitignored `datasets/pyq/`. Every PYQ must carry an official `source_url` and `source_sha256`; never use third-party or LLM-generated PYQ sources.
+- DO NOT fill an answer key from an LLM. LLM guesses go only in `suggested_answer` (unverified) and are never used for scoring or as gold labels.
+- DO NOT write scripts that assume POSIX paths or LF/CRLF; the target OS is Windows.
 - DO NOT implement any bypass for Telegram protected/forward-restricted content, paywalls, or captchas.
 - DO NOT scrape paywalled sites. Use RSS/public pages and respect robots.txt.
 - DO NOT ship an LLM-generated MCQ without `source_chunk_id`, a verbatim `source_quote`, and a passing validation step.
@@ -286,6 +309,7 @@ flowchart TB
 | Date | Reason | Changes |
 |------|--------|---------|
 | 2026-11-01 | Initial generation | Greenfield architecture from blueprint evaluation |
+| 2026-11-01 | Owner inputs: Windows, Sociology, English; OpenPets confirmed; laya = decision model; official PYQ dataset | Added Decision Brain (ADR-013), Windows-first (ADR-014), ADR-007 updated, 3 new agent rules, Phase 0 track |
 
 ---
 To update, run `/planfirst` again.

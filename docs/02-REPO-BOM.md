@@ -66,3 +66,25 @@
 | `active-win` | Active window title (Focus Guard) | Verify at P3 |
 
 > **Note:** "Verify" ka matlab: us WU ke andar agent ko pehle `npm view`/`pip index` + LICENSE check karna hai. Bina check ke dependency add nahi hogi.
+
+## E. Owner inputs ke baad jode gaye (2026-11-01; detail `docs/08-REPO-BRAINSTORM.md`)
+
+| Repo | Label | Role | License (GitHub API) | Verified | Phase | Note |
+|---|---|---|---|---|---|---|
+| `NandhaKishorM/laya` | LIBRARY (evaluate) | Decision Brain heads | Apache-2.0 (code); **weights licence unverified** (HF unreachable) | **inspected** (README, BENCHMARKS, docs), PyPI 0.4.20, ★34,782 | P0 | Zero-shot ≈ chance → fine-tune; bake-off decides (`docs/06`) |
+| `OpenPetsHQ/openpets` | SIDECAR | Pet (**confirmed**) | MIT | **inspected** (README, cli/mcp/ipc/plugins docs) | P3 | Windows signed installer; `@open-pets/client` named-pipe IPC |
+| `ActivityWatch/activitywatch` | SIDECAR (evaluate) | Focus Guard data | MPL-2.0 | metadata | P3 | Windows behaviour to verify in spike |
+| `qdrant/fastembed` | LIBRARY | CPU embeddings, bake-off baseline | Apache-2.0 | metadata | P0/P2 | |
+| `huggingface/setfit` | LIBRARY (bake-off) | Few-shot tagging | Apache-2.0 | metadata | P0 | |
+| `jsvine/pdfplumber` | LIBRARY | PDF text/layout | MIT | metadata | P0/P2 | |
+| `ocrmypdf/OCRmyPDF` + `tesseract-ocr/tesseract` | LIBRARY/tool | Scanned PDF → searchable | MPL-2.0 / Apache-2.0 | metadata | P0/P7 | Windows install effort to verify |
+| `adbar/trafilatura` | LIBRARY | Article extraction | Apache-2.0 | metadata | P6 | |
+| `open-spaced-repetition/fsrs-optimizer` | LIBRARY | Personal FSRS params | BSD-3-Clause | metadata | P10 | |
+| `kerrickstaley/genanki` | LIBRARY | Anki `.apkg` export | MIT | metadata | P10 | |
+| `markmap/markmap`, `excalidraw/excalidraw` | LIBRARY | Mind-maps, diagram trainer | MIT | metadata | P3/P5 | |
+| `blacksmithgu/obsidian-dataview`, `st3v3nmw/obsidian-spaced-repetition` | Obsidian plugins (user-installed) | Vault dashboards / card review | MIT | metadata | P2 | Dataview last push Nov-2025 |
+| `realyuvishere/upsc-pyq` | REFERENCE | Official-page scraper structure | MIT | **inspected** (`main.py`, README) | P0 | ~2.9 GB (PDFs committed): do not clone |
+| `promptfoo/promptfoo`, `docling-project/docling`, `microsoft/markitdown`, `m-bain/whisperX`, `ggml-org/whisper.cpp`, `librosa/librosa`, `YannickJadoul/Parselmouth` (GPL-3.0), `datameet/maps` (2022), `rhasspy/piper`, `huggingface/transformers.js`, `unslothai/unsloth` | EVALUATE | See brainstorm §2 | various | metadata | later | Parselmouth GPL: avoid while repo is public |
+
+> `pypdfium2`: GitHub licence metadata `None` → read the LICENSE file before use (WU-P00-002).
+

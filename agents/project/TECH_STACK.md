@@ -7,10 +7,12 @@
 - Database/storage: SQLite (WAL) + FTS5 + sqlite-vec; library folder (PDFs) and Obsidian vault folder (markdown) chosen by the user
 - Runtime/package manager: Node 20+ with pnpm; Python with uv
 - AI: `LLMClient` → OmniRoute (sidecar, `localhost:20128`) | Ollama (`localhost:11434`) | Gemini API (free key)
-- Companion: OpenPets (external app) controlled by CLI/MCP
+- Decision Brain: `DecisionClient` → rules | fastembed+LR baseline | laya (adopted per head after the Phase 0 bake-off); see `docs/06-BRAIN-DECISION-MODEL.md`
+- Companion: OpenPets (external app) via `@open-pets/client` local IPC (Windows named pipe)
+- Platform: Windows 10/11, Python 3.11/3.12, Git for Windows; data tooling in `tools/pyq`, `tools/brain`
 
 ## Decision
-- Why this stack fits: single developer using AI agents; desktop + embedded browser + webcam needs Chromium; all ML-ish libraries (FSRS, OCR, Whisper, Telethon) are best in Python; SQLite keeps everything one file and free. See `docs/architecture.md` ADR-001…012.
+- Why this stack fits: single developer using AI agents; desktop + embedded browser + webcam needs Chromium; all ML-ish libraries (FSRS, OCR, Whisper, Telethon) are best in Python; SQLite keeps everything one file and free. See `docs/architecture.md` ADR-001…014.
 - Overrides from defaults: WUR default suggestions target web apps; this is a desktop app, so Electron replaces Next.js/Vite-web. Python replaces Node backend for ML library fit. SQLite replaces Postgres/Supabase (single user, offline).
 - Verification commands (to exist after WU-P01-001/007): `pnpm verify`; `cd apps/sidecar && uv run pytest && uv run ruff check .`
 

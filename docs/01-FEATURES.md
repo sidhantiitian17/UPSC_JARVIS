@@ -259,6 +259,31 @@
 
 ---
 
+## Addendum (2026-11-01): owner inputs + repo brainstorm
+
+> Naye IDs existing modules mein jode gaye hain (module number same). Detail: `docs/06`, `07`, `08`.
+
+| ID | Feature | Kaise | Origin | Phase | Diff |
+|---|---|---|---|---|---|
+| M1.11 | **Decision Heads** (syllabus-node, grounded, relevance, directive, trap flags) via `DecisionClient`, bake-off se adopt | laya / fastembed+LR / SetFit | U | P0 | 🔴 |
+| M1.12 | **Prompt regression tests** (CI) | promptfoo ya pytest golden | N | P1 | 🟡 |
+| M2.10 | **Sociology optional ontology** (Paper I & II, thinkers + concepts) official syllabus se | ontology YAML + owner review | U | P2 | 🟡 |
+| M3.14 | **ActivityWatch-powered "aaj kahan time gaya"** weekly view | ActivityWatch sidecar | N | P3 | 🟡 |
+| M4.11 | **Scanned PDF → searchable** automatic | OCRmyPDF + Tesseract | N | P7 | 🟡 |
+| M5.7 | **Vault dashboards** (coverage/due/streak) bina UI code | Obsidian Dataview | N | P2 | 🟢 |
+| M5.8 | **Mind-map per syllabus node** | markmap | N | P3 | 🟢 |
+| M5.9 | **Personal FSRS parameters** | fsrs-optimizer | N | P10 | 🟡 |
+| M6.16 | **Official PYQ dataset (Markdown)**: Prelims GS-I + CSAT, Mains GS I–IV + Essay, Sociology I & II, provenance + verification | `tools/pyq` | U | P0 | 🔴 |
+| M6.17 | **Official syllabus + answer-key ingest** (sirf official) | `tools/pyq` | N | P0 | 🟡 |
+| M7.17 | **Sociology answer templates** (directive + thinkers + Indian sociologists) | rubric + LLM | N | P5 | 🟡 |
+| M7.18 | **Diagram trainer** (flowchart/hub-spoke, timed) | excalidraw | N | P5 | 🟡 |
+| M12.9 | **Verified quote bank** (public-domain texts mein exact-match + citation) | script + owner review | N | P3 | 🟡 |
+| M12.10 | **Wellbeing via OpenPets plugins** (Focus Buddy, Mood Check-in, Water, Anxiety Aid) | openpets | U | P3 | 🟢 |
+| M16.9 | **Phone revision pack** (`.apkg` export → Anki mobile) | genanki | N | P10 | 🟢 |
+| M16.10 | **Windows-first packaging + CRLF-safe hooks** | `.gitattributes`, NSIS later | N | P1/P10 | 🟡 |
+
+---
+
 ## Count
-- Kul features: **150** (16 modules) · P1–P2 (core loop + foundation): 36 · P3 (habit engine): 30 · baaki P4–P10
+- Kul features: **166** (16 modules; addendum shamil) · P0: 3 · P1–P2: 40 · P3: 34 · baaki P4–P10
 - Sabko ek saath mat banao. Phase 2 ka 7-din dogfood complete hone ke baad hi aage badho.

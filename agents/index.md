@@ -11,6 +11,7 @@
 ## Roadmap
 - [[roadmap/ALL]] — master dashboard: phases, status, commit index
 - [[roadmap/log]] — append-only activity journal
+- [[roadmap/PHASE_0]] — Data & Decision-Brain track (PYQ dataset, laya bake-off)
 - [[roadmap/PHASE_1]] — Foundation (walking skeleton)
 - [[roadmap/PHASE_2]] — Study Loop MVP
 - [[roadmap/PHASE_3]] — Habit Engine

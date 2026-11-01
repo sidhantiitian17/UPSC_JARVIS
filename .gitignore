@@ -1,1 +1,15 @@
 .worktrees/
+
+# PYQ dataset: raw PDFs never committed; generated md is local-only while the repo is public.
+# To opt in later (repo private or UPSC policy checked), remove the `datasets/pyq/md/` etc. lines.
+datasets/pyq/raw/
+datasets/pyq/md/
+datasets/pyq/keys/
+datasets/pyq/syllabus/
+datasets/pyq/reports/
+
+# local envs / caches
+.venv/
+node_modules/
+__pycache__/
+.pytest_cache/

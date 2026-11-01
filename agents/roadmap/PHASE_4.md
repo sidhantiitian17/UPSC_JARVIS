@@ -2,7 +2,7 @@
 type: phase
 status: planned
 tags: [state-planned, phase, content-review, data]
-depends_on: ["[[roadmap/PHASE_3]]"]
+depends_on: ["[[roadmap/PHASE_3]]", "[[roadmap/PHASE_0]]"]
 ---
 
 # Phase 4 — PYQ Lab (Prelims)
@@ -26,12 +26,12 @@ Owner 100 PYQ ka corpus spot-check kare: **>= 95/100 correct parse**. Split-view
 Mains PYQ, CA, LightRAG (trigger check hi hoga, build nahi).
 
 ## Dependencies
-`[[roadmap/PHASE_3]]` accepted.
+`[[roadmap/PHASE_3]]` accepted and `[[roadmap/PHASE_0]]` dataset (WU-P00-001…007) accepted.
 
 ## Work Units
 | ID | Goal | Acceptance | Scope | Deps | Verification | Status | Commit |
 |---|---|---|---|---|---|---|---|
-| WU-P04-001 | PYQ corpus importer + review UI | Parser + side-by-side review (PDF vs parsed); owner marks verified | `config/pyq/`, sidecar pyq router, review UI | P3 accepted | scoped tests + manual check | planned | — |
+| WU-P04-001 | PYQ corpus importer + review UI | **Import the Phase 0 dataset** (`datasets/pyq/md`) into SQLite (idempotent, keeps `status`/`answer_source`); review UI over the Phase 0 verify workflow; owner marks verified | `config/pyq/`, sidecar pyq router, review UI | P3 accepted | scoped tests + manual check | planned | — |
 | WU-P04-002 | Tag PYQ to syllabus nodes | LLM suggestion + owner accept/reject | sidecar pyq, review UI | prev WU | scoped tests + manual check | planned | — |
 | WU-P04-003 | Trend analysis + Direction Drift Alert | Weightage chart; drift rule uses time spent vs weightage | sidecar analytics, Insights | prev WU | scoped tests + manual check | planned | — |
 | WU-P04-004 | Source mapping (PYQ <-> paragraphs) | Embeddings (sqlite-vec) top-k; similarity threshold configurable; stored in `link` | sidecar mapping | prev WU | scoped tests + manual check | planned | — |

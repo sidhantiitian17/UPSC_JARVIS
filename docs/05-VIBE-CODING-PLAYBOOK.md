@@ -25,6 +25,22 @@
 > **Phase 7 mein** (Telegram): `my.telegram.org` se `api_id` / `api_hash` aap khud lenge. Ye mere paas nahi ho sakta.
 > **Phase 2/3/4 mein**: syllabus tree, PYQ tagging, aur quotes ka **human review** aap karoge. Isse skip mat karna, ye quality ka base hai.
 
+## 1b. Windows-specific (aapka laptop)
+
+| Cheez | Kya karo |
+|---|---|
+| **Git for Windows** install karo | WUR hooks `sh` se chalte hain; Git for Windows ka bundled `sh` PowerShell/cmd/Git Bash sab se kaam karta hai |
+| **Line endings** | Repo mein `.gitattributes` hai jo hooks/scripts ko **LF** par rakhta hai. CRLF hone par hooks silently toot jaate hain. Agar hook error aaye: `git config --global core.autocrlf input` set karke repo ko **dobara clone** karo (sabse safe tareeka; local changes pehle push/backup kar lo) |
+| **Python** | **3.11 ya 3.12** (3.14 avoid; laya ka purana Windows crash fix ho chuka hai par naye versions par risk kyun) |
+| **uv** | PowerShell mein uv ka official installer chalao, phir `uv sync` |
+| **Node** | 20+ aur `pnpm` (`corepack enable`) |
+| **Ollama** | Windows installer; phir ek chhota model pull |
+| **OmniRoute** | PowerShell: `npm install -g omniroute`, phir `omniroute` |
+| **OpenPets** | Releases page se `OpenPets-*-win-x64-setup.exe` (signed) |
+| **Paths** | Scripts mein hardcoded `/` ya `C:\...` nahi; agent ko bolo `pathlib`/`path.join` |
+| **Long paths** | Agar `node_modules` ya PYQ file names par error aaye: Windows long paths enable karo (admin) |
+| **Antivirus** | Defender dev folders ko slow kar sakta hai; exclusion aap apne risk par |
+
 ## 2. Roz ka loop (har WU ke liye)
 
 ```
