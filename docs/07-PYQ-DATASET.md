@@ -181,12 +181,12 @@ tags: []
 
 ## 9. Blocker aur do raste
 
-**Blocker (2026-11-01, dobara check kiya):** `upsc.gov.in`, `huggingface.co`, `pib.gov.in`, `ncert.nic.in` sab par `CONNECT tunnel failed, response 403`; proxy status endpoint mein bhi inhi hosts ke `connect_rejected` entries hain. Sirf GitHub (api, raw, git) aur PyPI/npm reachable hain. Owner ne bataya ki saare domains allowed hain, to sambhavna hai ki setting **naye session/container mein hi lagu hoti hai** (ya save nahi hui). Naya session shuru karke `uv run pyq fetch` yahin chal jayega. Maine ise bypass nahi kiya.
+**Blocker (2026-11-01, teesri baar check kiya):** Network policy ab theek hai (owner ne environment badla; proxy `CONNECT 200` deta hai): `huggingface.co` 200, `pib.gov.in` 301, `rbi.org.in`, `isro.gov.in`, `prsindia.org`, `india.gov.in` reachable. **Par `upsc.gov.in` TLS handshake par connection reset karta hai (TLS 1.2/1.3, plain HTTP, `www` sab par) aur `ncert.nic.in` jawab nahi deta**: ye site-side hai (is cloud IP ko filter), policy nahi, aur bypass nahi karenge. Dusre Indian gov sites chal rahe hain, to ye sab-India block nahi hai. Proxy status mein ab `ws_closed_mid_exchange` entries hain (tunnel khula, upar ka server band), `connect_rejected` nahi.
 
 | Rasta | Kaise | Tradeoff |
 |---|---|---|
-| **A. Network allow karo (recommended)** | Is cloud session ke environment ki **Network access** setting mein `upsc.gov.in` (aur `www.upsc.gov.in`) **Allowed domains** mein jodo (steps: <https://code.claude.com/docs/en/cloud-environments#network-access>). Phir main fetch→parse→validate yahin run karke test kar sakta hun, asli PDFs par. | Aapko settings badalni hogi. Baad mein laya ke liye `huggingface.co`, aur `ncert.nic.in`/`pib.gov.in` bhi chahiye ho sakte hain. |
-| **B. Aapke Windows laptop par** | WU-P00-001..006 ka code main yahan likhunga (synthetic fixtures par tested), aap `uv run pyq run` chalao; output `datasets/pyq/` mein. Real-PDF parsing issues aap report karoge. | Mere paas real PDFs par testing nahi hogi; parser ko ek-do round fix karna padega. |
+| ~~A. Network allow karo~~ **(ho chuka, par kaafi nahi)** | Owner ne environment ki Network access badli; PIB/RBI/ISRO/HF ab khulte hain. `upsc.gov.in` phir bhi site-side reset deta hai. | Is cloud se PYQ nahi aa sakte |
+| **B. Aapke Windows laptop par (ab recommended)** | `tools/pyq` ready (35 tests, synthetic fixtures). `cd tools\pyq; uv sync; uv run pyq --out ..\..\datasets\pyq run`. Real-PDF parsing issues ek-do round mein fix honge: laptop se aaye `reports/coverage.md` + `snapshots/` mere paas aane par main parser test-first theek karunga. | Mere paas real PDFs par testing tab tak nahi |
 
 Dono ho sakte hain. **Main A ko prefer karunga**, kyunki parser real PDFs ke bina "no vibe" ke against hai (meri assumptions test nahi hongi).
 

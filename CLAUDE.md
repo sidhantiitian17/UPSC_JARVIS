@@ -7,7 +7,7 @@ Local-first, zero-cost, gamified desktop study OS for one UPSC aspirant. Read or
 - Write/extend the Gherkin in `specs/` first, turn scenarios into failing tests, then implement (red → green → refactor).
 - Stop at `ready-for-review`; only the owner marks `accepted`/`done`.
 - Every implementation commit stages its `agents/roadmap/` update.
-- Do not push to or commit implementation on `main`; work on the designated feature branch.
+- Branching (owner decision 2026-11-01): `claude/gallant-volta-orla5n` is both the working and the default branch; no separate `main` will be created. The WUR hooks read `Default branch: main` (a branch that does not exist) so they do not block commits on this branch. Never push any other branch without permission.
 - User-facing explanations to the owner are in Hinglish; code, commits and agent rules stay in English.
 
 <!-- planfirst:start -->

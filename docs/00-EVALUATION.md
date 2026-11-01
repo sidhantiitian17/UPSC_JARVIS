@@ -31,8 +31,8 @@
 | OS | **Windows** (RAM/GPU abhi pata nahi). |
 | Optional | **Sociology.** |
 | Medium | **English.** |
-| PYQ | **Official site se dataset → Markdown** → `docs/07-PYQ-DATASET.md`. **Blocker:** `upsc.gov.in` cloud sandbox se blocked. |
-| Repo visibility | GitHub repo **public** hai → dataset default gitignored. GitHub default branch abhi `claude/gallant-volta-orla5n` hai (`main` nahi). |
+| PYQ | **Official site se dataset → Markdown** → `docs/07-PYQ-DATASET.md`. Tooling ready (`tools/pyq`, 35 tests). **Blocker:** `upsc.gov.in` is cloud IP ka TLS handshake reset karta hai (network policy ab theek hai); laptop par chalana hoga. |
+| Repo visibility | GitHub repo **public**; owner ne generated PYQ md commit karne ki permission di (raw PDFs nahi). **Branch:** owner decision — `claude/gallant-volta-orla5n` hi default/working branch hai, `main` nahi banega. |
 | Brainstorm | `docs/08-REPO-BRAINSTORM.md` |
 
 ## 2. Maine kya verify kiya (evidence)
@@ -149,9 +149,9 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 
 **Ab bache hue sawal (jawab nahi diya to defaults se aage badhenge):**
 1. Prelims ka **target attempt kab** hai? (Backward planner ke liye.)
-2. **Network:** aapka screenshot claude.ai ke chat ki setting ("Code execution and file creation") dikhata hai, jo Claude Code ke cloud environment par lagu nahi hoti. Sahi jagah: session ke title bar mein environment menu → Edit → **Network access**. Wahan "Full/Custom" set karke naya session shuru karo.
-3. **SweetClaude:** cloud container mein plugin registered nahi hai (`installed_plugins.json` nahi), isliye uska apna health gate `init` rok deta hai. Aap apne **Windows laptop par** (jahan plugin normally installed hai) repo clone karke `/sweetclaude:init` chala sakte ho.
-4. **Default branch:** GitHub ka default branch abhi `claude/gallant-volta-orla5n` hai; `main` banakar default set karoge?
+2. **PYQ download:** kya aap apne Windows laptop par `uv run pyq run` chalane ko tayyar ho? (`tools/pyq/README` ke commands; cloud se `upsc.gov.in` nahi khulta.)
+3. **Laya spike:** laptop par `uv run python -m brain.laya_spike --model english --out laya-spike-report-laptop.json` chalakar JSON bhej sakte ho? (agents/research/laya-spike.md mein steps.)
+4. **SweetClaude:** laptop par Claude Code mein `/plugin marketplace add carson-sweet/sweetclaude@main`, `/plugin install sweetclaude@sweetclaude-stable`, restart, phir `/sweetclaude:init`. Ye aap hi kar sakte ho (user-side commands).
 
 (Pehle ke sawal "OS", "optional subject", "medium" ab answered hain, upar §1b.)
 
@@ -164,4 +164,4 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 - **n360-engineering:large-feature**: Design → tasks → review gates ka structure (`agents/roadmap/PHASE_*.md`).
 - **design-skills:ux-strategy**: `docs/04-UX-STRATEGY.md`.
 - **novibe**: spec-first Gherkin (`specs/`). Iska interactive interview (ek-ek scenario par aapse puchna) maine skip kiya, kyunki aapne kam manual interaction maanga tha. Phase 2 shuru hone par ye spec aapke saath finalize hoga.
-- **sweetclaude** (2026-11-01 ko do baar check kiya. Plugin ki files cloud container ke `synced/` folder mein hain, par `~/.claude/plugins/installed_plugins.json` nahi hai, isliye SweetClaude ka apna `preflight.sh` `SC_PLUGIN_OK=false` ("no SweetClaude plugin install found") deta hai aur `init` ka Step-1 gate setup rok deta hai; `doctor` bhi "not configured" par ruk jaata hai. **Owner ne init ki permission di thi, par maine gate bypass nahi kiya** (registry file khud likhna = plugin ke safety check ko dhokha dena). Rasta: Windows laptop par plugin normally installed hai, wahan `/sweetclaude:init` chalao.): ye is project ke liye *configured nahi hai*. Maine `/sweetclaude:init` **jaan-boojh kar nahi chalaya**, kyunki wo apna alag project-management structure banata hai aur WUR ke saath do "source of truth" ho jaate. Aap chaho to baad mein dono ko jod sakte hain.
+- **sweetclaude** (2026-11-01, teen baar check kiya). Nishkarsh: (a) cloud container mein plugin sirf `synced/` folder se load hua hai, `~/.claude/plugins/installed_plugins.json` nahi hai, isliye `preflight.sh` `SC_PLUGIN_OK=false` deta hai aur `init`/`doctor` ruk jaate hain; (b) loaded plugin **4.5.2** hai jabki official repo `main` par **5.1.2** hai (maine repo clone karke dekha: structure alag hai, par registry requirement wahi); (c) official install sirf user-side slash commands se hota hai (`/plugin marketplace add carson-sweet/sweetclaude@main`, `/plugin install sweetclaude@sweetclaude-stable`, restart); (d) Claude Code docs ke hisaab se repo ki `.claude/settings.json` marketplace register karti hai par plugin install nahi karti, aur cloud sessions mein ye keys load nahi hoti (subagent ke summary par based, partly verified), isliye wo file maine commit nahi ki. **Maine `installed_plugins.json` haath se likhkar gate bypass nahi kiya**, kyunki wo installer ki nakal hoti, install nahi. Rasta: aapke Windows laptop par upar ke teen commands, phir `/sweetclaude:init`. Dhyan: WUR aur SweetClaude dono ek hi repo mein do tracking systems honge.
