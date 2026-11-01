@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from pyq.fetch import (
+    ARCHIVE_URL,
     LISTING_URL,
     Fetcher,
     Response,
@@ -23,8 +24,10 @@ PDF_BYTES = b"%PDF-1.4 synthetic"
 
 
 class FakeHttp:
-    def __init__(self, listing_html: str, robots: str = "User-agent: *\nAllow: /\n", etag="v1"):
+    def __init__(self, listing_html: str, robots: str = "User-agent: *\nAllow: /\n", etag="v1",
+                 archive_html: str | None = None):
         self.listing_html, self.robots, self.etag = listing_html, robots, etag
+        self.archive_html = archive_html if archive_html is not None else listing("listing_archive.html")
         self.calls: list[tuple[str, dict]] = []
 
     def get(self, url: str, headers: dict | None = None) -> Response:
@@ -34,6 +37,11 @@ class FakeHttp:
             return Response(200, {}, self.robots.encode())
         if url == LISTING_URL:
             return Response(200, {}, self.listing_html.encode())
+        if url == ARCHIVE_URL:
+            return Response(200, {}, self.archive_html.encode())
+        if url.endswith("/examinations/previous-question-papers") and "www." not in url:
+            # the bare host drops the path and serves the home page (observed 2026-11-01)
+            return Response(200, {}, b"<html><head><title>Welcome to UPSC</title></head></html>")
         if headers.get("If-None-Match") == self.etag:
             return Response(304, {"ETag": self.etag}, b"")
         return Response(200, {"ETag": self.etag, "Last-Modified": "Mon, 01 Jan 2024 00:00:00 GMT"}, PDF_BYTES)
@@ -176,3 +184,52 @@ def test_manifest_output_is_deterministic(tmp_path):
         f.run()
     assert (a / "manifest.jsonl").read_bytes() == (b / "manifest.jsonl").read_bytes()
     json.loads((a / "manifest.jsonl").read_text().splitlines()[0])
+
+
+def test_listing_urls_use_the_www_host():
+    assert LISTING_URL.startswith("https://www.upsc.gov.in/")
+    assert ARCHIVE_URL == LISTING_URL + "/archives"
+
+
+def test_fetcher_reads_current_and_archive_listings_on_www(tmp_path):
+    http = FakeHttp(listing())
+    f, _ = make(tmp_path, http)
+    f.run()
+    requested = [c[0] for c in http.calls]
+    assert LISTING_URL in requested and ARCHIVE_URL in requested
+    assert not any(u.startswith("https://upsc.gov.in/") for u in requested)
+    recs = load_manifest(tmp_path / "manifest.jsonl")
+    assert any(r.year == 2019 and r.paper == "sociology-1" and r.status == "downloaded" for r in recs)
+    assert any(r.year == 2024 and r.paper == "sociology-1" for r in recs)
+    assert not any("cms-2019" in r.url for r in recs)  # non Civil Services tables are ignored
+
+
+def test_structure_change_on_archive_page_downloads_nothing(tmp_path):
+    http = FakeHttp(listing(), archive_html=listing("listing_changed.html"))
+    f, _ = make(tmp_path, http)
+    with pytest.raises(StructureChangedError):
+        f.run()
+    assert not http.pdf_calls()
+    assert list((tmp_path / "snapshots").glob("listing-*.html"))
+
+
+def test_html_returned_for_robots_txt_means_no_rules(tmp_path):
+    # www.upsc.gov.in/robots.txt answers with an HTML page (no real robots file): treated as "no rules"
+    http = FakeHttp(listing(), robots="<html><body>Welcome to UPSC</body></html>")
+    f, _ = make(tmp_path, http)
+    f.run()
+    assert http.pdf_calls()
+
+
+def test_single_cell_rows_without_category_are_read():
+    entries = parse_listing(listing("listing_variants.html"), LISTING_URL)
+    pre = [e for e in entries if e.phase == "prelims"]
+    assert [e.year for e in pre] == [2025, 2025]
+    assert all(e.category == "" for e in pre)
+    assert [classify(e)[0] for e in pre] == ["gs-paper-1", "csat"]
+
+
+def test_general_studies_titles_without_the_word_paper_are_classified():
+    entries = parse_listing(listing("listing_variants.html"), LISTING_URL)
+    mains = [e for e in entries if e.phase == "mains"]
+    assert [classify(e)[0] for e in mains] == ["gs-1", "gs-2", "gs-3", "gs-4"]

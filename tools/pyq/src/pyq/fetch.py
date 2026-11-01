@@ -22,7 +22,10 @@ from bs4 import BeautifulSoup
 
 from pyq.manifest import SourceRecord, load_manifest, save_manifest
 
-LISTING_URL = "https://upsc.gov.in/examinations/previous-question-papers"
+# The bare host upsc.gov.in answers every path with a redirect to the home page (observed 2026-11-01),
+# so the real listing is only reachable on www. Older years live on the /archives page.
+LISTING_URL = "https://www.upsc.gov.in/examinations/previous-question-papers"
+ARCHIVE_URL = LISTING_URL + "/archives"
 DEFAULT_UA = "upsc-jarvis-pyq/0.1 (personal study tool; contact: repo owner)"
 
 
@@ -95,9 +98,10 @@ def parse_listing(html: str, base_url: str) -> list[ListingEntry]:
                 break
         for tr in table.find_all("tr"):
             tds = tr.find_all("td")
-            if len(tds) < 2:
+            if not tds:
                 continue
-            category = tds[0].get_text(" ", strip=True)
+            # current-page rows may carry only the links cell (no category column)
+            category = tds[0].get_text(" ", strip=True) if len(tds) >= 2 else ""
             for li in tr.find_all("li"):
                 a = li.find("a", href=True)
                 if not a or not a["href"].lower().split("?")[0].endswith(".pdf"):
@@ -115,7 +119,7 @@ def parse_listing(html: str, base_url: str) -> list[ListingEntry]:
 
 
 _ROMAN = {"i": 1, "ii": 2, "iii": 3, "iv": 4, "1": 1, "2": 2, "3": 3, "4": 4}
-_PAPER_NUM = re.compile(r"paper[\s\-–—]*\(?(iv|iii|ii|i|[1-4])\b", re.IGNORECASE)
+_PAPER_NUM = re.compile(r"(?:paper|general\s+studies)[\s\-–—]*\(?(iv|iii|ii|i|[1-4])\b", re.IGNORECASE)
 
 
 def _paper_num(title: str) -> int | None:
@@ -166,10 +170,12 @@ def _hdr(headers: dict, name: str) -> str | None:
 
 class Fetcher:
     def __init__(self, http: Http, out_dir: Path, throttle: Throttle, user_agent: str = DEFAULT_UA,
-                 now: Callable[[], str] | None = None, listing_url: str = LISTING_URL):
+                 now: Callable[[], str] | None = None, listing_url: str = LISTING_URL,
+                 archive_url: str | None = ARCHIVE_URL):
         self.http, self.out, self.throttle, self.ua = http, Path(out_dir), throttle, user_agent
         self.now = now or (lambda: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
         self.listing_url = listing_url
+        self.archive_url = archive_url
 
     def _get(self, url: str, headers: dict | None = None) -> Response:
         self.throttle.wait()
@@ -186,24 +192,33 @@ class Fetcher:
             rp.disallow_all = True  # RFC 9309: unreachable robots.txt => assume disallow
         return rp
 
+    def _listing_entries(self) -> list[ListingEntry]:
+        entries: dict[str, ListingEntry] = {}
+        for url in (u for u in (self.listing_url, self.archive_url) if u):
+            resp = self._get(url)
+            if resp.status != 200:
+                raise FetchError(f"listing page {url} returned HTTP {resp.status}")
+            html = resp.content.decode("utf-8", "replace")
+            try:
+                page = parse_listing(html, url)
+            except StructureChangedError:
+                snap_dir = self.out / "snapshots"
+                snap_dir.mkdir(parents=True, exist_ok=True)
+                stamp = re.sub(r"[^0-9A-Za-z]+", "", self.now())
+                name = "archive" if url == self.archive_url else "current"
+                (snap_dir / f"listing-{name}-{stamp}.html").write_text(html, encoding="utf-8")
+                raise
+            for e in page:
+                entries.setdefault(e.url, e)
+        return list(entries.values())
+
     def run(self) -> list[SourceRecord]:
         manifest_path = self.out / "manifest.jsonl"
         existing = {r.url: r for r in load_manifest(manifest_path)}
         robots = self._robots()
         if not robots.can_fetch(self.ua, self.listing_url):
             raise PermissionError("robots.txt disallows the listing page")
-        resp = self._get(self.listing_url)
-        if resp.status != 200:
-            raise FetchError(f"listing page returned HTTP {resp.status}")
-        html = resp.content.decode("utf-8", "replace")
-        try:
-            entries = parse_listing(html, self.listing_url)
-        except StructureChangedError:
-            snap_dir = self.out / "snapshots"
-            snap_dir.mkdir(parents=True, exist_ok=True)
-            stamp = re.sub(r"[^0-9A-Za-z]+", "", self.now())
-            (snap_dir / f"listing-{stamp}.html").write_text(html, encoding="utf-8")
-            raise
+        entries = self._listing_entries()
         records = [self._process(e, existing.get(e.url), robots) for e in entries]
         seen = {r.url for r in records}
         records += [r for u, r in existing.items() if u not in seen]

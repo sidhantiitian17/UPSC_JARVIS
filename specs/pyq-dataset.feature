@@ -15,6 +15,24 @@ Feature: Official PYQ dataset in Markdown
     And it sends an identifying User-Agent
     And files already downloaded with the same ETag or hash are not downloaded again
 
+  Scenario: Fetcher reads the current listing and the archives listing on the www host
+    Given the bare host upsc.gov.in redirects every path to the home page
+    And the real listing lives on www.upsc.gov.in as a current page and an archives page
+    When the fetcher runs
+    Then it requests both listing pages on the www host
+    And papers from both pages end up in the manifest
+    And it never requests a listing on the bare host
+
+  Scenario: Listing rows without a category column are still read
+    Given a Civil Services table whose rows hold only the paper links in a single cell
+    When the listing is parsed
+    Then every PDF link in the row becomes an entry with an empty category
+
+  Scenario: General Studies titles without the word Paper are classified
+    Given Mains entries titled "General Studies - I" to "General Studies - IV"
+    When they are classified
+    Then they map to gs-1 to gs-4
+
   Scenario: Fetcher refuses to guess when the page structure changes
     Given the listing page no longer has the expected structure
     When the fetcher runs
