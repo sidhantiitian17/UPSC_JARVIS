@@ -8,6 +8,8 @@ declare global {
       status: () => Promise<SidecarState>
       secrets: SecretsApi
       pickFolder: () => Promise<string | null>
+      pickPdf: () => Promise<string | null>
+      pathForFile: (file: File) => string
     }
   }
 }

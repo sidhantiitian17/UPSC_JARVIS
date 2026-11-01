@@ -132,6 +132,17 @@ app.whenReady().then(() => {
     return res.canceled ? null : (res.filePaths[0] ?? null)
   })
 
+  ipcMain.handle('dialog:pickPdf', async (event) => {
+    assertTrusted(event.senderFrame?.url)
+    const win = BrowserWindow.fromWebContents(event.sender)
+    const opts = {
+      properties: ['openFile'] as 'openFile'[],
+      filters: [{ name: 'PDF documents', extensions: ['pdf'] }]
+    }
+    const res = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
+    return res.canceled ? null : (res.filePaths[0] ?? null)
+  })
+
   void bootSidecar()
   createWindow()
 

@@ -5,6 +5,8 @@ import { _electron as electron } from 'playwright-core'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { execSync } from 'node:child_process'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -22,9 +24,38 @@ const SCREENS = [
   'settings'
 ]
 
+// Throwaway profile so every run starts with an empty database and never touches the owner's data.
+const userData = mkdtempSync(path.join(tmpdir(), 'jarvis-e2e-'))
+
+/** Minimal one-page text PDF (no dependencies) so the real library pipeline can be exercised. */
+function tinyPdf(lines) {
+  const body = `BT /F1 12 Tf 14 TL 50 740 Td ${lines.map((l) => `(${l}) Tj T*`).join(' ')} ET`
+  const objs = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+    `<< /Length ${body.length} >>\nstream\n${body}\nendstream`,
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'
+  ]
+  let out = '%PDF-1.4\n'
+  const offs = []
+  objs.forEach((o, i) => {
+    offs.push(out.length)
+    out += `${i + 1} 0 obj\n${o}\nendobj\n`
+  })
+  const x = out.length
+  out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n${offs.map((o) => `${String(o).padStart(10, '0')} 00000 n \n`).join('')}`
+  out += `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${x}\n%%EOF\n`
+  return out
+}
+
 const app = await electron.launch({
   executablePath: electronPath,
-  args: [root, ...(process.platform === 'linux' ? ['--no-sandbox'] : [])],
+  args: [
+    root,
+    `--user-data-dir=${userData}`,
+    ...(process.platform === 'linux' ? ['--no-sandbox'] : [])
+  ],
   cwd: root
 })
 let failed = false
@@ -73,6 +104,33 @@ try {
     )
   )
   check('unsafe api path refused', refused)
+
+  // Real library pipeline through the bridge: add a PDF, see it listed, find it by search.
+  const pdfPath = path.join(userData, 'e2e-polity.pdf')
+  writeFileSync(
+    pdfPath,
+    tinyPdf(['Article 14 guarantees equality before law.', 'Article 21 protects life.'])
+  )
+  const added = await win.evaluate(
+    (p) => window.jarvis.api({ method: 'POST', path: '/library/documents', body: { path: p } }),
+    pdfPath
+  )
+  check(
+    'PDF added to library',
+    added.status === 200 && added.body.page_count === 1,
+    JSON.stringify(added.body)
+  )
+  const found = await win.evaluate(() =>
+    window.jarvis.api({ method: 'GET', path: '/library/search?q=equality' })
+  )
+  check('library search finds the text', found.status === 200 && found.body.length > 0)
+  await win.click('text=Study')
+  const listed = await win
+    .waitForSelector('ul[aria-label="Documents"] >> text=e2e-polity', { timeout: 20000 })
+    .then(() => true)
+    .catch(() => false)
+  check('Study screen lists the document', listed)
+  await win.click('text=Syllabus')
   const banner = await win.locator('[role=alert]').count()
   check('no error banner', banner === 0)
   check('preload bridge present', (await win.evaluate(() => typeof window.jarvis)) === 'object')

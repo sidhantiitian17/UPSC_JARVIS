@@ -121,3 +121,9 @@
 | `pnpm/action-setup` v6.1.0, `astral-sh/setup-uv` v10.3.3 | MIT | pnpm (version from `packageManager`), uv | P01-007 |
 
 PyYAML (MIT, already listed in G) is also used by the syllabus ontology loader (P02-001). No new packages.
+
+## I. Library (licence read from PyPI metadata, 2026-11-01)
+
+| Package | Licence | Role | WU |
+|---|---|---|---|
+| `pypdfium2` 5.14.0 | BSD-3-Clause OR Apache-2.0 (bundles PDFium, BSD-3-Clause) | PDF page text extraction in the sidecar | P02-004 |

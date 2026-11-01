@@ -38,3 +38,12 @@ export const testAi = (): Promise<Schemas['AiTestOut']> => api('POST', '/llm/tes
 export type SyllabusNode = Schemas['SyllabusNodeOut']
 export const getSyllabusTree = (): Promise<SyllabusNode[]> => api('GET', '/syllabus/tree')
 export const reloadSyllabus = (): Promise<Schemas['ReloadOut']> => api('POST', '/syllabus/reload')
+
+export type LibraryDocument = Schemas['DocumentOut']
+export type AddDocumentResult = Schemas['AddDocumentOut']
+export type SearchHit = Schemas['SearchHit']
+export const listDocuments = (): Promise<LibraryDocument[]> => api('GET', '/library/documents')
+export const addDocument = (path: string): Promise<AddDocumentResult> =>
+  api('POST', '/library/documents', { path })
+export const searchLibrary = (q: string): Promise<SearchHit[]> =>
+  api('GET', `/library/search?q=${encodeURIComponent(q)}`)
