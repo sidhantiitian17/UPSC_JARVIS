@@ -26,5 +26,14 @@ Local-first, free, gamified UPSC study OS: padho → bookmark → focus timer �
 2. `docs/05-VIBE-CODING-PLAYBOOK.md` §1 aur §1b (Windows) ka setup karo.
 3. `agents/roadmap/PHASE_1.md` ka pehla WU (`WU-P01-001`) apne coding agent ko do. Saath mein Phase 0 (`PHASE_0.md`): PYQ dataset aur laya bake-off.
 
+## Developer quick start (Phase 1 onwards)
+```bash
+pnpm install                      # JS deps (Electron binary downloads on first install)
+(cd apps/sidecar && uv sync)      # Python sidecar deps
+pnpm dev                          # Electron app (sidecar is started by the app in WU-P01-003)
+pnpm verify                       # lint + typecheck + tests for everything
+```
+Rules for agents: `CLAUDE.md`. Roadmap: `agents/roadmap/ALL.md`.
+
 ## Licence
 Abhi tay nahi. Public karne se pehle dependencies ke licenses (aur model weights ke terms) `docs/02-REPO-BOM.md` mein dobara check karo.

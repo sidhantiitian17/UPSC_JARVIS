@@ -1,0 +1,15 @@
+{
+  "name": "upsc-jarvis",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local-first, free, gamified UPSC study OS",
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "pnpm --filter desktop dev",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "verify": "node scripts/verify.mjs"
+  }
+}

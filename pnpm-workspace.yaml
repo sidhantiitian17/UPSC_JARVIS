@@ -1,0 +1,8 @@
+packages:
+  - apps/desktop
+  - packages/*
+onlyBuiltDependencies:
+  - electron
+  - electron-builder
+  - esbuild
+  - '@electron-toolkit/preload'
