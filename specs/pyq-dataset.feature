@@ -50,6 +50,12 @@ Feature: Official PYQ dataset in Markdown
     When the fetcher runs
     Then the manifest records it with lang "hi" and status "skipped"
 
+  Scenario: Two-column pages are read column by column
+    Given a PDF page with a left and a right column of questions
+    When the text is extracted
+    Then the whole left column comes before the right column
+    And a full-width page is still read top to bottom
+
   Scenario: Parser keeps source text intact
     Given a Prelims GS Paper I PDF with 100 questions
     When the parser runs

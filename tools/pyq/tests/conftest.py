@@ -24,6 +24,22 @@ def write_pdf(path: Path, pages: list[list[str]]) -> Path:
     return path
 
 
+def write_two_column_pdf(path: Path, pages: list[tuple[list[str], list[str]]]) -> Path:
+    """Each page = (left column lines, right column lines); lines at equal heights are interleaved by a
+    naive top-to-bottom reader, which is what the extractor must not do."""
+    c = canvas.Canvas(str(path), pagesize=A4)
+    for left, right in pages:
+        c.setFont("Helvetica", 9)
+        for col_x, lines in ((40, left), (320, right)):
+            y = 800
+            for line in lines:
+                c.drawString(col_x, y, line)
+                y -= 11
+        c.showPage()
+    c.save()
+    return path
+
+
 def prelims_lines(n: int = 100, statements_in: int = 4, broken: int | None = None) -> list[str]:
     """Synthetic Prelims text. Question `statements_in` has 5 numbered statements (1.-5.) to
     exercise the 'numbered statements vs question numbers' ambiguity."""

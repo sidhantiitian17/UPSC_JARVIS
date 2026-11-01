@@ -1,0 +1,191 @@
+# PYQ coverage report
+
+## Parsed papers
+
+| phase | year | paper | questions | parsed | failed | verified |
+|---|---|---|---|---|---|---|
+| prelims | 2023 | gs-paper-1 | 10 | 9 | 1 | 0 |
+
+## Failed questions (need manual attention)
+
+- PRE-2023-GS1-002 (status: failed)
+
+## Source inventory by status
+
+- downloaded: 99
+- out-of-scope: 898
+- skipped: 33
+- unclassified: 170
+
+## Not downloaded (needs a decision)
+
+- 2016 mains English (Compulsory) -> unclassified
+- 2017 mains Assamese -> unclassified
+- 2017 mains Bengali -> unclassified
+- 2017 mains Bodo -> unclassified
+- 2017 mains English -> unclassified
+- 2017 mains Gujarati -> unclassified
+- 2017 mains Kannada -> unclassified
+- 2017 mains Maithili -> unclassified
+- 2017 mains Malayalam -> unclassified
+- 2017 mains Marathi -> unclassified
+- 2017 mains Nepali -> unclassified
+- 2017 mains Oriya -> unclassified
+- 2017 mains Punjabi -> unclassified
+- 2017 mains Sanskrit -> unclassified
+- 2017 mains Sindhi (Devanagari) -> unclassified
+- 2017 mains Tamil -> unclassified
+- 2017 mains Telugu -> unclassified
+- 2017 mains Urdu -> unclassified
+- 2018 mains Assamese -> unclassified
+- 2018 mains Bengali -> unclassified
+- 2018 mains Bodo -> unclassified
+- 2018 mains Dogri -> unclassified
+- 2018 mains English -> unclassified
+- 2018 mains Gujarati -> unclassified
+- 2018 mains Kannada -> unclassified
+- 2018 mains Malayalam -> unclassified
+- 2018 mains Marathi -> unclassified
+- 2018 mains Nepali -> unclassified
+- 2018 mains Oriya -> unclassified
+- 2018 mains Punjabi -> unclassified
+- 2018 mains Sanskrit -> unclassified
+- 2018 mains Sindhi (Devnagari) -> unclassified
+- 2018 mains Tamil -> unclassified
+- 2018 mains Telugu -> unclassified
+- 2018 mains Urdu -> unclassified
+- 2019 mains Assamese Compulsory -> unclassified
+- 2019 mains Bengali Compulsory -> unclassified
+- 2019 mains Dogri Compulsory -> unclassified
+- 2019 mains English Compulsory -> unclassified
+- 2019 mains Gujarati Compulsory -> unclassified
+- 2019 mains Kannada Compulsory -> unclassified
+- 2019 mains Maithili Compulsory -> unclassified
+- 2019 mains Malayalam Compulsory -> unclassified
+- 2019 mains Marathi Compulsory -> unclassified
+- 2019 mains Nepali Compulsory -> unclassified
+- 2019 mains Oriya Compulsory -> unclassified
+- 2019 mains Punjabi Compulsory -> unclassified
+- 2019 mains Sanskrit Compulsory -> unclassified
+- 2019 mains Sindhi Compulsory Dev -> unclassified
+- 2019 mains Tamil Compulsory -> unclassified
+- 2019 mains Telugu Compulsory -> unclassified
+- 2019 mains Urdu Compulsory -> unclassified
+- 2020 mains Assamese Compulsory -> unclassified
+- 2020 mains Bengali Compulsory -> unclassified
+- 2020 mains Bodo Compulsory -> unclassified
+- 2020 mains English Compulsory -> unclassified
+- 2020 mains Gujarati Compulsory -> unclassified
+- 2020 mains Kannada Compulsory -> unclassified
+- 2020 mains Maithili Compulsory -> unclassified
+- 2020 mains Malayalam Compulsory -> unclassified
+- 2020 mains Marathi Compulsory -> unclassified
+- 2020 mains Nepali Compulsory -> unclassified
+- 2020 mains Odia Compulsory -> unclassified
+- 2020 mains Punjabi Compulsory -> unclassified
+- 2020 mains Sanskrit Compulsory -> unclassified
+- 2020 mains Sindhi (Arabic) Compulsory -> unclassified
+- 2020 mains Tamil Compulsory -> unclassified
+- 2020 mains Telugu Compulsory -> unclassified
+- 2020 mains Urdu Compulsory -> unclassified
+- 2021 mains Assamese -> unclassified
+- 2021 mains Bengali -> unclassified
+- 2021 mains Bodo -> unclassified
+- 2021 mains English -> unclassified
+- 2021 mains Gujarati -> unclassified
+- 2021 mains Kannada -> unclassified
+- 2021 mains Malayalam -> unclassified
+- 2021 mains Marathi -> unclassified
+- 2021 mains Nepali -> unclassified
+- 2021 mains Odia -> unclassified
+- 2021 mains Punjabi -> unclassified
+- 2021 mains Sanskrit -> unclassified
+- 2021 mains Sindhi -> unclassified
+- 2021 mains Tamil -> unclassified
+- 2021 mains Telugu -> unclassified
+- 2021 mains Urdu -> unclassified
+- 2022 mains Assamese (Compulsory) -> unclassified
+- 2022 mains Bengali (Compulsory) -> unclassified
+- 2022 mains English (Compulsory) -> unclassified
+- 2022 mains Gujarati (Compulsory) -> unclassified
+- 2022 mains Kannada (Compulsory) -> unclassified
+- 2022 mains Kashmiri (Compulsory) -> unclassified
+- 2022 mains Malayalam (Compulsory) -> unclassified
+- 2022 mains Marathi (Compulsory) -> unclassified
+- 2022 mains Nepali (Compulsory) -> unclassified
+- 2022 mains Odia (Compulsory) -> unclassified
+- 2022 mains Punjabi (Compulsory) -> unclassified
+- 2022 mains Sanskrit (Compulsory) -> unclassified
+- 2022 mains Sindhi (Compulsory) -> unclassified
+- 2022 mains Tamil (Compulsory) -> unclassified
+- 2022 mains Telugu (Compulsory) -> unclassified
+- 2022 mains Urdu (Compulsory) -> unclassified
+- 2023 mains Assamese Compulsory -> unclassified
+- 2023 mains Bengali Compulsory -> unclassified
+- 2023 mains Bodo Compulsory -> unclassified
+- 2023 mains English Compulsory -> unclassified
+- 2023 mains Gujarati Compulsory -> unclassified
+- 2023 mains Kannada Compulsory -> unclassified
+- 2023 mains Maithili Compulsory -> unclassified
+- 2023 mains Malayalam Compulsory -> unclassified
+- 2023 mains Manipuri Compulsory -> unclassified
+- 2023 mains Marathi Compulsory -> unclassified
+- 2023 mains Nepali Compulsory -> unclassified
+- 2023 mains Odia Compulsory -> unclassified
+- 2023 mains Punjabi Compulsory -> unclassified
+- 2023 mains Sanskrit Compulsory -> unclassified
+- 2023 mains Sindhi Devanagari Compulsory -> unclassified
+- 2023 mains Tamil Compulsory -> unclassified
+- 2023 mains Telugu Compulsory -> unclassified
+- 2023 mains Urdu Compulsory -> unclassified
+- 2024 mains Assamese Compulsory -> unclassified
+- 2024 mains Bengali Compulsory -> unclassified
+- 2024 mains Bodo Compulsory -> unclassified
+- 2024 mains English Compulsory -> unclassified
+- 2024 mains Gujarati Compulsory -> unclassified
+- 2024 mains Kannada Compulsory -> unclassified
+- 2024 mains Maithili Compulsory -> unclassified
+- 2024 mains Malayalam Compulsory -> unclassified
+- 2024 mains Marathi Compulsory -> unclassified
+- 2024 mains Nepali Compulsory -> unclassified
+- 2024 mains Odia Compulsory -> unclassified
+- 2024 mains Punjabi Compulsory -> unclassified
+- 2024 mains Sindhi Compulsory -> unclassified
+- 2024 mains Sanskrit Compulsory -> unclassified
+- 2024 mains Tamil Compulsory -> unclassified
+- 2024 mains Telugu Compulsory -> unclassified
+- 2024 mains Urdu Compulsory -> unclassified
+- 2025 mains Assamese (Compulsory) -> unclassified
+- 2025 mains Bengali (Compulsory) -> unclassified
+- 2025 mains Bodo (Compulsory) -> unclassified
+- 2025 mains English (Compulsory) -> unclassified
+- 2025 mains Gujarati (Compulsory) -> unclassified
+- 2025 mains Kannada (Compulsory) -> unclassified
+- 2025 mains Kashimiri (Compulsory) -> unclassified
+- 2025 mains Maithili (Compulsory) -> unclassified
+- 2025 mains Malayalam (Compulsory) -> unclassified
+- 2025 mains Marathi (Compulsory) -> unclassified
+- 2025 mains Nepali (Compulsory) -> unclassified
+- 2025 mains Odia Compulsory) -> unclassified
+- 2025 mains Punjabi (Compulsory) -> unclassified
+- 2025 mains Sanskrit (Compulsory) -> unclassified
+- 2025 mains Sindhi (Devanagari) (Compulsory) -> unclassified
+- 2025 mains Tamil (Compulsory) -> unclassified
+- 2025 mains Telugu (Compulsory) -> unclassified
+- 2025 mains Urdu (Compulsory) -> unclassified
+- 2026 mains Assamese (Compulsory) -> unclassified
+- 2026 mains Bengali (Compulsory) -> unclassified
+- 2026 mains Bodo (Compulsory) -> unclassified
+- 2026 mains English (Compulsory) -> unclassified
+- 2026 mains Gujarati (Compulsory) -> unclassified
+- 2026 mains Kannada (Compulsory) -> unclassified
+- 2026 mains Maithili (Compulsory) -> unclassified
+- 2026 mains Malayalam (Compulsory) -> unclassified
+- 2026 mains Marathi (Compulsory) -> unclassified
+- 2026 mains Nepali (Compulsory) -> unclassified
+- 2026 mains ODIA (Compulsory) -> unclassified
+- 2026 mains Punjabi (Compulsory) -> unclassified
+- 2026 mains Sanskrit (Compulsory) -> unclassified
+- 2026 mains Tamil (Compulsory) -> unclassified
+- 2026 mains Telugu (Compulsory) -> unclassified
+- 2026 mains Urdu (Compulsory) -> unclassified

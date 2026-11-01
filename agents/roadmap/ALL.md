@@ -52,6 +52,7 @@ Phase gating: do not start Phase 3 until Phase 2 gates A1 (≥40/50 good MCQs) a
 | WU-P00-006 | Official-only keys + syllabus ingest | e583c78 | 30 cumulative; status blocked (real files) |
 | WU-P00-007 | Review sample + verify + pipeline + CLI | 657c936 | 35 cumulative, ruff clean; ready-for-review |
 | WU-P00-001 (follow-up) | Real-site fixes: www host, /archives page, single-cell rows, GS titles without 'Paper' | see git log | 41 cumulative, ruff clean; real fetch of 99 PDFs; ready-for-review |
+| WU-P00-002 (follow-up) | Column-aware extraction for two-column booklets; real-run coverage report | see git log | 43 cumulative, ruff clean; 2023 Prelims GS-I now 10/~100 questions (rest flagged); ready-for-review |
 
 ## Operating Rules
 - Work in Work Units only. One WU = one commit.

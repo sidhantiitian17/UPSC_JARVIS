@@ -20,9 +20,33 @@ class PageText:
     text: str
 
 
+_MAX_CROSSING_SHARE = 0.03  # words straddling the midline before a page counts as full width
+_MIN_COLUMN_SHARE = 0.2
+
+
+def _is_two_column(words: list[dict], mid: float) -> bool:
+    if len(words) < 20:
+        return False
+    crossing = sum(1 for w in words if w["x0"] < mid < w["x1"])
+    left = sum(1 for w in words if w["x1"] <= mid)
+    right = sum(1 for w in words if w["x0"] >= mid)
+    n = len(words)
+    return crossing / n <= _MAX_CROSSING_SHARE and left / n >= _MIN_COLUMN_SHARE and right / n >= _MIN_COLUMN_SHARE
+
+
+def _page_text(page) -> str:
+    """Two-column pages are read left column first, then right; others top to bottom."""
+    mid = page.width / 2
+    if not _is_two_column(page.extract_words(), mid):
+        return page.extract_text() or ""
+    left = page.crop((0, 0, mid, page.height)).extract_text() or ""
+    right = page.crop((mid, 0, page.width, page.height)).extract_text() or ""
+    return left + "\n" + right
+
+
 def extract_pdf(path: Path) -> list[PageText]:
     with pdfplumber.open(str(path)) as pdf:
-        return [PageText(i + 1, p.extract_text() or "") for i, p in enumerate(pdf.pages)]
+        return [PageText(i + 1, _page_text(p)) for i, p in enumerate(pdf.pages)]
 
 
 def is_scanned(pages: list[PageText], min_chars: int = 50, share: float = 0.5) -> bool:

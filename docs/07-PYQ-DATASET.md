@@ -1,6 +1,6 @@
 # PYQ Dataset — official UPSC site se Markdown dataset (Hinglish)
 
-> Status: **tooling ready (`tools/pyq`, 35 tests, synthetic fixtures). Abhi koi asli PDF download nahi hua.** Wajah: is cloud sandbox ka proxy `upsc.gov.in` ko ab bhi 403 deta hai (owner ne "saare domains allowed" bataya, par ye running session mein lagu nahi dikha). Neeche §9.
+> Status (2026-11-01, owner laptop): **fetch works** (99 English PDFs, `www.upsc.gov.in` + `/archives`). **98 of 99 PDFs are image-only, so parsing needs OCR (Tesseract not installed yet).** Only 2023 Prelims GS-I has a text layer (10/~100 questions parsed). Neeche §9 purani cloud-sandbox history hai.
 
 ## 1. Goal
 UPSC ki official site ke saare **previous year question papers** download karke ek **verified, versioned, Markdown dataset** banana:
