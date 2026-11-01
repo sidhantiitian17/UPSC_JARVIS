@@ -150,6 +150,9 @@ _NOISE = [
     re.compile(r"^\s*www\.upsc\.gov\.in\s*$", re.IGNORECASE),
     re.compile(r"^\s*Page\s+\d+(\s+of\s+\d+)?\s*$", re.IGNORECASE),
     re.compile(r"^\s*[A-Z]{3,5}-[A-Z]-[A-Z]{2,5}\b.*$"),  # booklet footer code, e.g. "KSPC-P-GSPO (3-A)"
+    # OCR variants: "BKL-F-GHP/54A", "LVPK-—O-PSO/56A", "B-APM—P-CKB/65A"
+    re.compile(r"^\s*[A-Z]{1,5}(?:[-—–]+[A-Z]{1,5}){2,3}\s*(?:/\s*\d+[A-Z]?)?\s*(?:\([0-9A-Z-]+\))?\s*$"),
+    re.compile(r"^\s*\(\d+-?[A-Z]\)\s*$"),  # footer page mark on its own line, e.g. "(7-A)"
 ]
 
 

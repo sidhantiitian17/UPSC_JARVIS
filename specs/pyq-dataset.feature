@@ -94,7 +94,7 @@ Feature: Official PYQ dataset in Markdown
     Then the statement "3." is not used as the start of question 3
 
   Scenario: A misread option letter fails only its own question
-    Given a question whose options read (a) (b) (c) (a)
+    Given a question whose options read (a) (b) (c) (x)
     When the parser runs
     Then that question is flagged failed and its neighbours are parsed
 
@@ -119,6 +119,23 @@ Feature: Official PYQ dataset in Markdown
     Given option markers read "( d)" or "{b)" and a number reads "I 23."
     When the parser runs
     Then the question is still parsed with its four options
+
+  Scenario: Option markers are recognised by their position in the group, not only by their letter
+    Given four consecutive option lines whose markers read "fa)", "{b)", "jc}" and "(a)"
+    When the parser runs
+    Then the question is parsed with options a, b, c and d in that order
+    But a marker that is no OCR lookalike of its position, such as "(x)", still fails the question
+
+  Scenario: Question numbers that OCR turned into lookalike characters are accepted
+    Given a question number that reads "ll." or "1Z." or "14," followed by the stem
+    When the parser runs
+    Then the number is read as 11, 12 and 14 only if it equals the expected next number
+    But a Roman-numeral statement such as "Il." is never taken for a question number
+
+  Scenario: Booklet footer codes with dashes and page marks are not question text
+    Given footer lines such as "BKL-F-GHP/54A", "LVPK-—O-PSO/56A", "B-APM—P-CKB/65A" and "(7-A)"
+    When the pages are cleaned
+    Then those lines are removed
 
   Scenario: Font-encoded Hindi pages in a text layer are detected by symbol noise
     Given a page whose text is mostly "~" and Latin lookalike words such as "it"

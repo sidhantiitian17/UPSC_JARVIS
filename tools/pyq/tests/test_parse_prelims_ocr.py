@@ -50,7 +50,7 @@ def test_numbered_statement_is_not_taken_for_the_missing_question_number():
 
 
 def test_misread_option_letter_fails_only_its_own_question():
-    d = doc(block(1), block(2, letters="abca"), block(3), block(4))
+    d = doc(block(1), block(2, letters="abcx"), block(3), block(4))
     qs = by_number(d)
     assert sorted(qs) == [1, 2, 3, 4]
     assert qs[2].status == "failed" and "topic 2" in qs[2].raw_text
@@ -117,6 +117,59 @@ def test_exam_instruction_numbers_before_question_one_are_skipped():
     d = doc(instructions, block(1), block(2))
     qs = by_number(d)
     assert sorted(qs) == [1, 2] and "topic 1," in qs[1].stem
+
+
+def test_option_markers_are_matched_by_position_in_the_group():
+    b = block(2)
+    b = [ln.replace("(a)", "fa)").replace("(b)", "{b)").replace("(c)", "jc}").replace("(d)", "(a)") for ln in b]
+    qs = by_number(doc(block(1), b, block(3)))
+    assert qs[2].status == "parsed"
+    assert qs[2].options == {"a": "1 only", "b": "2 only", "c": "Both 1 and 2", "d": "Neither 1 nor 2"}
+
+
+def test_more_real_marker_shapes_are_tolerated():
+    for markers in (("(a)", "(6)", "{¢)", "(dq)"), ("ia fa}", "(b}", "| jc}", "fd)"), ("(a)", "(b)", "(ec)", "(d)")):
+        b = block(2)
+        for old, new in zip(("(a)", "(b)", "(c)", "(d)"), markers, strict=True):
+            b = [ln.replace(old, new) for ln in b]
+        qs = by_number(doc(block(1), b, block(3)))
+        assert qs[2].status == "parsed", markers
+        assert qs[2].options["b"] == "2 only" and qs[2].options["d"] == "Neither 1 nor 2", markers
+
+
+def test_lookalike_question_numbers_are_accepted_only_when_expected():
+    blocks = [block(n) for n in range(1, 15)]
+    blocks[10][0] = blocks[10][0].replace("11.", "ll.", 1)
+    blocks[11][0] = blocks[11][0].replace("12.", "1Z.", 1)
+    blocks[13][0] = blocks[13][0].replace("14.", "14,", 1)
+    qs = by_number(doc(*blocks))
+    assert sorted(qs) == list(range(1, 15))
+    assert all(qs[n].status == "parsed" and f"topic {n}," in qs[n].stem for n in (11, 12, 14))
+
+
+def test_statement_run_with_a_lost_first_number_does_not_start_the_next_question():
+    blocks = [block(n, subs=4 if n == 3 else 0) for n in range(1, 7)]
+    blocks[2] = [ln.replace("1. Claim 1", "k Claim 1") for ln in blocks[2]]  # statement "1." misread as "k"
+    qs = by_number(doc(*blocks))
+    assert sorted(qs) == list(range(1, 7))
+    assert qs[3].status == "parsed" and "Claim 4 about topic 3" in qs[3].stem
+    assert all(qs[n].status == "parsed" and f"topic {n}," in qs[n].stem for n in (4, 5, 6))
+
+
+def test_roman_numeral_statement_is_not_a_question_number():
+    # statement "Il." sits inside question 3's region where "3." is missing; "Il." must not become question 11
+    lines = [ln for b in (block(1), block(2)) for ln in b]
+    lines += ["With reference to topic 3, consider:", "I. First claim", "Il. Second claim", "Which is correct?",
+              "(a) I only", "(b) Il only", "(c) Both I and Il", "(d) Neither", ""]
+    lines += [ln for ln in block(4)]
+    qs = by_number(parse_prelims([PageText(1, "\n".join(lines) + "\n")], year=2024, paper="gs-paper-1"))
+    assert 11 not in qs and qs[3].status == "failed"
+
+
+def test_footer_codes_with_dashes_and_page_marks_are_removed():
+    pages = [PageText(1, "keep a\nBKL-F-GHP/54A\nLVPK-—O-PSO/56A\nB-APM—P-CKB/65A\nHGY-P-JHKI\n(7-A)\nkeep b\n")]
+    text, _ = clean_text(pages)
+    assert text.split() == ["keep", "a", "keep", "b"]
 
 
 def test_booklet_footer_code_is_removed_by_clean_text():
