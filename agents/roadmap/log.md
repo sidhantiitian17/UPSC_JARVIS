@@ -13,3 +13,4 @@ Append-only. One line per event. Never edit past entries.
 | 2026-11-01 | commit-index | recorded hashes for WU-TW-003 and WU-TW-004 |
 | 2026-11-01 | owner-inputs | Hardware recorded (16 GB RAM, Ryzen 5 5600H, GPU model unconfirmed => CPU-first); owner opted in to committing generated PYQ md (raw PDFs stay ignored; repo to be made private after all work; history keeps public-period commits); owner says all domains allowed but running cloud session still gets 403 (checked via curl, httpx and proxy status); SweetClaude pre-flight: plugin installed, project not configured, init not run (needs owner yes) |
 | 2026-11-01 | WU-P00-001 | Fetcher tooling done and tested on synthetic HTML + fake HTTP (9 tests). Status blocked: acceptance needs a real run against upsc.gov.in, which this session cannot reach (proxy 403) |
+| 2026-11-01 | WU-P00-002 | Extractor + scanned detection + language detection + optional OCRmyPDF path; fixture PDFs generated with reportlab (3 tests) |
