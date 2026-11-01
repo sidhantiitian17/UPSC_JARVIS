@@ -149,7 +149,7 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 
 **Ab bache hue sawal (jawab nahi diya to defaults se aage badhenge):**
 1. Prelims ka **target attempt kab** hai? (Backward planner ke liye.)
-2. **PYQ download:** kya aap apne Windows laptop par `uv run pyq run` chalane ko tayyar ho? (`tools/pyq/README` ke commands; cloud se `upsc.gov.in` nahi khulta.)
+2. **PYQ download:** kya aap apne Windows laptop par `uv run pyq run` chalane ko tayyar ho? (commands: `datasets/pyq/README.md`; cloud se `upsc.gov.in` nahi khulta.)
 3. **Laya spike:** laptop par `uv run python -m brain.laya_spike --model english --out laya-spike-report-laptop.json` chalakar JSON bhej sakte ho? (agents/research/laya-spike.md mein steps.)
 4. **SweetClaude:** laptop par Claude Code mein `/plugin marketplace add carson-sweet/sweetclaude@main`, `/plugin install sweetclaude@sweetclaude-stable`, restart, phir `/sweetclaude:init`. Ye aap hi kar sakte ho (user-side commands).
 
