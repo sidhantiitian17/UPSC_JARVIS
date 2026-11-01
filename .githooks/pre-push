@@ -1,0 +1,36 @@
+#!/bin/sh
+set -eu
+
+read_field() {
+  field="$1"
+  awk -v f="$field" '
+    BEGIN { IGNORECASE=1 }
+    {
+      sub(/^[[:space:]]*[-*][[:space:]]*/, "")
+      if (tolower($0) ~ "^"tolower(f)":") {
+        sub(/^[^:]*:[[:space:]]*/, "")
+        gsub(/[[:space:]]+$/, "")
+        print
+        exit
+      }
+    }
+  ' agents/roadmap/ALL.md 2>/dev/null || true
+}
+
+default_branch=$(read_field "Default branch")
+active_phase=$(read_field "Active phase")
+active_wu=$(read_field "Active Work Unit")
+current_branch=$(git branch --show-current)
+
+[ -z "$default_branch" ] && exit 0
+[ "$current_branch" != "$default_branch" ] && exit 0
+
+if [ -n "$active_phase" ] && [ "$active_phase" != "none" ]; then
+  echo "WUR: cannot push default branch while Active phase is $active_phase." >&2
+  exit 1
+fi
+
+if [ -n "$active_wu" ] && [ "$active_wu" != "none" ]; then
+  echo "WUR: cannot push default branch while Active Work Unit is $active_wu." >&2
+  exit 1
+fi
