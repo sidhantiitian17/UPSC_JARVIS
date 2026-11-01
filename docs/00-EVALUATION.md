@@ -142,16 +142,16 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 ## 9. Assumptions aur open questions
 
 **Maine ye maana (galat ho to bolo):**
-- **Hardware (owner ne bataya, 2026-11-01):** Windows, **16 GB RAM**, **AMD Ryzen 5 5600H with Radeon Graphics**, "4 GB GPU" (kaunsa GPU hai, ye confirm nahi: 5600H mein integrated Radeon Vega hota hai; agar alag discrete 4 GB GPU hai to uska model batao). **CUDA maan kar nahi chalenge; CPU-first.** Detail `docs/06` §6.
+- **Hardware (owner ne bataya, 2026-11-01):** 16 GB RAM; GPU: **discrete AMD Radeon RX 5500M (4 GB VRAM, RDNA1)** plus the Ryzen 5 5600H's integrated AMD Radeon Graphics; Windows. 4 GB VRAM mein ~3B (q4) model comfortably fit hota hai; 7–8B (q4, ~4.5–5 GB) poora VRAM mein nahi aayega (partial offload ya CPU). Ollama ke docs (https://docs.ollama.com/gpu) ke hisaab se Windows par AMD ke liye ROCm ya Vulkan hai; RX 5500 XT unki ROCm table mein hai aur RX 5500M shayad wahi gfx1012 hai, par **ye confirm nahi** (docs mein 5500M ka naam nahi mila), to Vulkan sabse sambhavit raasta hai. Do GPU hone se Ollama integrated GPU chun sakta hai: tab discrete wala `GGML_VK_VISIBLE_DEVICES` se chuno (docs ke hisaab se). **Maine kuch chalakar verify nahi kiya.** PyTorch CUDA AMD par nahi hota, to laya default CPU par; ONNX Runtime DirectML sirf experiment. **Policy: CPU-first default; GPU acceleration ek optional experiment hai jo Ollama server log se verify hoga, kabhi requirement nahi.** Detail `docs/06` §6.
 - Sirf aap use karoge (single user). Cloud sync/login nahi.
 - Budget ₹0. Koi paid API/billing enable nahi hogi.
 - Aapke Gemini Pro subscription se API quota milta hai ya nahi, mujhe pakka nahi pata. Meri jaankari mein subscription aur API key alag cheezein hain. Aap apne Google AI Studio account par check kar lena.
 
 **Ab bache hue sawal (jawab nahi diya to defaults se aage badhenge):**
-1. Aapke laptop mein **discrete GPU** hai? Task Manager → Performance → GPU mein naam dekho (sirf "AMD Radeon Graphics" hai ya NVIDIA/AMD alag bhi?).
-2. Prelims ka **target attempt kab** hai? (Backward planner ke liye.)
-3. **Network:** aapne "saare domains allowed" bataya, par ye running session ab bhi block hai. Naya session shuru karoge (ya settings save check karoge)?
-4. **SweetClaude:** is project mein `/sweetclaude:init` chalayein (WUR ke saath do tracking systems ho jayenge), ya skip?
+1. Prelims ka **target attempt kab** hai? (Backward planner ke liye.)
+2. **Network:** aapka screenshot claude.ai ke chat ki setting ("Code execution and file creation") dikhata hai, jo Claude Code ke cloud environment par lagu nahi hoti. Sahi jagah: session ke title bar mein environment menu → Edit → **Network access**. Wahan "Full/Custom" set karke naya session shuru karo.
+3. **SweetClaude:** cloud container mein plugin registered nahi hai (`installed_plugins.json` nahi), isliye uska apna health gate `init` rok deta hai. Aap apne **Windows laptop par** (jahan plugin normally installed hai) repo clone karke `/sweetclaude:init` chala sakte ho.
+4. **Default branch:** GitHub ka default branch abhi `claude/gallant-volta-orla5n` hai; `main` banakar default set karoge?
 
 (Pehle ke sawal "OS", "optional subject", "medium" ab answered hain, upar §1b.)
 
@@ -164,4 +164,4 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 - **n360-engineering:large-feature**: Design → tasks → review gates ka structure (`agents/roadmap/PHASE_*.md`).
 - **design-skills:ux-strategy**: `docs/04-UX-STRATEGY.md`.
 - **novibe**: spec-first Gherkin (`specs/`). Iska interactive interview (ek-ek scenario par aapse puchna) maine skip kiya, kyunki aapne kam manual interaction maanga tha. Phase 2 shuru hone par ye spec aapke saath finalize hoga.
-- **sweetclaude** (2026-11-01 ko dobara check kiya: plugin properly installed hai — `config/phase-skills.yaml`, `rules/interaction-model.md`, `hooks/test-guardian.sh` teeno mile — par `.sweetclaude/state/` nahi hai, `read-state` ne `STATE_NOT_FOUND` diya): ye is project ke liye *configured nahi hai*. Maine `/sweetclaude:init` **jaan-boojh kar nahi chalaya**, kyunki wo apna alag project-management structure banata hai aur WUR ke saath do "source of truth" ho jaate. Aap chaho to baad mein dono ko jod sakte hain.
+- **sweetclaude** (2026-11-01 ko do baar check kiya. Plugin ki files cloud container ke `synced/` folder mein hain, par `~/.claude/plugins/installed_plugins.json` nahi hai, isliye SweetClaude ka apna `preflight.sh` `SC_PLUGIN_OK=false` ("no SweetClaude plugin install found") deta hai aur `init` ka Step-1 gate setup rok deta hai; `doctor` bhi "not configured" par ruk jaata hai. **Owner ne init ki permission di thi, par maine gate bypass nahi kiya** (registry file khud likhna = plugin ke safety check ko dhokha dena). Rasta: Windows laptop par plugin normally installed hai, wahan `/sweetclaude:init` chalao.): ye is project ke liye *configured nahi hai*. Maine `/sweetclaude:init` **jaan-boojh kar nahi chalaya**, kyunki wo apna alag project-management structure banata hai aur WUR ke saath do "source of truth" ho jaate. Aap chaho to baad mein dono ko jod sakte hain.

@@ -272,7 +272,7 @@ flowchart TB
 
 ### ADR-014: Windows-first development
 - **Choice:** Target Windows 10/11 (owner's laptop). Pin Python 3.11/3.12; `uv`; Git for Windows (hooks run via its `sh`); `.gitattributes` forces LF for `.githooks/*` and scripts; paths via `pathlib`/`path` (no hardcoded `/`); `safeStorage` (DPAPI) for secrets; sidecar listens on `127.0.0.1`; OpenPets via named pipe; installers via Electron builder (NSIS) later.
-- **Hardware (owner, 2026-11-01):** 16 GB RAM, Ryzen 5 5600H (integrated Radeon), "4 GB GPU" (unconfirmed). Design for **CPU-only** inference: small local LLM (3–4B q4), laya via CPU, faster-whisper `small`/`base`, MediaPipe on CPU; heavy jobs run **one at a time** (no parallel Whisper + LLM + webcam). GPU acceleration is an optional later experiment, never a requirement.
+- **Hardware (owner, 2026-11-01):** 16 GB RAM; GPU: **discrete AMD Radeon RX 5500M (4 GB VRAM, RDNA1)** plus the Ryzen 5 5600H's integrated AMD Radeon Graphics; Windows. Design for **CPU-first** inference: small local LLM (3–4B q4), laya via CPU, faster-whisper `small`/`base`, MediaPipe on CPU; heavy jobs run **one at a time** (no parallel Whisper + LLM + webcam). GPU acceleration (Vulkan via Ollama, ONNX DirectML) is an optional experiment, never a requirement; see `docs/06` §6 for what is and is not verified.
 - **Why:** CRLF in hook scripts silently breaks Git hooks; Windows path/process differences break naive scripts.
 - **Tradeoff:** Linux-only shortcuts avoided; CI should include a Windows job once code exists (add in WU-P01-007).
 - **Revisit when:** a second OS user appears.
@@ -292,7 +292,7 @@ flowchart TB
 - DO NOT copy code from repositories without an OSI license (`upsc-os`, `UPSC-Star`, `UPSC-Answer-Generator`, `prelimspattern`). Re-implement from the spec instead.
 - DO NOT add LightRAG, Telethon, faster-whisper, MediaPipe, open-browser-use, or an adblocker before the phase that lists them in `agents/roadmap/`.
 - DO NOT use decision heads (laya or baselines) for text generation. Access them only through `DecisionClient` with a rules/LLM fallback, and only for heads the Phase 0 bake-off adopted.
-- DO NOT commit PYQ PDFs or generated PYQ markdown while the repository is public; datasets live in gitignored `datasets/pyq/`. Every PYQ must carry an official `source_url` and `source_sha256`; never use third-party or LLM-generated PYQ sources.
+- DO NOT commit raw PYQ PDFs or any third-party/LLM-generated PYQ source. Generated PYQ markdown/keys/syllabus MAY be committed (owner opt-in 2026-11-01; the repo will be made private after all work, but public-period commits stay in git history). Every PYQ must carry an official `source_url` and `source_sha256`.
 - DO NOT fill an answer key from an LLM. LLM guesses go only in `suggested_answer` (unverified) and are never used for scoring or as gold labels.
 - DO NOT write scripts that assume POSIX paths or LF/CRLF; the target OS is Windows.
 - DO NOT implement any bypass for Telegram protected/forward-restricted content, paywalls, or captchas.

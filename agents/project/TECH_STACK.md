@@ -9,7 +9,7 @@
 - AI: `LLMClient` → OmniRoute (sidecar, `localhost:20128`) | Ollama (`localhost:11434`) | Gemini API (free key)
 - Decision Brain: `DecisionClient` → rules | fastembed+LR baseline | laya (adopted per head after the Phase 0 bake-off); see `docs/06-BRAIN-DECISION-MODEL.md`
 - Companion: OpenPets (external app) via `@open-pets/client` local IPC (Windows named pipe)
-- Hardware: 16 GB RAM, Ryzen 5 5600H (integrated Radeon; discrete GPU unconfirmed) → CPU-first inference
+- Hardware: 16 GB RAM; discrete AMD Radeon RX 5500M (4 GB VRAM, RDNA1) + integrated Radeon; no CUDA → CPU-first inference, GPU acceleration optional (unverified)
 - Platform: Windows 10/11, Python 3.11/3.12, Git for Windows; data tooling in `tools/pyq`, `tools/brain`
 
 ## Decision

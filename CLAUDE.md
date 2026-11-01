@@ -29,7 +29,7 @@ Full spec: `./docs/architecture.md` — read before adding any infrastructure.
 - DO NOT copy code from repositories without an OSI license (`upsc-os`, `UPSC-Star`, `UPSC-Answer-Generator`, `prelimspattern`). Re-implement from the spec instead.
 - DO NOT add LightRAG, Telethon, faster-whisper, MediaPipe, open-browser-use, or an adblocker before the phase that lists them in `agents/roadmap/`.
 - DO NOT use decision heads (laya or baselines) for text generation. Access them only through `DecisionClient` with a rules/LLM fallback, and only for heads the Phase 0 bake-off adopted.
-- DO NOT commit PYQ PDFs or generated PYQ markdown while the repository is public; datasets live in gitignored `datasets/pyq/`. Every PYQ must carry an official `source_url` and `source_sha256`; never use third-party or LLM-generated PYQ sources.
+- DO NOT commit raw PYQ PDFs or any third-party/LLM-generated PYQ source. Generated PYQ markdown/keys/syllabus MAY be committed (owner opt-in 2026-11-01; the repo will be made private after all work, but public-period commits stay in git history). Every PYQ must carry an official `source_url` and `source_sha256`.
 - DO NOT fill an answer key from an LLM. LLM guesses go only in `suggested_answer` (unverified) and are never used for scoring or as gold labels.
 - DO NOT write scripts that assume POSIX paths or LF/CRLF; the target OS is Windows.
 - DO NOT implement any bypass for Telegram protected/forward-restricted content, paywalls, or captchas.
