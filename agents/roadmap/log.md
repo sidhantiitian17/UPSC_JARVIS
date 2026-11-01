@@ -15,3 +15,4 @@ Append-only. One line per event. Never edit past entries.
 | 2026-11-01 | WU-P00-001 | Fetcher tooling done and tested on synthetic HTML + fake HTTP (9 tests). Status blocked: acceptance needs a real run against upsc.gov.in, which this session cannot reach (proxy 403) |
 | 2026-11-01 | WU-P00-002 | Extractor + scanned detection + language detection + optional OCRmyPDF path; fixture PDFs generated with reportlab (3 tests) |
 | 2026-11-01 | WU-P00-003 | Prelims parser + markdown renderer/loader + JSON Schema, spec-first (13 tests incl. numbered-statements ambiguity, failed-segment flagging, substring-of-source). Status blocked: needs real-PDF runs on >=3 years; heuristic accuracy on real layouts is UNVERIFIED |
+| 2026-11-01 | WU-P00-004 | Mains/Essay/Sociology parser (sections, multi-part questions, word limits, marks) with 3 tests on synthetic text. Status blocked: needs real-PDF runs; trailing-number marks heuristic can misread numbers at the end of a stem |
