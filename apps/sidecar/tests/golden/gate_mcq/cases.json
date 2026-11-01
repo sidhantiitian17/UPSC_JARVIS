@@ -1,0 +1,45 @@
+[
+  {
+    "id": "federalism-basic",
+    "task": "gate_mcq",
+    "prompt_version": "v1",
+    "source_text": "The Constitution of India describes India as a Union of States. Parliament may by law form new States and alter the areas, boundaries or names of existing States under Article 3.",
+    "canned": {
+      "question": "Under which Article can Parliament form new States?",
+      "options": ["Article 1", "Article 3", "Article 368", "Article 356"],
+      "answer_index": 1,
+      "source_quote": "Parliament may by law form new States and alter the areas, boundaries or names of existing States under Article 3",
+      "explanation": "Article 3 empowers Parliament to form new States."
+    }
+  },
+  {
+    "id": "fabricated-quote",
+    "task": "gate_mcq",
+    "prompt_version": "v1",
+    "source_text": "The Preamble declares India a sovereign, socialist, secular, democratic republic.",
+    "canned": {
+      "question": "How does the Preamble describe India?",
+      "options": ["Monarchy", "Sovereign republic", "Theocracy", "Colony"],
+      "answer_index": 1,
+      "source_quote": "India is a sovereign democratic republic of 28 states",
+      "explanation": "Made-up quote."
+    },
+    "expect_pass": false,
+    "expect_reason": "source_quote is not verbatim"
+  },
+  {
+    "id": "answer-out-of-range",
+    "task": "gate_mcq",
+    "prompt_version": "v1",
+    "source_text": "Article 14 guarantees equality before law.",
+    "canned": {
+      "question": "Which Article guarantees equality before law?",
+      "options": ["Article 14", "Article 19", "Article 21", "Article 32"],
+      "answer_index": 7,
+      "source_quote": "Article 14 guarantees equality before law",
+      "explanation": "Article 14."
+    },
+    "expect_pass": false,
+    "expect_reason": "answer_index"
+  }
+]

@@ -25,6 +25,7 @@ packages = ["src/jarvis"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["golden: LLM golden-fixture evaluation (offline by default)"]
 
 [tool.ruff]
 line-length = 110
