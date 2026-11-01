@@ -1,0 +1,21 @@
+# Top-level structure of the four GS Mains papers. source: draft = written by the assistant from the
+# publicly known paper structure; the owner must verify against the official syllabus (WU-P02-002/003
+# add micro-themes and the owner review that sets `reviewed: true`).
+version: 1
+nodes:
+  - {id: gs1, title: "GS Paper I", kind: paper, paper: GS1, children: [
+      {id: gs1.culture, title: "Indian Heritage and Culture", kind: subject},
+      {id: gs1.history, title: "History (Modern India and World)", kind: subject},
+      {id: gs1.geography, title: "Geography", kind: subject},
+      {id: gs1.society, title: "Indian Society", kind: subject}]}
+  - {id: gs2, title: "GS Paper II", kind: paper, paper: GS2, children: [
+      {id: gs2.polity, title: "Constitution and Polity", kind: subject},
+      {id: gs2.governance, title: "Governance and Social Justice", kind: subject},
+      {id: gs2.ir, title: "International Relations", kind: subject}]}
+  - {id: gs3, title: "GS Paper III", kind: paper, paper: GS3, children: [
+      {id: gs3.economy, title: "Indian Economy", kind: subject},
+      {id: gs3.environment, title: "Environment and Disaster Management", kind: subject},
+      {id: gs3.scitech, title: "Science and Technology", kind: subject},
+      {id: gs3.security, title: "Internal Security", kind: subject}]}
+  - {id: gs4, title: "GS Paper IV", kind: paper, paper: GS4, children: [
+      {id: gs4.ethics, title: "Ethics, Integrity and Aptitude", kind: subject}]}

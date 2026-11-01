@@ -74,6 +74,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/syllabus/reload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reload */
+        post: operations["reload_syllabus_reload_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/syllabus/tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tree */
+        get: operations["tree_syllabus_tree_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -121,6 +155,15 @@ export interface components {
             /** Secret Name */
             secret_name?: string | null;
         };
+        /** ReloadOut */
+        ReloadOut: {
+            /** Kept Linked */
+            kept_linked: number;
+            /** Pruned */
+            pruned: number;
+            /** Upserted */
+            upserted: number;
+        };
         /** SecretIn */
         SecretIn: {
             /** Value */
@@ -150,6 +193,25 @@ export interface components {
             providers: components["schemas"]["ProviderInfo"][];
             /** Vault Path */
             vault_path: string | null;
+        };
+        /** SyllabusNodeOut */
+        SyllabusNodeOut: {
+            /** Children */
+            children: components["schemas"]["SyllabusNodeOut"][];
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Paper */
+            paper: string | null;
+            /** Parent Id */
+            parent_id: string | null;
+            /** Reviewed */
+            reviewed: boolean;
+            /** Source */
+            source: string;
+            /** Title */
+            title: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -328,6 +390,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reload_syllabus_reload_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReloadOut"];
+                };
+            };
+        };
+    };
+    tree_syllabus_tree_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyllabusNodeOut"][];
                 };
             };
         };

@@ -42,6 +42,11 @@ try {
   check('ten sidebar links', JSON.stringify(hrefs) === JSON.stringify(SCREENS.map((s) => `#/${s}`)))
   await win.click('text=Syllabus')
   check('navigation works', (await win.textContent('h1')) === 'Syllabus')
+  const treeOk = await win
+    .waitForSelector('[role="tree"] >> text=GS Paper I', { timeout: 20000 })
+    .then(() => true)
+    .catch(() => false)
+  check('syllabus tree loads from the real sidecar', treeOk)
   const leak = await win.evaluate(() => ({ req: typeof require, proc: typeof process }))
   check(
     'renderer has no node globals',

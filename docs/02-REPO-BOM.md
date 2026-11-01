@@ -119,3 +119,5 @@
 |---|---|---|---|
 | `actions/checkout` v7.0.1, `actions/setup-node` v7.1.0, `actions/setup-python` v7.1.0 | MIT | Checkout, Node, Python toolchains | P01-007 |
 | `pnpm/action-setup` v6.1.0, `astral-sh/setup-uv` v10.3.3 | MIT | pnpm (version from `packageManager`), uv | P01-007 |
+
+PyYAML (MIT, already listed in G) is also used by the syllabus ontology loader (P02-001). No new packages.

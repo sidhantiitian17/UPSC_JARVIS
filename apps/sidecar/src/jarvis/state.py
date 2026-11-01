@@ -14,6 +14,7 @@ from jarvis.llm.types import Provider
 
 ProviderBuilder = Callable[[RoutingConfig, SecretStore], Mapping[str, Provider]]
 DEFAULT_ROUTING = Path(__file__).resolve().parents[4] / "config" / "routing.yaml"
+DEFAULT_SYLLABUS = Path(__file__).resolve().parents[4] / "config" / "syllabus"
 
 
 class AppState:

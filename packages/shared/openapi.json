@@ -134,6 +134,29 @@
         "title": "ProviderInfo",
         "type": "object"
       },
+      "ReloadOut": {
+        "properties": {
+          "kept_linked": {
+            "title": "Kept Linked",
+            "type": "integer"
+          },
+          "pruned": {
+            "title": "Pruned",
+            "type": "integer"
+          },
+          "upserted": {
+            "title": "Upserted",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "upserted",
+          "pruned",
+          "kept_linked"
+        ],
+        "title": "ReloadOut",
+        "type": "object"
+      },
       "SecretIn": {
         "properties": {
           "value": {
@@ -238,6 +261,71 @@
           "db_version"
         ],
         "title": "SettingsOut",
+        "type": "object"
+      },
+      "SyllabusNodeOut": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/SyllabusNodeOut"
+            },
+            "title": "Children",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "paper": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paper"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "boolean"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "parent_id",
+          "title",
+          "kind",
+          "paper",
+          "reviewed",
+          "source",
+          "children"
+        ],
+        "title": "SyllabusNodeOut",
         "type": "object"
       },
       "ValidationError": {
@@ -462,6 +550,52 @@
           }
         },
         "summary": "Put Settings"
+      }
+    },
+    "/syllabus/reload": {
+      "post": {
+        "operationId": "reload_syllabus_reload_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReloadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Reload",
+        "tags": [
+          "syllabus"
+        ]
+      }
+    },
+    "/syllabus/tree": {
+      "get": {
+        "operationId": "tree_syllabus_tree_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SyllabusNodeOut"
+                  },
+                  "title": "Response Tree Syllabus Tree Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Tree",
+        "tags": [
+          "syllabus"
+        ]
       }
     }
   }
