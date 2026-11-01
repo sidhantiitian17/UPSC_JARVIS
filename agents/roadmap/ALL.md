@@ -43,6 +43,14 @@ Phase gating: do not start Phase 3 until Phase 2 gates A1 (≥40/50 good MCQs) a
 | WU-TW-001 | Evaluation report, architecture, features, BOM, AI strategy, UX strategy, playbook, specs, CLAUDE.md, README | f17a5e8 | docs-only: relative-link check (0 broken), counts re-derived from files |
 | WU-TW-003 | Research docs: Brain/laya (06), PYQ dataset spec (07), repo brainstorm (08) | dc3704b | docs-only; every external fact traced to a command run this session |
 | WU-TW-004 | Phase 0 roadmap, specs, Windows/ADR/rule updates, features/BOM/README/playbook | 6398a24 | docs-only: link check, feature recount |
+| WU-TW-006 | Owner inputs recorded (hardware, dataset opt-in, network, sweetclaude) | 2ee4f35 | docs-only |
+| WU-P00-001 | Manifest-driven polite fetcher | 7fefa2c | 10 tests pass in isolated worktree; status blocked (real-site run) |
+| WU-P00-002 | PDF extraction + scanned/language detection | 1f89979 | 13 cumulative tests pass; ready-for-review |
+| WU-P00-003 | Prelims parser + md renderer + schema | c91e49b | 21 cumulative; status blocked (real PDFs) |
+| WU-P00-004 | Mains/Essay/Sociology parser | 53695a6 | 24 cumulative; status blocked (real PDFs) |
+| WU-P00-005 | Validator + coverage report | d1d313c | 27 cumulative; ready-for-review |
+| WU-P00-006 | Official-only keys + syllabus ingest | e583c78 | 30 cumulative; status blocked (real files) |
+| WU-P00-007 | Review sample + verify + pipeline + CLI | 657c936 | 35 cumulative, ruff clean; ready-for-review |
 
 ## Operating Rules
 - Work in Work Units only. One WU = one commit.
