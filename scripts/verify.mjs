@@ -13,6 +13,7 @@ export const steps = [
   { name: 'js-test', cmd: 'pnpm', args: ['test'], cwd: root },
   { name: 'sidecar-lint', cmd: 'uv', args: ['run', 'ruff', 'check', '.'], cwd: path.join(root, 'apps/sidecar') },
   { name: 'sidecar-test', cmd: 'uv', args: ['run', 'pytest', '-q'], cwd: path.join(root, 'apps/sidecar') },
+  { name: 'workflows', cmd: 'node', args: ['tools/check-workflows.mjs'], cwd: root },
   { name: 'pyq-test', cmd: 'uv', args: ['run', 'pytest', '-q'], cwd: path.join(root, 'tools/pyq') },
   { name: 'brain-test', cmd: 'uv', args: ['run', 'pytest', '-q'], cwd: path.join(root, 'tools/brain') }
 ]

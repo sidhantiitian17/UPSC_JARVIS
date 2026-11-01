@@ -112,3 +112,10 @@
 | `uvicorn`, `httpx` | BSD-3-Clause | ASGI server, HTTP client | P01-001/003 |
 | `openapi-typescript` | MIT | Generates `packages/shared/src/api.d.ts` from the sidecar's OpenAPI | P01-003 |
 | `sqlite-vec` 0.1.9 | MIT OR Apache-2.0 (PyPI metadata) | Vector search inside SQLite (loaded in `connect()`; KNN verified in tests) | P01-004 |
+
+## H. CI Actions (licences read from each repo's LICENSE, 2026-11-01; pinned by commit SHA in `.github/workflows/ci.yml`)
+
+| Action | Licence | Role | WU |
+|---|---|---|---|
+| `actions/checkout` v7.0.1, `actions/setup-node` v7.1.0, `actions/setup-python` v7.1.0 | MIT | Checkout, Node, Python toolchains | P01-007 |
+| `pnpm/action-setup` v6.1.0, `astral-sh/setup-uv` v10.3.3 | MIT | pnpm (version from `packageManager`), uv | P01-007 |
