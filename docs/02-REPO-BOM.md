@@ -104,3 +104,11 @@
 
 `@electron-toolkit/preload` was removed: the preload is now a minimal sandbox-safe bridge.
 
+## G. Sidecar and API tooling (licences read from PyPI/npm, 2026-11-01)
+
+| Package | Licence | Role | WU |
+|---|---|---|---|
+| `fastapi`, `pydantic`, `pyyaml`, `jsonschema`, `hatchling`, `pytest`, `ruff` | MIT | Sidecar framework, validation, build, tests, lint | P01-001/003 |
+| `uvicorn`, `httpx` | BSD-3-Clause | ASGI server, HTTP client | P01-001/003 |
+| `openapi-typescript` | MIT | Generates `packages/shared/src/api.d.ts` from the sidecar's OpenAPI | P01-003 |
+

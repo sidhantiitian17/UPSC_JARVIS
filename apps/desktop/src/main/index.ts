@@ -1,8 +1,35 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import type { ApiRequest, SidecarState } from '@jarvis/shared'
+import { createApiProxy } from './api-proxy'
+import { resolveSidecarCommand, startSidecar, type RunningSidecar } from './sidecar'
+import { realSidecarDeps } from './sidecar-runtime'
+import { isTrustedSender } from './trusted-sender'
 import { isAllowedExternalUrl, secureWebPreferences } from './window-options'
+
+let sidecar: RunningSidecar | null = null
+let proxy: ReturnType<typeof createApiProxy> | null = null
+let sidecarState: SidecarState = { ready: false }
+
+async function bootSidecar(): Promise<void> {
+  try {
+    sidecar = await startSidecar(
+      { ...resolveSidecarCommand(app.getAppPath(), process.env), baseEnv: {} },
+      realSidecarDeps()
+    )
+    proxy = createApiProxy({ baseUrl: sidecar.baseUrl, token: sidecar.token, fetchImpl: fetch })
+    sidecarState = { ready: true }
+  } catch (e) {
+    sidecarState = { ready: false, error: e instanceof Error ? e.message : String(e) }
+  }
+}
+
+function assertTrusted(frameUrl: string | undefined): void {
+  if (!isTrustedSender(frameUrl ?? '', process.env['ELECTRON_RENDERER_URL']))
+    throw new Error('untrusted sender')
+}
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -44,12 +71,25 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  ipcMain.handle('api:request', async (event, req: ApiRequest) => {
+    assertTrusted(event.senderFrame?.url)
+    if (!proxy) return { status: 503, body: { error: 'sidecar-not-ready' } }
+    return proxy(req)
+  })
+  ipcMain.handle('api:status', (event) => {
+    assertTrusted(event.senderFrame?.url)
+    return sidecarState
+  })
+
+  void bootSidecar()
   createWindow()
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+app.on('before-quit', () => sidecar?.stop())
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()

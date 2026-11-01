@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { APP_NAME, SCREENS } from '@jarvis/shared'
+import { SidecarStatus } from './components/sidecar-status'
 import { SCREEN_META } from './screens'
 import { cn } from './lib/utils'
 
@@ -33,6 +34,7 @@ export function Shell(): React.JSX.Element {
         </nav>
       </aside>
       <main className="min-w-0 flex-1 overflow-auto p-8">
+        <SidecarStatus />
         <Outlet />
       </main>
     </div>
