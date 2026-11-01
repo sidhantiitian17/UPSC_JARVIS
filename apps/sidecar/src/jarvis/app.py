@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
-import hmac
+from pathlib import Path
 from typing import Literal
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 
 from jarvis import __version__
+from jarvis.llm.providers import build_providers
+from jarvis.routers import settings as settings_router
+from jarvis.security import MIN_TOKEN_LENGTH, make_token_dependency
+from jarvis.state import AppState, ProviderBuilder
 
-MIN_TOKEN_LENGTH = 16
+__all__ = ["MIN_TOKEN_LENGTH", "Health", "create_app"]
 
 
 class Health(BaseModel):
@@ -18,29 +22,25 @@ class Health(BaseModel):
     version: str
 
 
-def create_app(token: str) -> FastAPI:
-    if len(token) < MIN_TOKEN_LENGTH:
-        raise ValueError(f"token must be at least {MIN_TOKEN_LENGTH} characters")
-
-    def require_token(request: Request) -> None:
-        header = request.headers.get("authorization", "")
-        scheme, _, supplied = header.partition(" ")
-        if (
-            scheme.lower() != "bearer"
-            or not supplied
-            or not hmac.compare_digest(supplied.encode(), token.encode())
-        ):
-            raise HTTPException(
-                status_code=401, detail="unauthorized", headers={"WWW-Authenticate": "Bearer"}
-            )
+def create_app(
+    token: str,
+    *,
+    data_dir: Path | None = None,
+    routing_path: Path | None = None,
+    provider_builder: ProviderBuilder = build_providers,
+) -> FastAPI:
+    require_token = make_token_dependency(token)
+    state = AppState.create(data_dir, routing_path, provider_builder)
 
     # No /docs, /redoc or /openapi.json: nothing is reachable without the token.
     app = FastAPI(
         title="UPSC JARVIS sidecar", version=__version__, docs_url=None, redoc_url=None, openapi_url=None
     )
+    app.state.jarvis = state
 
     @app.get("/health", response_model=Health, dependencies=[Depends(require_token)])
     def health() -> Health:
         return Health(status="ok", version=__version__)
 
+    app.include_router(settings_router.build_router(state), dependencies=[Depends(require_token)])
     return app

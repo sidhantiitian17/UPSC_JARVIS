@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import os
 from collections.abc import Mapping
+from pathlib import Path
 
 import uvicorn
 
@@ -26,8 +27,11 @@ def load_token(env: Mapping[str, str]) -> str:
     return token
 
 
-def build_uvicorn_config(port: int, token: str) -> uvicorn.Config:
-    app = create_app(token)
+def build_uvicorn_config(port: int, token: str, env: Mapping[str, str] | None = None) -> uvicorn.Config:
+    env = os.environ if env is None else env
+    data_dir = Path(env["JARVIS_DATA_DIR"]) if env.get("JARVIS_DATA_DIR") else None
+    routing = Path(env["JARVIS_ROUTING"]) if env.get("JARVIS_ROUTING") else None
+    app = create_app(token, data_dir=data_dir, routing_path=routing)
     return uvicorn.Config(app, host=LOOPBACK, port=port, log_level="warning")
 
 

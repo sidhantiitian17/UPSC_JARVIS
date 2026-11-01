@@ -17,3 +17,10 @@ export async function api<T>(method: ApiMethod, path: string, body?: unknown): P
 }
 
 export const getHealth = (): Promise<components['schemas']['Health']> => api('GET', '/health')
+
+type Schemas = components['schemas']
+
+export const getSettings = (): Promise<Schemas['SettingsOut']> => api('GET', '/settings')
+export const putSettings = (body: Schemas['SettingsIn']): Promise<Schemas['SettingsOut']> =>
+  api('PUT', '/settings', body)
+export const testAi = (): Promise<Schemas['AiTestOut']> => api('POST', '/llm/test')

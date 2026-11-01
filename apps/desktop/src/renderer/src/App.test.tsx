@@ -28,7 +28,7 @@ describe('app shell', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/today/i)
   })
 
-  it.each(SCREENS)(
+  it.each(SCREENS.filter((s) => s !== 'settings'))(
     'screen "%s" has a heading, an empty state and exactly one primary action',
     (id) => {
       renderAt(`/${id}`)

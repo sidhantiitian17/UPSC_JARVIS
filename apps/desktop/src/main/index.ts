@@ -1,9 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, safeStorage, dialog } from 'electron'
+import { existsSync } from 'fs'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import type { ApiRequest, SidecarState } from '@jarvis/shared'
 import { createApiProxy } from './api-proxy'
+import { createSecretStore } from './secret-store'
 import { resolveSidecarCommand, startSidecar, type RunningSidecar } from './sidecar'
 import { realSidecarDeps } from './sidecar-runtime'
 import { isTrustedSender } from './trusted-sender'
@@ -12,14 +14,30 @@ import { isAllowedExternalUrl, secureWebPreferences } from './window-options'
 let sidecar: RunningSidecar | null = null
 let proxy: ReturnType<typeof createApiProxy> | null = null
 let sidecarState: SidecarState = { ready: false }
+let secretStore: ReturnType<typeof createSecretStore> | null = null
+
+async function pushSecretsToSidecar(): Promise<void> {
+  if (!proxy || !secretStore) return
+  for (const [name, value] of Object.entries(secretStore.getAll())) {
+    try {
+      await proxy({ method: 'PUT', path: `/secrets/${name}`, body: { value } })
+    } catch {
+      /* a stale or rejected secret must not stop the app */
+    }
+  }
+}
 
 async function bootSidecar(): Promise<void> {
   try {
+    const baseEnv: Record<string, string> = { JARVIS_DATA_DIR: app.getPath('userData') }
+    const routing = join(app.getAppPath(), '..', '..', 'config', 'routing.yaml')
+    if (existsSync(routing)) baseEnv.JARVIS_ROUTING = routing
     sidecar = await startSidecar(
-      { ...resolveSidecarCommand(app.getAppPath(), process.env), baseEnv: {} },
+      { ...resolveSidecarCommand(app.getAppPath(), process.env), baseEnv },
       realSidecarDeps()
     )
     proxy = createApiProxy({ baseUrl: sidecar.baseUrl, token: sidecar.token, fetchImpl: fetch })
+    await pushSecretsToSidecar()
     sidecarState = { ready: true }
   } catch (e) {
     sidecarState = { ready: false, error: e instanceof Error ? e.message : String(e) }
@@ -79,6 +97,39 @@ app.whenReady().then(() => {
   ipcMain.handle('api:status', (event) => {
     assertTrusted(event.senderFrame?.url)
     return sidecarState
+  })
+
+  secretStore = createSecretStore({ dir: app.getPath('userData'), safeStorage })
+
+  ipcMain.handle('secrets:set', async (event, name: string, value: string) => {
+    assertTrusted(event.senderFrame?.url)
+    if (!secretStore) throw new Error('secret store not ready')
+    secretStore.set(name, value)
+    if (proxy) {
+      const res = await proxy({ method: 'PUT', path: `/secrets/${name}`, body: { value } })
+      if (res.status >= 400) {
+        secretStore.delete(name)
+        throw new Error(`sidecar rejected the secret (HTTP ${res.status})`)
+      }
+    }
+  })
+  ipcMain.handle('secrets:delete', async (event, name: string) => {
+    assertTrusted(event.senderFrame?.url)
+    secretStore?.delete(name)
+    if (proxy) await proxy({ method: 'DELETE', path: `/secrets/${name}` })
+  })
+  ipcMain.handle('secrets:names', (event) => {
+    assertTrusted(event.senderFrame?.url)
+    return secretStore?.names() ?? []
+  })
+  ipcMain.handle('dialog:pickFolder', async (event) => {
+    assertTrusted(event.senderFrame?.url)
+    const win = BrowserWindow.fromWebContents(event.sender)
+    const opts = {
+      properties: ['openDirectory', 'createDirectory'] as ('openDirectory' | 'createDirectory')[]
+    }
+    const res = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
+    return res.canceled ? null : (res.filePaths[0] ?? null)
   })
 
   void bootSidecar()

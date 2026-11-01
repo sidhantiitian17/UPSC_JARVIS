@@ -3,6 +3,7 @@ import { SCREENS } from '@jarvis/shared'
 import { Shell } from './Shell'
 import { NotFound } from './screens/not-found'
 import { ScreenView } from './screens/screen-view'
+import { SettingsScreen } from './screens/settings-screen'
 
 export function AppRoutes(): React.JSX.Element {
   return (
@@ -10,7 +11,11 @@ export function AppRoutes(): React.JSX.Element {
       <Route element={<Shell />}>
         <Route index element={<Navigate to="/today" replace />} />
         {SCREENS.map((id) => (
-          <Route key={id} path={id} element={<ScreenView id={id} />} />
+          <Route
+            key={id}
+            path={id}
+            element={id === 'settings' ? <SettingsScreen /> : <ScreenView id={id} />}
+          />
         ))}
         <Route path="*" element={<NotFound />} />
       </Route>
