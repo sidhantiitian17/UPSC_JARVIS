@@ -34,7 +34,7 @@ Pet, gamification beyond basic XP number, PYQ, Mains, CA, Telegram, browser, int
 ## Work Units
 | ID | Goal | Acceptance | Scope | Deps | Verification | Status | Commit |
 |---|---|---|---|---|---|---|---|
-| WU-P02-001 | Ontology schema + loader + tree view | YAML schema validated; unique ids; loads into `syllabus_node`; tree UI with expand/collapse | `config/syllabus/schema.*`, sidecar syllabus router, `apps/desktop` Syllabus screen | P1 | pytest (schema, uniqueness); UI test | ready-for-review | this commit |
+| WU-P02-001 | Ontology schema + loader + tree view | YAML schema validated; unique ids; loads into `syllabus_node`; tree UI with expand/collapse | `config/syllabus/schema.*`, sidecar syllabus router, `apps/desktop` Syllabus screen | P1 | pytest (schema, uniqueness); UI test | ready-for-review | 609a9ca |
 | WU-P02-002 | Ontology data A: Polity & Governance, Economy, History & Culture | Micro-themes down to leaf nodes; `source: draft` until owner review sets `reviewed: true` | `config/syllabus/*.yaml` | 001 | schema validation; **owner review** (`content-review`) | planned | — |
 | WU-P02-003 | Ontology data B: Geography, Environment, S&T, IR, Security, Society, Ethics, Essay | Same as 002 | `config/syllabus/*.yaml` | 001 | schema validation; **owner review** | planned | — |
 | WU-P02-004 | Library: add PDF + extraction + chunking + FTS | Drag-drop/picker; sha256 dedupe; page text via `pypdfium2` (license verified); chunks with page + offsets; FTS5 index; scanned-PDF detection (warn only) | sidecar library router, `apps/desktop` Library screen | P1 | pytest on fixture PDFs; dedupe test | planned | — |
