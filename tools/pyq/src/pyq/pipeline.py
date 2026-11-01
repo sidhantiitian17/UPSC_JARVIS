@@ -1,9 +1,10 @@
 """Offline stages over an output directory (default datasets/pyq): extract -> parse -> validate -> review."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 
-from pyq.extract import PageText, detect_lang, extract_pdf, is_scanned, load_pages, ocr_pdf, save_pages
+from pyq.extract import PageText, detect_lang, extract_pdf, is_scanned, load_pages, ocr_pages, save_pages
 from pyq.manifest import SourceRecord, load_manifest
 from pyq.models import PaperDoc
 from pyq.parse_mains import parse_mains
@@ -28,20 +29,35 @@ def pages_path(out: Path, rec: SourceRecord) -> Path:
     return (out / rec.local_path).with_suffix(".pages.json")
 
 
-def extract_all(out: Path, ocr: bool = False) -> list[str]:
+def _already_ocred(path: Path, rec: SourceRecord) -> bool:
+    if not path.exists():
+        return False
+    _, info = load_pages(path)
+    return bool(info.get("ocr")) and info.get("source_sha256") == rec.sha256
+
+
+def extract_all(out: Path, ocr: bool = False, ocr_runner: Callable[[Path], str] | None = None,
+                only: str | None = None) -> list[str]:
+    """`only` keeps records whose local_path contains the substring (e.g. "2024/prelims")."""
     notes: list[str] = []
     for rec in _ready(out):
+        if only and only not in rec.local_path.replace("\\", "/"):
+            continue
         pdf = out / rec.local_path
+        target = pages_path(out, rec)
+        if ocr and _already_ocred(target, rec):
+            continue
         pages = extract_pdf(pdf)
         scanned = is_scanned(pages)
+        ocred = False
         if scanned and ocr:
-            ocr_pdf(pdf, pdf.with_suffix(".ocr.pdf"))
-            pages = extract_pdf(pdf.with_suffix(".ocr.pdf"))
+            pages = ocr_pages(pdf, runner=ocr_runner)
+            ocred = True
             scanned = is_scanned(pages)
         if scanned:
-            notes.append(f"{rec.url}: scanned PDF, no text layer (run with --ocr after installing ocrmypdf)")
+            notes.append(f"{rec.url}: scanned PDF, no text layer (run with --ocr after installing tesseract)")
         lang = detect_lang(" ".join(p.text for p in pages[:5])[:5000])
-        save_pages(pages_path(out, rec), pages, scanned=scanned, lang=lang, source_sha256=rec.sha256)
+        save_pages(target, pages, scanned=scanned, ocr=ocred, lang=lang, source_sha256=rec.sha256)
     return notes
 
 

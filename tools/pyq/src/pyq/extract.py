@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
+import tempfile
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -68,12 +71,47 @@ def normalize_ws(s: str) -> str:
     return " ".join(s.split())
 
 
-def ocr_pdf(src: Path, dst: Path) -> None:
-    """Add a text layer to a scanned PDF using OCRmyPDF (must be installed separately)."""
-    exe = shutil.which("ocrmypdf")
-    if not exe:
-        raise ExtractError("ocrmypdf is not installed; see docs/08-REPO-BRAINSTORM.md (OCRmyPDF + Tesseract)")
-    subprocess.run([exe, "--skip-text", str(src), str(dst)], check=True)
+_WINDOWS_TESSERACT = [
+    Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Tesseract-OCR" / "tesseract.exe",
+    Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Tesseract-OCR" / "tesseract.exe",
+]
+OCR_DPI = 300
+
+
+def find_tesseract() -> str:
+    """TESSERACT_CMD, then PATH, then the usual Windows install folders."""
+    env = os.environ.get("TESSERACT_CMD")
+    if env and Path(env).exists():
+        return env
+    found = shutil.which("tesseract")
+    if found:
+        return found
+    for cand in _WINDOWS_TESSERACT:
+        if cand.exists():
+            return str(cand)
+    raise ExtractError("tesseract is not installed (winget install UB-Mannheim.TesseractOCR) or set TESSERACT_CMD")
+
+
+def tesseract_runner(exe: str, lang: str = "eng") -> Callable[[Path], str]:
+    def run(png: Path) -> str:
+        res = subprocess.run([exe, str(png), "stdout", "-l", lang, "--psm", "3"], capture_output=True,
+                             text=True, encoding="utf-8", check=False)
+        if res.returncode != 0:
+            raise ExtractError(f"tesseract failed on {png.name}: {res.stderr.strip()[:200]}")
+        return res.stdout
+    return run
+
+
+def ocr_pages(path: Path, runner: Callable[[Path], str] | None = None, dpi: int = OCR_DPI) -> list[PageText]:
+    """OCR every page of a (scanned) PDF: render to PNG with pdfplumber, read with the Tesseract CLI."""
+    runner = runner or tesseract_runner(find_tesseract())
+    pages: list[PageText] = []
+    with pdfplumber.open(str(path)) as pdf, tempfile.TemporaryDirectory() as tmp:
+        for i, page in enumerate(pdf.pages):
+            png = Path(tmp) / f"page-{i + 1:03d}.png"
+            page.to_image(resolution=dpi).original.save(png)
+            pages.append(PageText(i + 1, runner(png)))
+    return pages
 
 
 _NOISE = [

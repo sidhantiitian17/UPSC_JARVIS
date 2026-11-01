@@ -77,7 +77,8 @@
 | `qdrant/fastembed` | LIBRARY | CPU embeddings, bake-off baseline | Apache-2.0 | metadata | P0/P2 | |
 | `huggingface/setfit` | LIBRARY (bake-off) | Few-shot tagging | Apache-2.0 | metadata | P0 | |
 | `jsvine/pdfplumber` | LIBRARY | PDF text/layout | MIT | metadata | P0/P2 | |
-| `ocrmypdf/OCRmyPDF` + `tesseract-ocr/tesseract` | LIBRARY/tool | Scanned PDF → searchable | MPL-2.0 / Apache-2.0 | metadata | P0/P7 | Windows install effort to verify |
+| `tesseract-ocr/tesseract` (UB-Mannheim Windows build 5.4.0.20240606) | tool (CLI, external) | Scanned PDF page images → text (called via `subprocess`, no Python wrapper) | Apache-2.0 (winget metadata; installer SHA256 verified by winget) | installed + run on owner laptop 2026-11-01 | P0/P7 | OCRmyPDF dropped for now: it also needs Ghostscript (AGPL) which was not approved. Only the `eng` and `osd` traineddata are installed |
+| `ocrmypdf/OCRmyPDF` | LIBRARY (not used) | — | MPL-2.0 | — | — | Not adopted; revisit only if Ghostscript is approved |
 | `adbar/trafilatura` | LIBRARY | Article extraction | Apache-2.0 | metadata | P6 | |
 | `open-spaced-repetition/fsrs-optimizer` | LIBRARY | Personal FSRS params | BSD-3-Clause | metadata | P10 | |
 | `kerrickstaley/genanki` | LIBRARY | Anki `.apkg` export | MIT | metadata | P10 | |

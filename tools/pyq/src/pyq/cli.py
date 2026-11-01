@@ -31,7 +31,7 @@ def cmd_fetch(a) -> int:
 
 
 def cmd_extract(a) -> int:
-    for n in pipeline.extract_all(a.out, ocr=a.ocr):
+    for n in pipeline.extract_all(a.out, ocr=a.ocr, only=a.only):
         print("note:", n)
     return 0
 
@@ -125,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         sp = sub.add_parser(name)
         sp.add_argument("--delay", type=float, default=2.0, help="seconds between requests (min 2.0 recommended)")
         sp.add_argument("--ocr", action="store_true")
+        sp.add_argument("--only", default=None, help="extract only files whose path contains this, e.g. 2024/prelims")
         sp.add_argument("--seed", type=int, default=13)
         sp.add_argument("--fraction", type=float, default=0.10)
         sp.set_defaults(fn=fn)

@@ -50,6 +50,13 @@ Feature: Official PYQ dataset in Markdown
     When the fetcher runs
     Then the manifest records it with lang "hi" and status "skipped"
 
+  Scenario: Scanned PDFs are OCRed page by page when requested
+    Given a PDF without a text layer and Tesseract installed
+    When extraction runs with OCR enabled
+    Then every page gets its text from OCR and keeps its page number
+    And an unchanged file is not OCRed again on the next run
+    And without Tesseract the run fails with an explicit error instead of guessing
+
   Scenario: Two-column pages are read column by column
     Given a PDF page with a left and a right column of questions
     When the text is extracted
