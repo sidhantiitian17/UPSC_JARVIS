@@ -1,0 +1,39 @@
+{
+  "model": "english",
+  "routing_model_used": "english",
+  "env": {
+    "python": "3.13.5",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "machine": "AMD64",
+    "cpu_count": 12
+  },
+  "import_s": 0.97,
+  "first_call_s_includes_download": 112.55,
+  "rss_mb": {
+    "before_load": 41.8,
+    "after_load": 2081.8,
+    "after_runs": 2084.8
+  },
+  "latency_one_question": {
+    "n": 20,
+    "p50_ms": 911.3,
+    "p95_ms": 981.0,
+    "max_ms": 985.4,
+    "mean_ms": 919.4
+  },
+  "zero_shot_smoke": {
+    "subject_6_way": {
+      "n": 36,
+      "accuracy": 0.861,
+      "majority_baseline": 0.167,
+      "random_baseline": 0.167
+    },
+    "directive_10_way": {
+      "n": 30,
+      "accuracy": 0.8,
+      "majority_baseline": 0.1,
+      "random_baseline": 0.1
+    }
+  },
+  "caveat": "hand-written smoke data (not PYQs, not a benchmark); sample too small for conclusions"
+}
