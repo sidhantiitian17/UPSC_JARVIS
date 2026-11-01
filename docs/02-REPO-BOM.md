@@ -90,3 +90,17 @@
 
 > `pypdfium2`: GitHub licence metadata `None` → read the LICENSE file before use (WU-P00-002).
 
+## F. Build dependencies added in Phase 1 (licences read from the npm registry, 2026-11-01)
+
+| Package | Licence | Role | WU |
+|---|---|---|---|
+| `electron-vite` template (`@quick-start/create-electron`), `electron`, `vite`, `react` | MIT (template and tools) | Desktop shell scaffold (existing repo reused, not written from scratch) | P01-001 |
+| `react-router-dom`, `clsx`, `tailwind-merge`, `tailwindcss`, `@tailwindcss/vite` | MIT | Routing, class utilities, styling | P01-002 |
+| `class-variance-authority` | Apache-2.0 | Button variants | P01-002 |
+| `lucide-react` | ISC | Icons | P01-002 |
+| `@fontsource-variable/inter`, `@fontsource/noto-sans-devanagari`, `@fontsource-variable/source-serif-4` | OFL-1.1 (font licence) | Bundled fonts (offline, CSP-safe) | P01-002 |
+| `vitest`, `jsdom`, `@testing-library/{react,jest-dom,user-event}` | MIT | Tests | P01-002 |
+| `playwright-core` | Apache-2.0 | `pnpm e2e` Electron launch check | P01-002 |
+
+`@electron-toolkit/preload` was removed: the preload is now a minimal sandbox-safe bridge.
+

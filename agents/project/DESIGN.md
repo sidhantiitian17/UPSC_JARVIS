@@ -14,6 +14,7 @@
 | `text` | `#E8EAF2` | `#1B1E2B` | Primary text |
 | `text-muted` | `#9AA1BD` | `#5B6178` | Secondary text |
 | `accent` (saffron) | `#F4A340` | `#C97A12` | Primary action, XP |
+| `accent-fg` (text on accent) | `#0F1220` | `#1B1E2B` | Button text; light-theme white failed AA (3.35:1), dark text measured 4.5:1+ in tokens.test.ts |
 | `info` (indigo) | `#6C7CFF` | `#4553D6` | Links, focus ring |
 | `success` / Green tag | `#3FB68B` | `#1F8A64` | Pass, confident ✓ |
 | `warning` / Amber tag | `#E5B13A` | `#A87A0E` | 50-50, caution ◐ |
