@@ -1,0 +1,36 @@
+# Task -> provider ladder (cheapest / most private first). See docs/03-FREE-AI-STRATEGY.md.
+#
+# IMPORTANT: model names below are PLACEHOLDERS. Check what your accounts/installs actually offer
+# (OmniRoute dashboard, Google AI Studio, `ollama list`) and edit them here.
+# Providers of kind `one_time_credit` are disabled unless you set `enabled: true` (no silent paid tiers).
+providers:
+  ollama:
+    type: openai_compat
+    kind: local
+    base_url: http://127.0.0.1:11434/v1
+  omniroute:
+    type: openai_compat
+    kind: recurring_free
+    base_url: http://127.0.0.1:20128/v1
+    api_key_secret: omniroute_key
+  gemini:
+    type: gemini
+    kind: recurring_free
+    api_key_secret: gemini_key
+
+tasks:
+  ping:
+    ladder:
+      - {provider: ollama, model: llama3.2:3b}
+      - {provider: omniroute, model: auto}
+      - {provider: gemini, model: gemini-flash-latest}
+  tag_chunk:
+    ladder:
+      - {provider: ollama, model: llama3.2:3b}
+      - {provider: omniroute, model: auto}
+      - {provider: gemini, model: gemini-flash-latest}
+  gate_mcq:
+    ladder:
+      - {provider: omniroute, model: auto}
+      - {provider: gemini, model: gemini-flash-latest}
+      - {provider: ollama, model: llama3.2:3b}

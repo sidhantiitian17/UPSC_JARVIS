@@ -19,6 +19,7 @@ EXPECTED_TABLES = {
     "review_log",
     "llm_cache",
     "llm_usage",
+    "llm_queue",
     "setting",
 }
 

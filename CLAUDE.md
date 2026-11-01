@@ -40,7 +40,7 @@ Full spec: `./docs/architecture.md` — read before adding any infrastructure.
 - DO NOT run external-site content (webview/browser) with `nodeIntegration`; keep `contextIsolation: true` and `sandbox: true`.
 - ALWAYS write the Gherkin spec in `specs/` before implementing a slice; implement test-first.
 - ALWAYS follow the WUR flow: one Work Unit = one commit, message `WU-P{nn}-{nnn}: ...`.
-- ALWAYS cache LLM responses by `sha256(model+prompt+schema)` and record token usage in the quota ledger.
+- ALWAYS cache LLM responses by `sha256(task+messages+schema+prompt_version)` (provider-independent, so fallback tiers share the cache) and record token usage in the quota ledger.
 - ALWAYS label scores as "practice score", never as "predicted UPSC marks".
 <!-- planfirst:end -->
 
