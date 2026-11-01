@@ -57,6 +57,18 @@ Feature: Official PYQ dataset in Markdown
     And an unchanged file is not OCRed again on the next run
     And without Tesseract the run fails with an explicit error instead of guessing
 
+  Scenario: OCR keeps margin question numbers attached to their stems
+    Given an OCR result where a question number is a separate block left of its first line
+    When the word boxes are rebuilt into lines
+    Then the number and the stem appear on the same line, in reading order
+    And words the OCR is unsure about are dropped instead of kept as junk
+
+  Scenario: Scanned two-column pages are OCRed one column at a time
+    Given a scanned page with a clear vertical gutter
+    When it is OCRed
+    Then the left column text comes before the right column text
+    And a page without a gutter is OCRed whole
+
   Scenario: Two-column pages are read column by column
     Given a PDF page with a left and a right column of questions
     When the text is extracted

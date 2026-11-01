@@ -78,6 +78,7 @@
 | `huggingface/setfit` | LIBRARY (bake-off) | Few-shot tagging | Apache-2.0 | metadata | P0 | |
 | `jsvine/pdfplumber` | LIBRARY | PDF text/layout | MIT | metadata | P0/P2 | |
 | `tesseract-ocr/tesseract` (UB-Mannheim Windows build 5.4.0.20240606) | tool (CLI, external) | Scanned PDF page images → text (called via `subprocess`, no Python wrapper) | Apache-2.0 (winget metadata; installer SHA256 verified by winget) | installed + run on owner laptop 2026-11-01 | P0/P7 | OCRmyPDF dropped for now: it also needs Ghostscript (AGPL) which was not approved. Only the `eng` and `osd` traineddata are installed |
+| `python-pillow/Pillow` 13.0.0 | LIBRARY | Page image crop/resize/border before OCR, gutter detection | MIT-CMU (HPND-style, from package metadata) | installed + used 2026-11-01; was already a transitive dependency of pdfplumber, now declared in tools/pyq/pyproject.toml | P0 | |
 | `ocrmypdf/OCRmyPDF` | LIBRARY (not used) | — | MPL-2.0 | — | — | Not adopted; revisit only if Ghostscript is approved |
 | `adbar/trafilatura` | LIBRARY | Article extraction | Apache-2.0 | metadata | P6 | |
 | `open-spaced-repetition/fsrs-optimizer` | LIBRARY | Personal FSRS params | BSD-3-Clause | metadata | P10 | |

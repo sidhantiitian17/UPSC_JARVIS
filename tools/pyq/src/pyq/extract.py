@@ -7,10 +7,14 @@ import shutil
 import subprocess
 import tempfile
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
 import pdfplumber
+from PIL import Image, ImageOps
+
+from pyq.ocr_layout import find_gutter, is_english_page, tsv_to_text
 
 
 class ExtractError(RuntimeError):
@@ -76,6 +80,11 @@ _WINDOWS_TESSERACT = [
     Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Tesseract-OCR" / "tesseract.exe",
 ]
 OCR_DPI = 300
+OCR_VERSION = 5  # bump when OCR changes so cached pages are redone (1 plain, 2 TSV+columns, 3 gutter+non-English, 4 white border, 5 psm 6 + upscale)
+OCR_WORKERS = max(1, min(4, (os.cpu_count() or 2) // 2))  # Tesseract is single-threaded per process here
+_CUT_PAD = 10  # px of overlap so a margin number at the cut is not clipped
+OCR_BORDER = 60  # px of white around every image sent to Tesseract
+OCR_SCALE = 4 / 3  # upscale before OCR: bold margin digits like "3." are misread as "8." at 300 dpi
 
 
 def find_tesseract() -> str:
@@ -92,25 +101,47 @@ def find_tesseract() -> str:
     raise ExtractError("tesseract is not installed (winget install UB-Mannheim.TesseractOCR) or set TESSERACT_CMD")
 
 
-def tesseract_runner(exe: str, lang: str = "eng") -> Callable[[Path], str]:
+def tesseract_runner(exe: str, lang: str = "eng", dpi: int = OCR_DPI) -> Callable[[Path], str]:
+    """Run Tesseract on one image and rebuild reading-order lines from its word boxes (TSV)."""
     def run(png: Path) -> str:
-        res = subprocess.run([exe, str(png), "stdout", "-l", lang, "--psm", "3"], capture_output=True,
-                             text=True, encoding="utf-8", check=False)
+        res = subprocess.run([exe, str(png), "stdout", "-l", lang, "--psm", "6", "--dpi", str(dpi), "tsv"],
+                             capture_output=True, text=True, encoding="utf-8", check=False,
+                             env={**os.environ, "OMP_THREAD_LIMIT": "1"})
         if res.returncode != 0:
             raise ExtractError(f"tesseract failed on {png.name}: {res.stderr.strip()[:200]}")
-        return res.stdout
+        return tsv_to_text(res.stdout)
     return run
 
 
 def ocr_pages(path: Path, runner: Callable[[Path], str] | None = None, dpi: int = OCR_DPI) -> list[PageText]:
-    """OCR every page of a (scanned) PDF: render to PNG with pdfplumber, read with the Tesseract CLI."""
-    runner = runner or tesseract_runner(find_tesseract())
-    pages: list[PageText] = []
+    """OCR every page of a (scanned) PDF: render to PNG with pdfplumber, read with the Tesseract CLI.
+    Two-column pages (clear vertical gutter) are cut in two and read left column first."""
+    runner = runner or tesseract_runner(find_tesseract(), dpi=round(dpi * OCR_SCALE))
     with pdfplumber.open(str(path)) as pdf, tempfile.TemporaryDirectory() as tmp:
+        jobs: list[list[Path]] = []  # per page: its image file(s), left column first
         for i, page in enumerate(pdf.pages):
-            png = Path(tmp) / f"page-{i + 1:03d}.png"
-            page.to_image(resolution=dpi).original.save(png)
-            pages.append(PageText(i + 1, runner(png)))
+            img = page.to_image(resolution=dpi).original
+            gutter = find_gutter(img)
+            stem = f"page-{i + 1:03d}"
+            if gutter is None:
+                parts = [(stem, img)]
+            else:
+                parts = [(f"{stem}-c1", img.crop((0, 0, gutter, img.height))),
+                         (f"{stem}-c2", img.crop((max(0, gutter - _CUT_PAD), 0, img.width, img.height)))]
+            files = []
+            for name, part in parts:
+                png = Path(tmp) / f"{name}.png"
+                # Tesseract misses glyphs that touch the image border (the margin question numbers)
+                part = part.resize((round(part.width * OCR_SCALE), round(part.height * OCR_SCALE)), Image.Resampling.LANCZOS)
+                ImageOps.expand(part, border=OCR_BORDER, fill="white").save(png)
+                files.append(png)
+            jobs.append(files)
+        with ThreadPoolExecutor(max_workers=OCR_WORKERS) as pool:
+            results = [[pool.submit(runner, f) for f in files] for files in jobs]
+            pages = []
+            for i, futs in enumerate(results):
+                text = "\n".join(f.result() for f in futs)
+                pages.append(PageText(i + 1, text if is_english_page(text) else ""))
     return pages
 
 

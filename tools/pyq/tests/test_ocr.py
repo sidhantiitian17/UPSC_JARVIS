@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import pytest
-from conftest import write_pdf
+from conftest import write_pdf, write_two_column_pdf
 
 from pyq import pipeline
-from pyq.extract import ExtractError, extract_pdf, find_tesseract, load_pages, ocr_pages
+from pyq.extract import ExtractError, extract_pdf, find_tesseract, load_pages, ocr_pages, save_pages
 from pyq.manifest import SourceRecord, save_manifest
 
 
@@ -16,7 +16,7 @@ class FakeRunner:
     def __call__(self, png) -> str:
         assert png.suffix == ".png" and png.stat().st_size > 1000
         self.seen.append(png.name)
-        return f"OCR text for {png.stem} " + "question words " * 10
+        return f"OCR text for {png.stem} " + "Consider the following statements which of the statements is correct " * 3
 
 
 def test_ocr_pages_keeps_page_numbers_and_uses_runner(tmp_path):
@@ -26,6 +26,34 @@ def test_ocr_pages_keeps_page_numbers_and_uses_runner(tmp_path):
     assert [p.number for p in pages] == [1, 2]
     assert all(p.text.startswith("OCR text for") for p in pages)
     assert len(runner.seen) == 2
+
+
+def test_ocr_pages_reads_two_column_pages_one_column_at_a_time(tmp_path):
+    left = [f"L{i} left column line number {i}" for i in range(1, 25)]
+    right = [f"R{i} right column line number {i}" for i in range(1, 25)]
+    pdf = write_two_column_pdf(tmp_path / "two.pdf", [(left, right)])
+    seen: list[str] = []
+
+    def runner(png):
+        seen.append(png.stem)
+        return png.stem
+
+    pages = ocr_pages(pdf, runner=runner)
+    assert sorted(seen) == ["page-001-c1", "page-001-c2"]  # workers may run in any order
+    assert pages[0].text == "page-001-c1\npage-001-c2"  # but the result is always left column first
+
+
+def test_non_english_pages_are_blanked_but_keep_their_number(tmp_path):
+    pdf = write_pdf(tmp_path / "bi.pdf", [[""], [""], [""]])
+    english = "Consider the following statements about the Parliament and which of the statements is correct " * 3
+    junk = "fier aeft fares afeat wad bred art arent eH bert tsa meet ara seat fear fifi PATI SR ST awe att " * 3
+
+    def runner(png):
+        return junk if png.stem == "page-002" else english
+
+    pages = ocr_pages(pdf, runner=runner)
+    assert [p.number for p in pages] == [1, 2, 3]
+    assert pages[0].text and pages[2].text and pages[1].text == ""
 
 
 def test_find_tesseract_fails_loudly_when_missing(monkeypatch):
@@ -55,6 +83,17 @@ def test_extract_all_ocr_is_cached_for_unchanged_files(tmp_path):
     assert info["ocr"] is True and info["scanned"] is False and "OCR text" in pages[0].text
     pipeline.extract_all(tmp_path, ocr=True, ocr_runner=runner)
     assert len(runner.seen) == 2  # second run reused the cache
+
+
+def test_extract_all_redoes_ocr_made_by_an_older_algorithm(tmp_path):
+    rel = _scanned_manifest(tmp_path, write_pdf)
+    runner = FakeRunner()
+    pipeline.extract_all(tmp_path, ocr=True, ocr_runner=runner)
+    target = (tmp_path / rel).with_suffix(".pages.json")
+    pages, info = load_pages(target)
+    save_pages(target, pages, **{**info, "ocr_version": 0})
+    pipeline.extract_all(tmp_path, ocr=True, ocr_runner=runner)
+    assert len(runner.seen) == 4  # 2 pages OCRed twice
 
 
 def test_extract_all_only_filter_limits_files(tmp_path):
