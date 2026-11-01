@@ -111,4 +111,4 @@
 | `fastapi`, `pydantic`, `pyyaml`, `jsonschema`, `hatchling`, `pytest`, `ruff` | MIT | Sidecar framework, validation, build, tests, lint | P01-001/003 |
 | `uvicorn`, `httpx` | BSD-3-Clause | ASGI server, HTTP client | P01-001/003 |
 | `openapi-typescript` | MIT | Generates `packages/shared/src/api.d.ts` from the sidecar's OpenAPI | P01-003 |
-
+| `sqlite-vec` 0.1.9 | MIT OR Apache-2.0 (PyPI metadata) | Vector search inside SQLite (loaded in `connect()`; KNN verified in tests) | P01-004 |
