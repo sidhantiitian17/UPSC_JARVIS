@@ -41,8 +41,8 @@ Phase gating: do not start Phase 3 until Phase 2 gates A1 (≥40/50 good MCQs) a
 |---|---|---|---|
 | WU-TW-000 | Bootstrap agents/ workspace, WUR hooks, phases 1–10 | 24112e0 | hooks smoke-tested (commit-msg accept/reject) |
 | WU-TW-001 | Evaluation report, architecture, features, BOM, AI strategy, UX strategy, playbook, specs, CLAUDE.md, README | f17a5e8 | docs-only: relative-link check (0 broken), counts re-derived from files |
-| WU-TW-003 | Research docs: Brain/laya (06), PYQ dataset spec (07), repo brainstorm (08) | see git log | docs-only; every external fact traced to a command run this session |
-| WU-TW-004 | Phase 0 roadmap, specs, Windows/ADR/rule updates, features/BOM/README/playbook | see git log | docs-only: link check, feature recount |
+| WU-TW-003 | Research docs: Brain/laya (06), PYQ dataset spec (07), repo brainstorm (08) | dc3704b | docs-only; every external fact traced to a command run this session |
+| WU-TW-004 | Phase 0 roadmap, specs, Windows/ADR/rule updates, features/BOM/README/playbook | 6398a24 | docs-only: link check, feature recount |
 
 ## Operating Rules
 - Work in Work Units only. One WU = one commit.

@@ -10,3 +10,4 @@ Append-only. One line per event. Never edit past entries.
 | 2026-11-01 | commit-index | recorded hashes for WU-TW-000 and WU-TW-001 |
 | 2026-11-01 | research | laya inspected (README/BENCHMARKS/finetune/structured, PyPI 0.4.20); OpenPets cli/mcp/ipc/plugins docs read; upsc.gov.in blocked by egress policy (403); 40 repos batch-verified via GitHub API; repo is public, default branch is the feature branch |
 | 2026-11-01 | roadmap | Phase 0 added; Sociology ontology WU in P2; OpenPets + ActivityWatch in P3; P4 consumes P0 dataset; ADR-013/014 + 3 agent rules; .gitattributes (LF hooks) and dataset gitignore |
+| 2026-11-01 | commit-index | recorded hashes for WU-TW-003 and WU-TW-004 |
