@@ -71,7 +71,7 @@
 
 | Repo | Label | Role | License (GitHub API) | Verified | Phase | Note |
 |---|---|---|---|---|---|---|
-| `NandhaKishorM/laya` | LIBRARY (evaluate) | Decision Brain heads | Apache-2.0 (code); **weights licence unverified** (HF unreachable) | **inspected** (README, BENCHMARKS, docs), PyPI 0.4.20, ★34,782 | P0 | Zero-shot ≈ chance → fine-tune; bake-off decides (`docs/06`) |
+| `NandhaKishorM/laya` | LIBRARY (evaluate) | Decision Brain heads | Apache-2.0 (code) **and weights** (HF model-card metadata, verified 2026-11-01) | **inspected** (README, BENCHMARKS, docs), PyPI 0.4.20, ★34,782; **installed + run on sandbox CPU** (`agents/research/laya-spike.md`) | P0 | Bake-off decides per head (`docs/06`) |
 | `OpenPetsHQ/openpets` | SIDECAR | Pet (**confirmed**) | MIT | **inspected** (README, cli/mcp/ipc/plugins docs) | P3 | Windows signed installer; `@open-pets/client` named-pipe IPC |
 | `ActivityWatch/activitywatch` | SIDECAR (evaluate) | Focus Guard data | MPL-2.0 | metadata | P3 | Windows behaviour to verify in spike |
 | `qdrant/fastembed` | LIBRARY | CPU embeddings, bake-off baseline | Apache-2.0 | metadata | P0/P2 | |

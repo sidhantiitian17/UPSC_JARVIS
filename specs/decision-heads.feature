@@ -20,15 +20,20 @@ Feature: Decision heads with measured model selection
     And laya is adopted for that head only if it beats the baseline by at least 3 macro-F1 points
     Or has equal F1 with half the calibration error
 
-  Scenario: Latency budget
+  Scenario: Latency budget for interactive heads
+    Given a head that runs while the user waits
     When a decision runs on the owner's Windows laptop CPU
     Then it completes within 300 milliseconds
     Or the head uses the baseline instead
 
+  Scenario: Batch heads report throughput instead of latency
+    Given a head that runs at ingest time
+    Then the bake-off reports decisions per second and no per-decision latency limit applies
+
   Scenario: Hierarchical tagging respects option limits
-    Given the syllabus tree has more than 32 siblings at some level
+    Given the syllabus tree has more than 20 siblings at some level
     When the tree is prepared for a head
-    Then siblings are grouped so every question has at most 32 options
+    Then siblings are grouped so every question has at most 20 options
 
   Scenario: Low confidence is escalated
     Given a decision with confidence below the head's threshold

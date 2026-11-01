@@ -1,0 +1,39 @@
+{
+  "model": "english",
+  "routing_model_used": "english",
+  "env": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v185-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "cpu_count": 4
+  },
+  "import_s": 0.11,
+  "first_call_s_includes_download": 28.16,
+  "rss_mb": {
+    "before_load": 42.8,
+    "after_load": 2167.6,
+    "after_runs": 2173.9
+  },
+  "latency_one_question": {
+    "n": 20,
+    "p50_ms": 521.0,
+    "p95_ms": 598.0,
+    "max_ms": 741.4,
+    "mean_ms": 526.7
+  },
+  "zero_shot_smoke": {
+    "subject_6_way": {
+      "n": 36,
+      "accuracy": 0.861,
+      "majority_baseline": 0.167,
+      "random_baseline": 0.167
+    },
+    "directive_10_way": {
+      "n": 30,
+      "accuracy": 0.8,
+      "majority_baseline": 0.1,
+      "random_baseline": 0.1
+    }
+  },
+  "caveat": "hand-written smoke data (not PYQs, not a benchmark); sample too small for conclusions"
+}

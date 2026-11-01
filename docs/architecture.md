@@ -266,7 +266,7 @@ flowchart TB
 
 ### ADR-013: Decision Brain = laya heads, but only after a measured bake-off
 - **Choice:** `DecisionClient` (rules | baseline | laya | LLM) per head. Phase 0: laya Windows spike, bake-off (fastembed+LR vs SetFit vs laya vs LLM teacher), gold set = owner-verified official PYQs, training set = teacher-labelled book chunks. Adopt laya per head iff ≥ 3 macro-F1 points over baseline or equal F1 with half the ECE, and ≤ 300 ms CPU latency.
-- **Why:** Laya zero-shot ≈ chance on typed decisions (its own docs); benchmarks are author-reported; weights licence and Windows CPU latency are unverified. A measured decision beats a hunch.
+- **Why:** Laya zero-shot ≈ chance on typed decisions (its own docs); benchmarks are author-reported; weights licence is Apache-2.0 (verified on the HF model cards); Windows CPU latency is still unmeasured on the owner's laptop (cloud-sandbox spike: p50 521 ms, 2.17 GB RSS). A measured decision beats a hunch.
 - **Tradeoff:** Phase 0 effort before the Brain is used; some heads will stay on simple baselines.
 - **Revisit when:** laya releases a materially better checkpoint, or after 3 months of dogfood data (personalised heads).
 

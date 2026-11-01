@@ -14,14 +14,14 @@ Pichle evaluation (`00-EVALUATION.md` row 5) mein maine likha tha ki "JEV koi re
 | Baat | Detail | Source |
 |---|---|---|
 | Type | **Non-autoregressive "System 1" decision engine.** Text *generate nahi karta*; ek forward pass mein typed decision deta hai. | README |
-| Answer types | `choice` (≤ **32** options), `noul` (yes/no probability), `score` (≤ **10** levels) | `docs/structured.md` (`MAX_OPTIONS=32`, `MAX_SCORE_LEVELS=10`) |
+| Answer types | `choice` (hard limit ≤ **32** options, par **model card kehta hai ~20 se kam rakho**: options 256-token head budget share karte hain), `noul` (yes/no probability), `score` (≤ **10** levels) | `docs/structured.md`, HF model card (typed-decisions) |
 | Size | English aur typed-decisions checkpoints ≈ **421M** parameters; multilingual ≈ **322M** | README (Model setup) |
 | Speed (author ka claim) | ~33 ms, 1 question, T4 GPU. **CPU/Windows laptop latency unmeasured** | BENCHMARKS.md |
 | Languages | English + multilingual checkpoint (100+ languages) | README |
 | Windows | Windows PowerShell instructions + `start.bat`; Windows + Python 3.14 crash fix 0.3.7 mein | README |
 | Package | PyPI `laya` **0.4.20** (maine `pip index` se verify kiya); extras: `serve`, `mcp`, `onnx`, … | PyPI |
 | Code license | **Apache-2.0** | LICENSE |
-| Weights | Hugging Face Hub par. **Weights ka license maine verify nahi kiya**, kyunki sandbox se HF reachable nahi (HTTP 000). Public karne se pehle model card padhna | — |
+| Weights | Hugging Face Hub. **License: Apache-2.0** (model-card metadata of `laya`, `laya-multilingual`, `laya-typed-decisions`; HF API se verify, 2026-11-01). `laya-typed-decisions` ka `model.safetensors` = **842.6 MB**. Original `laya` checkpoint ke base-model/training-data ka license maine **check nahi kiya** | HF API |
 | Popularity | ★34,782, last push 2026-11-01 (GitHub API) | GitHub |
 | Fine-tune | `laya-train` (CSV/JSONL, CPU/CUDA/MPS) + Kaggle **2×T4 free** notebook | `docs/finetune.md` |
 
@@ -32,14 +32,27 @@ Laya ke apne docs (`docs/finetune.md`) kehte hain: typed-decisions par base chec
 
 Is-liye plan sirf "laya install karo" nahi, balki **"data banao → bake-off → fine-tune"** hai.
 
+## 2b. Spike result (2026-11-01, **cloud sandbox, aapka laptop nahi**) — `agents/research/laya-spike.md`
+| Cheez | Measured | Matlab |
+|---|---|---|
+| Install | `laya==0.4.20` + CPU torch 2.15, Python 3.12, Linux; install ~1 min | Windows par abhi nahi chala |
+| Download + first call | 28 s (5 files; 842 MB-class weights) | HF reachable hai ab |
+| RAM after load | **2,168 MB** | 16 GB laptop par theek, par 2 GB budget se thoda upar |
+| Latency (1 question, 6 options) | p50 **521 ms**, p95 598 ms, 4-core Xeon 2.8 GHz | 300 ms interactive budget **fail** (is machine par) |
+| Zero-shot smoke: subject 6-way | **86.1%** (n=36; random 16.7%) | simple topic classification par base checkpoint acchha chala |
+| Zero-shot smoke: directive 10-way | **80.0%** (n=30; random 10%) | regex isse behtar hoga |
+| Warning | "checkpoint ships invalid temperatures…; treat confidence as uncalibrated" | confidence ko **refit** karna padega |
+
+**Correction:** upar §2 mein "zero-shot lagbhag chance" laya ke **typed-decisions benchmark** ke baare mein hai (unke docs ke hisaab se). Simple, lexically-aasaan classification par ye overstate tha. Fine-tuning ab bhi zaroori hone ki sambhavna **mushkil heads** par hai (600+ micro-themes, trap flags, grounding), par ye bake-off se tay hoga, assumption se nahi. **Caveat:** 66 items maine khud likhe (PYQ nahi, benchmark nahi); is size par ±10–15 points ka noise normal hai.
+
 ## 3. JARVIS ke "Decision Heads" (jahan laya fit hota hai)
 
 | # | Head | Type | Options/levels | Kaam | Kab banega |
 |---|---|---|---|---|---|
-| H1 | `syllabus_node` | choice, **hierarchical** (paper→subject→topic→micro-theme; har level ≤ 32) | ≤ 32 per level | chunk / PYQ / CA item ko syllabus node se jodna | P2 (data) → P4 |
+| H1 | `syllabus_node` | choice, **hierarchical** (paper→subject→topic→micro-theme; har level **≤ ~20**) | ≤ ~20 per level | chunk / PYQ / CA item ko syllabus node se jodna | P2 (data) → P4 |
 | H2 | `grounded` | noul | yes/no | "kya ye answer iss `source_quote` se supported hai?" (MCQ validation) | P2 |
 | H3 | `upsc_relevance` | score | 0–4 | CA item / YouTube title / Telegram file kitna relevant | P6, P8 |
-| H4 | `directive` | choice | ~12 directives | Mains question ka directive (Discuss, Critically examine…) → structure template | P5 |
+| H4 | `directive` | **rules (regex pe stem ka pehla directive shabd)**, laya zaroori nahi | ~12 directives | Mains question ka directive → structure template. Spike ne dikhaya ki laya yahan ~80% (n=30) deta hai jabki regex trivially behtar hoga | P5 |
 | H5 | `trap_flag` | noul × k | per-trap | extreme modifier, word-substitution, contradiction pair (**aapke hit-rate ke saath measure hoga**) | P4 |
 | H6 | `pyq_format` | choice | statement / match / assertion-reason / direct | question format | P4 |
 | H7 | `mistake_type` | choice | Conceptual / Revision / Silly / Over-elimination | aapke galat jawab ka auto-suggest (aap confirm karoge) | P4+ |
@@ -48,7 +61,7 @@ Is-liye plan sirf "laya install karo" nahi, balki **"data banao → bake-off →
 
 **Rule:** har head ke peeche ek **`DecisionClient`** interface hoga. Backend options: (a) simple rules, (b) baseline classifier, (c) laya, (d) LLM teacher. Jo head bake-off jeete, wahi use hoga (section 5).
 
-**Hierarchical tagging kyun:** laya ek question mein ≤ 32 options leta hai, aur syllabus mein 600+ micro-themes honge. Isliye 3–4 level ka tree: har level par ≤ 32 siblings.
+**Hierarchical tagging kyun:** laya ek question mein ≤ 32 options leta hai, aur syllabus mein 600+ micro-themes honge. Isliye 3–4 level ka tree: har level par **≤ ~20 siblings** (model card ki recommendation; 32 sirf hard limit hai).
 
 ## 4. Training data plan (honest numbers)
 
@@ -81,7 +94,7 @@ Aapne kaha "research karke best dhoondo ya fine-tune plan karo." Sach ye hai ki 
 **Decision rule (hypothesis, pehle se likha taaki post-hoc na ho):**
 1. Head ke liye **laya adopt** hoga agar macro-F1 baseline A se **≥ 3 points** behtar ho, **ya** F1 barabar ho par ECE aadha ho.
 2. Warna **baseline A** (simple, halka). Laya "Add Later".
-3. Latency: CPU par ek decision **≤ 300 ms** (UI block nahi hona chahiye) aur RAM ≤ 2 GB resident. Fail → ONNX/`max_loaded=1`/ya baseline.
+3. Latency: **interactive** heads (user ke samne, jaise gate-time grounding) par CPU decision **≤ 300 ms** aur RAM ≤ 2 GB; **batch/ingest-time** heads (tagging, relevance) par per-decision latency ki limit nahi, throughput report hogi. Fail → ONNX/`max_loaded=1`/ya baseline. (**Sandbox spike: p50 521 ms, 2.17 GB RSS, 4-core Xeon** → interactive budget fail; aapke laptop par measure hona baaki hai.)
 4. Agar laya ≥ 3 heads par jeete → laya ko "Decision Brain" ke roop mein ek hi service mein chalayenge (multi-head advantage).
 
 (3 points / 300 ms / 2 GB — ye **starting hypotheses** hain, tuned data ke baad badal sakte hain.)
@@ -108,7 +121,7 @@ Aapne kaha "research karke best dhoondo ya fine-tune plan karo." Sach ye hai ki 
 | Risk | Detail | Mitigation |
 |---|---|---|
 | Benchmarks author ke apne hain | 0.766 / 33 ms / "Jev se behtar" sab self-reported; Jev numbers third-party, unmeasured | Hamara bake-off hi final |
-| Weights license unverified | HF unreachable yahan se | WU-P00-008 mein model card padho; public distribution se pehle verify |
+| ~~Weights license unverified~~ → **resolved** | Apache-2.0 (HF API, 2026-11-01) | Sirf original-`laya` ke base model/training data ka license abhi unchecked; public distribution se pehle model card padho |
 | Single-maintainer, fast-moving | 0.4.20, bahut releases | Version pin; `DecisionClient` ke peeche swap |
 | Windows CPU latency unmeasured | 421M params | Spike; ONNX/baseline fallback |
 | Label noise (teacher LLM) | galat labels | Human-verified gold set; agreement report |
