@@ -108,6 +108,23 @@ Feature: Official PYQ dataset in Markdown
     When the pages are cleaned
     Then the footer line is removed
 
+  Scenario: A completely lost question does not shift the later numbers
+    Given question 5 is missing from the text entirely
+    And question 6 is followed by a confirming question 7
+    When the parser runs
+    Then questions 6, 7 and 8 keep their own numbers
+    But a misread number that the next question does not confirm is not accepted as a jump
+
+  Scenario: Garbled option markers and junk before a number are tolerated
+    Given option markers read "( d)" or "{b)" and a number reads "I 23."
+    When the parser runs
+    Then the question is still parsed with its four options
+
+  Scenario: Font-encoded Hindi pages in a text layer are detected by symbol noise
+    Given a page whose text is mostly "~" and Latin lookalike words such as "it"
+    When the pages are checked
+    Then the page is treated as not English and blanked
+
   Scenario: Failed segments are flagged, never silently repaired
     Given one question's text cannot be segmented
     When the parser runs

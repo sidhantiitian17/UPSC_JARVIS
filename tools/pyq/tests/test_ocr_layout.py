@@ -96,6 +96,17 @@ def test_english_page_detection():
     assert is_english_page(HINDI_AS_JUNK) is False
 
 
+def test_garbled_text_layer_with_enough_stopword_lookalikes_is_still_non_english():
+    # real 2023 Hindi pages: font-encoded text, many "~", and Latin lookalikes such as "it" that pass a word check
+    garbled = ("59. ~ ~ ~ it ~ the ~ ~ is ~ ~ of ~ 1R ~ and ~ ~ to ~ ~ in ~ ~ ~ fcRR ~ ~ are ~ ~ ~ for ~ ~ "
+               "with ~ ~ ~ which ~ ~ ~ ~ by ~ ~ ~ on ~ ~ ") * 4
+    assert is_english_page(garbled) is False
+
+
+def test_english_page_with_a_few_table_bars_stays_english():
+    assert is_english_page(ENGLISH_PAGE + " Waterfall | Region | River | Malwa | Narmada") is True
+
+
 def test_short_or_empty_pages_are_not_judged_as_non_english():
     assert is_english_page("") is True
     assert is_english_page("KSPC-P-GSPO (3-A)") is True

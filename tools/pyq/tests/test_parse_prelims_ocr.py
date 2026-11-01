@@ -66,6 +66,29 @@ def test_misread_larger_number_does_not_shift_the_following_questions():
     assert all(qs[n].status == "parsed" and f"topic {n}," in qs[n].stem for n in (1, 2, 3, 4, 6, 7))
 
 
+def test_a_completely_lost_question_does_not_shift_later_numbers_when_the_next_one_confirms():
+    qs = by_number(doc(*[block(n) for n in (1, 2, 3, 4, 6, 7, 8)]))  # question 5 is gone entirely
+    assert sorted(qs) == [1, 2, 3, 4, 6, 7, 8]
+    assert all(q.status == "parsed" for q in qs.values())
+    assert "topic 6," in qs[6].stem
+
+
+def test_a_misread_number_that_the_next_question_does_not_confirm_is_not_a_jump():
+    blocks = [block(n) for n in range(1, 8)]
+    blocks[3][0] = blocks[3][0].replace("4.", "9.", 1)  # Q4 read as "9." and Q5 is still "5."
+    qs = by_number(doc(*blocks))
+    assert sorted(qs) == list(range(1, 8)) and qs[4].status == "failed"
+    assert all(qs[n].status == "parsed" for n in (5, 6, 7))
+
+
+def test_garbled_option_markers_and_number_junk_are_tolerated():
+    b = block(2)
+    b = [ln.replace("(d)", "( d)").replace("(b)", "{b)") for ln in b]
+    b[0] = "I " + b[0]
+    qs = by_number(doc(block(1), b, block(3)))
+    assert qs[2].status == "parsed" and qs[2].options["d"] == "Neither 1 nor 2" and qs[2].options["b"] == "2 only"
+
+
 def test_question_with_an_empty_option_is_failed():
     d = doc(block(1), block(2, options=("1 only", "", "Both 1 and 2", "Neither 1 nor 2")), block(3))
     qs = by_number(d)

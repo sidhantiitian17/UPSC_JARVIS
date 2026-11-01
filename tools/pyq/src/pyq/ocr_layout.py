@@ -80,6 +80,8 @@ _STOPWORDS = frozenset(
      "also", "have", "has", "had", "can", "may", "will", "shall", "would", "should", "one", "all", "any"]
 )
 _WORD = re.compile(r"[A-Za-z]{2,}")
+_NOISE_CHARS = frozenset("~^`{}<>")
+_MAX_NOISE_SHARE = 0.05
 _MIN_TOKENS_TO_JUDGE = 25
 _MIN_STOPWORD_SHARE = 0.12
 
@@ -87,6 +89,9 @@ _MIN_STOPWORD_SHARE = 0.12
 def is_english_page(text: str) -> bool:
     """False for pages that are not English (e.g. the Hindi pages of a bilingual booklet, which the English
     OCR model turns into Latin-looking junk with almost no real English words). Short pages are not judged."""
+    chars = [c for c in text if not c.isspace()]
+    if chars and sum(c in _NOISE_CHARS for c in chars) / len(chars) > _MAX_NOISE_SHARE:
+        return False  # font-encoded Hindi text layers are full of "~" (21-29% on real pages, English < 0.3%)
     tokens = [t.lower() for t in _WORD.findall(text)]
     if len(tokens) < _MIN_TOKENS_TO_JUDGE:
         return True

@@ -15,13 +15,15 @@ import re
 from pyq.extract import PageText, clean_text, page_for
 from pyq.models import PaperDoc, Question, base_meta, make_id
 
-_OPT = re.compile(r"^\s*\(([a-d])\)\s*(.*)$")
-_NUM = re.compile(r"^\s*(\d{1,3})\.\s+(\S.*)$")
+# Text layers and OCR garble the markers: "( d)", "{b)", ".( d)" and junk before numbers: "I 23."
+_OPT = re.compile(r"^[\s.'|]*[(\[{]\s*([a-d])\s*[)\]}]\s*(.*)$")
+_NUM = re.compile(r"^\s*(?:[Il|'.,]\s+)?(\d{1,3})\.\s+(\S.*)$")
 _MARKS = re.compile(r"carries?\s+(\d+(?:\.\d+)?)\s+marks?", re.IGNORECASE)
 _LETTERS = "abcd"
 _MAX_GROUP_SPAN = 60  # lines between (a) and (d)
 _Q1_WINDOW = 1500  # Question 1 must start within this many characters of its first option
 _MAX_TAIL_LINES = 4  # wrapped lines allowed after option (d)
+_MAX_RESYNC = 3  # a number may skip ahead by this many, but only if the NEXT question confirms it
 
 
 def clean_block(s: str) -> str:
@@ -139,12 +141,20 @@ def parse_prelims(pages: list[PageText], year: int, paper: str) -> PaperDoc:
         return q
 
     questions: list[Question] = []
+    groups = _find_groups(lines)
     lo, expected, force_fail = 0, 1, False
-    for k, (a, b, c, d) in enumerate(_find_groups(lines)):
+    for k, (a, b, c, d) in enumerate(groups):
         if k == 0:
             lo = _first_question_lo(lines, a)
-        starts = _starts(lines, lo, a, expected)
         tail, after, ambiguous = _tail(lines, d)
+        starts = _starts(lines, lo, a, expected)
+        if not starts and k + 1 < len(groups):  # a whole question may be lost: resync only if the next one confirms
+            for j in range(1, _MAX_RESYNC + 1):
+                cand = _starts(lines, lo, a, expected + j)
+                nxt = _starts(lines, d + 1 if ambiguous else after, groups[k + 1][0], cand[-1][1] + 1) if cand else []
+                if cand and nxt:
+                    starts = cand
+                    break
         for (s, v), (s2, _) in itertools.pairwise(starts):  # earlier starts: questions without options
             questions.append(failed(v, s, lines[s:s2]))
         if starts:
