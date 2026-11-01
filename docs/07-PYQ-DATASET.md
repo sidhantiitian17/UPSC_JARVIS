@@ -1,6 +1,6 @@
 # PYQ Dataset — official UPSC site se Markdown dataset (Hinglish)
 
-> Status: **spec + plan. Abhi koi PDF download nahi hua.** Wajah: is cloud sandbox ka network policy `upsc.gov.in` ko block karta hai (HTTP 403 on CONNECT; maine retry/bypass nahi kiya). Neeche §9 mein 2 raste hain.
+> Status: **tooling ready (`tools/pyq`, 35 tests, synthetic fixtures). Abhi koi asli PDF download nahi hua.** Wajah: is cloud sandbox ka proxy `upsc.gov.in` ko ab bhi 403 deta hai (owner ne "saare domains allowed" bataya, par ye running session mein lagu nahi dikha). Neeche §9.
 
 ## 1. Goal
 UPSC ki official site ke saare **previous year question papers** download karke ek **verified, versioned, Markdown dataset** banana:
@@ -20,7 +20,7 @@ UPSC ki official site ke saare **previous year question papers** download karke 
 |---|---|
 | **Aapka GitHub repo PUBLIC hai** (API se verify: `visibility: public`) | PYQ PDFs ya dataset md ko public repo mein commit karna = redistribution. UPSC ki content/copyright policy maine **padhi nahi** (site blocked). |
 | Raw PDFs | **Kabhi commit nahi.** `datasets/pyq/raw/` hamesha `.gitignore`. |
-| Generated md dataset | **Default: `.gitignore`** (local-only). Aap tab commit karna chaho jab (a) repo private karo, ya (b) UPSC ki policy padhkar tay karo. Toggle: `.gitignore` ki ek line. |
+| Generated md dataset | **Owner ne opt-in kiya (2026-11-01):** md/keys/syllabus/reports commit honge; owner sab kaam ke baad repo **private** karega. **Dhyan:** public rehte waqt jo commit hua wo git history/forks/caches mein rehta hai, private karne se purana copy gayab nahi hota. Agar ye matter karta hai to dataset commits hata kar history rewrite karni padegi. UPSC policy ab bhi padhi nahi gayi. |
 | Fetcher behaviour | `robots.txt` padhe, `User-Agent` apna naam batayega, **kam rate** (≥ 2 s delay, 1 connection), resume, **koi login/captcha bypass nahi** |
 | Personal use | Padhai ke liye local copy; third-party ko redistribute nahi |
 
@@ -29,8 +29,8 @@ UPSC ki official site ke saare **previous year question papers** download karke 
 datasets/pyq/
   README.md                       # kaise chalayein, status
   manifest.jsonl                  # 1 line / source PDF (git-tracked: sirf URLs+hash, content nahi)
-  raw/                            # PDFs — gitignored
-  md/                             # generated dataset — gitignored by default (§3)
+  raw/                            # PDFs — gitignored (never committed)
+  md/                             # generated dataset — committed (owner opt-in, §3)
     prelims/2024/gs-paper-1.md
     prelims/2024/csat.md
     mains/2024/gs-1.md  gs-2.md  gs-3.md  gs-4.md  essay.md
@@ -181,7 +181,7 @@ tags: []
 
 ## 9. Blocker aur do raste
 
-**Blocker:** `upsc.gov.in` is cloud sandbox se unreachable (`CONNECT tunnel failed, response 403` — environment ki network policy). Sirf GitHub (api, raw, git) reachable hai. Maine ise bypass nahi kiya.
+**Blocker (2026-11-01, dobara check kiya):** `upsc.gov.in`, `huggingface.co`, `pib.gov.in`, `ncert.nic.in` sab par `CONNECT tunnel failed, response 403`; proxy status endpoint mein bhi inhi hosts ke `connect_rejected` entries hain. Sirf GitHub (api, raw, git) aur PyPI/npm reachable hain. Owner ne bataya ki saare domains allowed hain, to sambhavna hai ki setting **naye session/container mein hi lagu hoti hai** (ya save nahi hui). Naya session shuru karke `uv run pyq fetch` yahin chal jayega. Maine ise bypass nahi kiya.
 
 | Rasta | Kaise | Tradeoff |
 |---|---|---|

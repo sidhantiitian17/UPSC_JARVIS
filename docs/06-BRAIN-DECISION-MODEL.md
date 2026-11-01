@@ -92,7 +92,8 @@ Aapne kaha "research karke best dhoondo ya fine-tune plan karo." Sach ye hai ki 
 - Pehle **sidecar ke andar** (Python `laya` package) run. ONNX / `laya-ts` (Electron mein seedha) baad mein, agar latency chahiye.
 - Models lazy-load, `Router(max_loaded=1)` (RAM bachane ke liye).
 - First download ke liye internet (Hugging Face) chahiye. Aapke laptop par hoga, hamare cloud sandbox mein nahi.
-- **RAM/GPU abhi pata nahi** (aapne sirf "Windows" bataya). 8 GB par 421M params theek hona chahiye, par **unverified** hai. Spike mein measure hoga.
+- **Hardware (owner):** 16 GB RAM, Ryzen 5 5600H (integrated Radeon Vega), "4 GB GPU" (model unconfirmed). **Mera andaaza (unverified, spike mein measure hoga):** laya (≈ 421M params) 16 GB par comfortably fit hona chahiye; AMD integrated GPU par PyTorch/CUDA acceleration par bharosa nahi karenge, to **CPU-first** (ONNX Runtime CPU; DirectML sirf experiment). Fine-tuning laptop par nahi, **Kaggle free 2×T4** par (aapke docs ke hisaab se wahi notebook hai).
+- **Local LLM (Ollama):** 16 GB mein 3–4B (q4) model comfortable aur interactive; 7–8B (q4, ~5 GB) chal sakta hai par CPU par dheema hoga (batch/raat ke jobs ke liye). Ollama ka AMD acceleration generally supported discrete Radeon cards ke liye hota hai; integrated Vega par acceleration ki ummeed mat rakho (verify nahi kiya).
 
 ## 7. Spike aur fine-tune: Work Units
 (`agents/roadmap/PHASE_0.md` mein)

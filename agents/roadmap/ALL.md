@@ -15,7 +15,7 @@ UPSC JARVIS: a local-first, zero-cost, gamified desktop study OS for one UPSC as
 - Active phase: none
 - Active Work Unit: none
 - Latest completed unit: none
-- Blockers: (1) `upsc.gov.in` unreachable from the cloud sandbox (egress policy 403) — owner to allow it or run Phase 0 locally; (2) GitHub default branch is currently `claude/gallant-volta-orla5n` (no `main` exists) — owner to create `main` and set it default (not done by agent: pushing other branches is not permitted); (3) repo is public → PYQ dataset stays gitignored until owner decides. Open questions: `docs/00-EVALUATION.md` §9
+- Blockers: (1) `upsc.gov.in`, `huggingface.co`, `pib.gov.in`, `ncert.nic.in` still 403 from the running cloud session although owner says all domains are allowed (policy likely applies to new sessions) — start a fresh session or run `uv run pyq run` locally; (1b) SweetClaude plugin installed but project not configured (init not run: needs owner yes; it would add a second tracking system next to WUR); (2) GitHub default branch is currently `claude/gallant-volta-orla5n` (no `main` exists) — owner to create `main` and set it default (not done by agent: pushing other branches is not permitted); (3) repo is public: owner opted in (2026-11-01) to committing generated PYQ md (raw PDFs stay ignored) and will make the repo private after all work — history keeps anything committed meanwhile. Open questions: `docs/00-EVALUATION.md` §9
 
 ## Phases
 | Phase | Goal | Status | File | Contract |

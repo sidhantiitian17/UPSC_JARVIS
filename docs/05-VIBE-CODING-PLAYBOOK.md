@@ -16,7 +16,7 @@
 | 1 | **Node.js 20+** aur **pnpm** install | Electron/React |
 | 2 | **Python 3.11+** aur **uv** install | Sidecar |
 | 3 | **Git** | Version control |
-| 4 | **Ollama** install, phir ek chhota model pull karo (3–4B parameters ke aas-paas, Ollama library mein jo current recommended ho) | Offline fallback |
+| 4 | **Ollama** install, phir ek chhota model pull karo. Aapke **16 GB RAM, CPU-only** laptop ke liye **3–4B (q4)** interactive rahega; 7–8B q4 bhi chalega par CPU par dheema (raat ke batch jobs). Exact model naam Ollama library mein jo current recommended ho | Offline fallback |
 | 5 | `npm install -g omniroute` phir `omniroute` chalao, dashboard (`localhost:20128`) mein **sirf free providers** connect karo, **billing kisi par enable mat karna** | Free AI gateway |
 | 6 | **Google AI Studio** se free API key lo | Mains vision (T3) |
 | 7 | Ek coding agent chuno: **Claude Code**, **Antigravity (Gemini Pro)**, ya **OpenCode** | App banane ke liye |

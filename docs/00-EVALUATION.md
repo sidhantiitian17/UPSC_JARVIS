@@ -142,16 +142,16 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 ## 9. Assumptions aur open questions
 
 **Maine ye maana (galat ho to bolo):**
-- OS: **Windows** (confirmed). RAM/GPU **abhi unknown**. Maine 8 GB+ RAM aur GPU nahi maana hai; local LLM chhota (3–4B) aur laya (≈ 421M params) ka fit spike mein measure hoga.
+- **Hardware (owner ne bataya, 2026-11-01):** Windows, **16 GB RAM**, **AMD Ryzen 5 5600H with Radeon Graphics**, "4 GB GPU" (kaunsa GPU hai, ye confirm nahi: 5600H mein integrated Radeon Vega hota hai; agar alag discrete 4 GB GPU hai to uska model batao). **CUDA maan kar nahi chalenge; CPU-first.** Detail `docs/06` §6.
 - Sirf aap use karoge (single user). Cloud sync/login nahi.
 - Budget ₹0. Koi paid API/billing enable nahi hogi.
 - Aapke Gemini Pro subscription se API quota milta hai ya nahi, mujhe pakka nahi pata. Meri jaankari mein subscription aur API key alag cheezein hain. Aap apne Google AI Studio account par check kar lena.
 
 **Ab bache hue sawal (jawab nahi diya to defaults se aage badhenge):**
-1. Laptop ki **RAM aur GPU** (agar hai)? (laya, Whisper aur local LLM ka size isi par depend karta hai.)
+1. Aapke laptop mein **discrete GPU** hai? Task Manager → Performance → GPU mein naam dekho (sirf "AMD Radeon Graphics" hai ya NVIDIA/AMD alag bhi?).
 2. Prelims ka **target attempt kab** hai? (Backward planner ke liye.)
-3. **Network:** kya aap cloud environment mein `upsc.gov.in` allow karoge (recommended), ya dataset aapke laptop par chalayenge? (`docs/07-PYQ-DATASET.md` §9)
-4. **Dataset publishing:** repo public hai. Repo private karoge, ya dataset local-only rakhenge? (default: local-only)
+3. **Network:** aapne "saare domains allowed" bataya, par ye running session ab bhi block hai. Naya session shuru karoge (ya settings save check karoge)?
+4. **SweetClaude:** is project mein `/sweetclaude:init` chalayein (WUR ke saath do tracking systems ho jayenge), ya skip?
 
 (Pehle ke sawal "OS", "optional subject", "medium" ab answered hain, upar §1b.)
 
@@ -164,4 +164,4 @@ Poori table `docs/02-REPO-BOM.md` mein hai.
 - **n360-engineering:large-feature**: Design → tasks → review gates ka structure (`agents/roadmap/PHASE_*.md`).
 - **design-skills:ux-strategy**: `docs/04-UX-STRATEGY.md`.
 - **novibe**: spec-first Gherkin (`specs/`). Iska interactive interview (ek-ek scenario par aapse puchna) maine skip kiya, kyunki aapne kam manual interaction maanga tha. Phase 2 shuru hone par ye spec aapke saath finalize hoga.
-- **sweetclaude**: ye is project ke liye *configured nahi hai*. Maine `/sweetclaude:init` **jaan-boojh kar nahi chalaya**, kyunki wo apna alag project-management structure banata hai aur WUR ke saath do "source of truth" ho jaate. Aap chaho to baad mein dono ko jod sakte hain.
+- **sweetclaude** (2026-11-01 ko dobara check kiya: plugin properly installed hai — `config/phase-skills.yaml`, `rules/interaction-model.md`, `hooks/test-guardian.sh` teeno mile — par `.sweetclaude/state/` nahi hai, `read-state` ne `STATE_NOT_FOUND` diya): ye is project ke liye *configured nahi hai*. Maine `/sweetclaude:init` **jaan-boojh kar nahi chalaya**, kyunki wo apna alag project-management structure banata hai aur WUR ke saath do "source of truth" ho jaate. Aap chaho to baad mein dono ko jod sakte hain.

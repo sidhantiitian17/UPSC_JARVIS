@@ -272,6 +272,7 @@ flowchart TB
 
 ### ADR-014: Windows-first development
 - **Choice:** Target Windows 10/11 (owner's laptop). Pin Python 3.11/3.12; `uv`; Git for Windows (hooks run via its `sh`); `.gitattributes` forces LF for `.githooks/*` and scripts; paths via `pathlib`/`path` (no hardcoded `/`); `safeStorage` (DPAPI) for secrets; sidecar listens on `127.0.0.1`; OpenPets via named pipe; installers via Electron builder (NSIS) later.
+- **Hardware (owner, 2026-11-01):** 16 GB RAM, Ryzen 5 5600H (integrated Radeon), "4 GB GPU" (unconfirmed). Design for **CPU-only** inference: small local LLM (3–4B q4), laya via CPU, faster-whisper `small`/`base`, MediaPipe on CPU; heavy jobs run **one at a time** (no parallel Whisper + LLM + webcam). GPU acceleration is an optional later experiment, never a requirement.
 - **Why:** CRLF in hook scripts silently breaks Git hooks; Windows path/process differences break naive scripts.
 - **Tradeoff:** Linux-only shortcuts avoided; CI should include a Windows job once code exists (add in WU-P01-007).
 - **Revisit when:** a second OS user appears.

@@ -68,7 +68,6 @@ Feature: Official PYQ dataset in Markdown
     When the pipeline is run again without source changes
     Then the generated md files have identical hashes
 
-  Scenario: Public repository safety
-    Given the repository is public
-    Then raw PDFs are gitignored
-    And generated md files are gitignored unless the owner opts in
+  Scenario: Repository safety
+    Then raw PDFs are always gitignored
+    And generated md files are committed only after the owner's explicit opt-in is recorded in the roadmap log
