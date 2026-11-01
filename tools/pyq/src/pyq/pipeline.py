@@ -16,6 +16,7 @@ from pyq.extract import (
 )
 from pyq.manifest import SourceRecord, load_manifest
 from pyq.models import PaperDoc
+from pyq.ocr_layout import is_english_page
 from pyq.parse_mains import parse_mains
 from pyq.parse_prelims import parse_prelims
 from pyq.render import load_md, md_path, render_md
@@ -54,7 +55,7 @@ def extract_all(out: Path, ocr: bool = False, ocr_runner: Callable[[Path], str] 
             continue
         pdf = out / rec.local_path
         target = pages_path(out, rec)
-        if ocr and _already_ocred(target, rec):
+        if _already_ocred(target, rec):  # never downgrade existing OCR text, with or without --ocr
             continue
         pages = extract_pdf(pdf)
         scanned = is_scanned(pages)
@@ -63,9 +64,11 @@ def extract_all(out: Path, ocr: bool = False, ocr_runner: Callable[[Path], str] 
             pages = ocr_pages(pdf, runner=ocr_runner)
             ocred = True
             scanned = is_scanned(pages)
-        blank = [p.number for p in pages if not p.text.strip()] if ocred else []
+        if not scanned and not ocred:  # text layer: Hindi pages of a bilingual booklet come out garbled
+            pages = [PageText(p.number, p.text if is_english_page(p.text) else "") for p in pages]
+        blank = [p.number for p in pages if not p.text.strip()] if (ocred or not scanned) else []
         if blank:
-            notes.append(f"{rec.url}: {len(blank)} page(s) blank or not English after OCR (e.g. Hindi pages): {blank[:12]}")
+            notes.append(f"{rec.url}: {len(blank)} page(s) blank or not English (e.g. Hindi pages): {blank[:12]}")
         scanned = scanned and not (ocred and len(blank) < len(pages))
         if scanned:
             notes.append(f"{rec.url}: scanned PDF, no text layer (run with --ocr after installing tesseract)")

@@ -85,6 +85,14 @@ def test_extract_all_ocr_is_cached_for_unchanged_files(tmp_path):
     assert len(runner.seen) == 2  # second run reused the cache
 
 
+def test_extract_without_ocr_never_overwrites_existing_ocr_text(tmp_path):
+    rel = _scanned_manifest(tmp_path, write_pdf)
+    pipeline.extract_all(tmp_path, ocr=True, ocr_runner=FakeRunner())
+    pipeline.extract_all(tmp_path)  # plain re-extract of an image-only PDF must not wipe the OCR result
+    pages, info = load_pages((tmp_path / rel).with_suffix(".pages.json"))
+    assert info["ocr"] is True and "OCR text" in pages[0].text
+
+
 def test_extract_all_redoes_ocr_made_by_an_older_algorithm(tmp_path):
     rel = _scanned_manifest(tmp_path, write_pdf)
     runner = FakeRunner()
@@ -94,6 +102,21 @@ def test_extract_all_redoes_ocr_made_by_an_older_algorithm(tmp_path):
     save_pages(target, pages, **{**info, "ocr_version": 0})
     pipeline.extract_all(tmp_path, ocr=True, ocr_runner=runner)
     assert len(runner.seen) == 4  # 2 pages OCRed twice
+
+
+def test_garbled_non_english_pages_of_a_text_layer_pdf_are_blanked(tmp_path):
+    rel = "raw/2023/prelims/gs-paper-1-abc12345.pdf"
+    english = ["Consider the following statements about the Parliament and which of the statements is correct"] * 6
+    junk = ["~ ~ qitan mq fir.n cJIT 1$ OMR aA3ffi q;i7it XDTG-F-GST fcrcroJT ~ t1T ~ ~ lfffi CfiT"] * 6
+    (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+    write_pdf(tmp_path / rel, [english, junk, english])
+    save_manifest(tmp_path / "manifest.jsonl", [SourceRecord(
+        url="https://www.upsc.gov.in/x.pdf", exam="cse", year=2023, phase="prelims", category="", title="t",
+        paper="gs-paper-1", lang="en", status="downloaded", sha256="00", bytes=1, retrieved_at="t", local_path=rel)])
+    notes = pipeline.extract_all(tmp_path)
+    pages, info = load_pages((tmp_path / rel).with_suffix(".pages.json"))
+    assert [bool(p.text.strip()) for p in pages] == [True, False, True]
+    assert info["blank_pages"] == [2] and any("not English" in n for n in notes)
 
 
 def test_extract_all_only_filter_limits_files(tmp_path):

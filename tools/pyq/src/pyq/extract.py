@@ -80,7 +80,7 @@ _WINDOWS_TESSERACT = [
     Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Tesseract-OCR" / "tesseract.exe",
 ]
 OCR_DPI = 300
-OCR_VERSION = 5  # bump when OCR changes so cached pages are redone (1 plain, 2 TSV+columns, 3 gutter+non-English, 4 white border, 5 psm 6 + upscale)
+OCR_VERSION = 6  # bump when OCR changes so cached pages are redone (1 plain, 2 TSV+columns, 3 gutter+non-English, 4 white border, 5 psm 6 + upscale, 6 layout gaps as blank lines)
 OCR_WORKERS = max(1, min(4, (os.cpu_count() or 2) // 2))  # Tesseract is single-threaded per process here
 _CUT_PAD = 10  # px of overlap so a margin number at the cut is not clipped
 OCR_BORDER = 60  # px of white around every image sent to Tesseract
@@ -149,6 +149,7 @@ _NOISE = [
     re.compile(r"^\s*Test Booklet Series\b", re.IGNORECASE),
     re.compile(r"^\s*www\.upsc\.gov\.in\s*$", re.IGNORECASE),
     re.compile(r"^\s*Page\s+\d+(\s+of\s+\d+)?\s*$", re.IGNORECASE),
+    re.compile(r"^\s*[A-Z]{3,5}-[A-Z]-[A-Z]{2,5}\b.*$"),  # booklet footer code, e.g. "KSPC-P-GSPO (3-A)"
 ]
 
 

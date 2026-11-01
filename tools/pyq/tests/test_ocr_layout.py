@@ -31,6 +31,14 @@ def test_lines_are_in_vertical_order():
     assert tsv_to_text(data).splitlines() == ["first line", "later"]
 
 
+def test_large_vertical_gap_becomes_a_blank_line_and_even_spacing_does_not():
+    even = tsv(*[row(1, i, 1, 10, 20 + 25 * i, f"line{i}") for i in range(5)])
+    assert "" not in tsv_to_text(even).splitlines()
+    gap = tsv(row(1, 1, 1, 10, 20, "a"), row(1, 2, 1, 10, 45, "b"), row(1, 3, 1, 10, 70, "c"),
+              row(2, 1, 1, 10, 150, "d"), row(2, 2, 1, 10, 175, "e"))
+    assert tsv_to_text(gap).splitlines() == ["a", "b", "c", "", "d", "e"]
+
+
 def test_low_confidence_words_are_dropped():
     data = tsv(row(1, 1, 1, 10, 20, "Which", conf=95), row(1, 1, 2, 80, 20, "xq#z", conf=12),
                row(1, 1, 3, 150, 20, "one", conf=91))

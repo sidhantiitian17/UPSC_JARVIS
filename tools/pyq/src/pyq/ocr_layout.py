@@ -6,6 +6,7 @@ word boxes by vertical position puts the number back on the line it belongs to.
 """
 from __future__ import annotations
 
+import itertools
 import re
 from statistics import median
 
@@ -13,6 +14,7 @@ from PIL import Image
 
 MIN_CONF = 30.0  # words below this are junk (e.g. Hindi read by the English model)
 _LINE_TOLERANCE = 0.6  # of the median word height
+_GAP_FACTOR = 1.6  # a vertical gap above this many median line pitches is emitted as a blank line
 _GUTTER_WINDOW = (0.35, 0.65)  # where a two-column gutter may sit (share of page width)
 _MIN_GUTTER_SHARE = 0.015
 _EMPTY_INK = 0.25  # a column is "empty" below this share of the strongest ink (margin numbers are faint)
@@ -59,7 +61,16 @@ def tsv_to_text(tsv: str) -> str:
         else:
             lines.append([w])
             centres.append(cy)
-    return "\n".join(" ".join(x["text"] for x in sorted(ln, key=lambda x: x["left"])) for ln in lines)
+    texts = [" ".join(x["text"] for x in sorted(ln, key=lambda x: x["left"])) for ln in lines]
+    if len(centres) < 3:
+        return "\n".join(texts)
+    pitch = median(b - a for a, b in itertools.pairwise(centres))
+    out = [texts[0]]
+    for gap, text in zip((b - a for a, b in itertools.pairwise(centres)), texts[1:], strict=True):
+        if pitch > 0 and gap > _GAP_FACTOR * pitch:
+            out.append("")  # layout gap: question / paragraph boundary
+        out.append(text)
+    return "\n".join(out)
 
 
 _STOPWORDS = frozenset(

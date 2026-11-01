@@ -82,6 +82,32 @@ Feature: Official PYQ dataset in Markdown
     And each question has four options a to d
     And each question text is a substring of the extracted page text
 
+  Scenario: One missing or misread question number does not derail the rest
+    Given OCR text where the number of one question was not recognised
+    When the parser runs
+    Then that question is flagged failed with its raw text
+    And every other question is still parsed with its own number, stem and four options
+
+  Scenario: A numbered statement is not taken for a missing question number
+    Given a question whose own number is missing and whose statements are numbered 1 to 4
+    When the parser runs
+    Then the statement "3." is not used as the start of question 3
+
+  Scenario: A misread option letter fails only its own question
+    Given a question whose options read (a) (b) (c) (a)
+    When the parser runs
+    Then that question is flagged failed and its neighbours are parsed
+
+  Scenario: A wrapped last option stays together and ends at the layout gap
+    Given option (d) wraps over two lines and a blank line follows
+    When the parser runs
+    Then option d holds both lines and the next stem is not part of it
+
+  Scenario: Page footer codes are not question text
+    Given a booklet footer such as "KSPC-P-GSPO (3-A)" between questions
+    When the pages are cleaned
+    Then the footer line is removed
+
   Scenario: Failed segments are flagged, never silently repaired
     Given one question's text cannot be segmented
     When the parser runs
