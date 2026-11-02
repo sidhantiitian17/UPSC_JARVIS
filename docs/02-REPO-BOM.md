@@ -73,7 +73,10 @@
 |---|---|---|---|---|---|---|
 | `NandhaKishorM/laya` | LIBRARY (evaluate) | Decision Brain heads | Apache-2.0 (code) **and weights** (HF model-card metadata, verified 2026-11-01) | **inspected** (README, BENCHMARKS, docs), PyPI 0.4.20, ★34,782; **installed + run on sandbox CPU** (`agents/research/laya-spike.md`) | P0 | Bake-off decides per head (`docs/06`) |
 | `OpenPetsHQ/openpets` | SIDECAR | Pet (**confirmed**) | MIT | **inspected** (README, cli/mcp/ipc/plugins docs) | P3 | Windows signed installer; `@open-pets/client` named-pipe IPC |
-| `ActivityWatch/activitywatch` | SIDECAR (evaluate) | Focus Guard data | MPL-2.0 | metadata | P3 | Windows behaviour to verify in spike |
+| `ActivityWatch/activitywatch` | SIDECAR (rejected for now) | Focus Guard data | MPL-2.0 | Tauri 0.14.1 Windows build installed and run on owner laptop 2026-11-02 (SHA-256 matches release digest; installer NotSigned): server never starts (`database is locked`, reproduced on a fresh DB, cause unknown). Classic build not tried | P3 | Replaced by `active-win` in ADR-015; still installed, autostart entry removed |
+| `OpenPetsHQ/openpets` v4.1.0 (Windows installer) | SIDECAR | Pet app | MIT (repo); Hoodie Cat sprite licence **not verified** | installed + IPC-tested on owner laptop 2026-11-02; SHA-256 equals release digest; Authenticode Valid (SignPath Foundation) | P3 | `agents/research/pet-focusguard-spike.md` |
+| `@open-pets/client` 4.1.0 | LIBRARY | Named-pipe IPC client for the pet | MIT (`npm view`) | installed with `--ignore-scripts` in a scratch folder, 0 vulnerabilities; `hello/status/react/say` run against the app | P3 | Pin exactly; wrap in `PetClient` |
+| `active-win` 9.0.0 | LIBRARY | Foreground window title/app/path for Focus Guard | MIT (`npm view`) | run on owner laptop 2026-11-02 (2 ms/call after first); install script downloads a prebuilt binary from the project's GitHub release; `npm audit`: moderate `minimatch` DoS (GHSA-g3hv-75wg-m249) in install-time deps | P3 | Not added to the repo yet; add in WU-P03-005 |
 | `qdrant/fastembed` | LIBRARY | CPU embeddings, bake-off baseline | Apache-2.0 | metadata | P0/P2 | |
 | `huggingface/setfit` | LIBRARY (bake-off) | Few-shot tagging | Apache-2.0 | metadata | P0 | |
 | `jsvine/pdfplumber` | LIBRARY | PDF text/layout | MIT | metadata | P0/P2 | |

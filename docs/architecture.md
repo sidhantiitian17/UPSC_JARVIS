@@ -277,6 +277,13 @@ flowchart TB
 - **Tradeoff:** Linux-only shortcuts avoided; CI should include a Windows job once code exists (add in WU-P01-007).
 - **Revisit when:** a second OS user appears.
 
+### ADR-015: Pet = OpenPets over its local named-pipe IPC; Focus Guard = `active-win`
+- **Choice:** Desktop main talks to the OpenPets desktop app (4.1.0, MIT, signed installer) through `@open-pets/client`, wrapped behind our own `PetClient` so only one file knows the protocol. Message rules: `say` ≤ 140 characters, reactions only from the client's `allowedReactions` list (`celebrating`, not `celebrate`). Focus Guard reads the foreground window with `active-win` (MIT), opt-in and local, and ignores the OpenPets and JARVIS windows. ActivityWatch is not used.
+- **Why (measured on the owner laptop, 2026-11-02, `agents/research/pet-focusguard-spike.md`):** `hello`/`status`/`react`/`say` answered in 3–17 ms; `active-win` returned title, app and exe path in 2 ms after a 306 ms first call; the ActivityWatch Tauri 0.14.1 build never started its server (`database is locked`, reproduced on a fresh database, cause not profiled).
+- **API stability:** client protocol is `v1`; pin `@open-pets/client` to an exact version and re-run the spike checks on every bump. The pet's own window can be the foreground window, so Focus Guard must filter it.
+- **Tradeoff:** a 216 MB external app must be installed and running for the pet to show; if it is down the client fails fast and JARVIS must degrade silently. Browser tab titles/URLs are not covered by `active-win` on Windows (unverified).
+- **Revisit when:** OpenPets changes the IPC protocol major version, or the classic ActivityWatch build proves reliable and browser-tab data is needed.
+
 ## Cost Estimate
 - **Monthly now:** **₹0**. Sab open-source/free tier. Disk: PDFs (GBs) + local models (2–8 GB).
 - **Monthly at next stage:** ₹0 (phir bhi single user).
