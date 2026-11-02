@@ -21,17 +21,22 @@ const dash = (over: object = {}): object => ({
 })
 
 let progress: object | null = null
+let guard: object | null = null
 function setup(
   d: object,
   queue: object[] = [],
-  prog: object | null = null
+  prog: object | null = null,
+  g: object | null = null
 ): ReturnType<typeof vi.fn> {
   progress = prog
+  guard = g
   const api = vi.fn(async (req: { path: string }) => {
     if (req.path === '/dashboard/today') return { status: 200, body: d }
     if (req.path === '/review/queue') return { status: 200, body: queue }
     if (req.path === '/gamification/progress')
       return progress ? { status: 200, body: progress } : { status: 404, body: null }
+    if (req.path === '/guard/status' || req.path === '/guard/bad-day')
+      return guard ? { status: 200, body: guard } : { status: 404, body: null }
     if (req.path.endsWith('/rate'))
       return { status: 200, body: { card_id: 1, due: 'x', interval_days: 1 } }
     return { status: 404, body: null }
@@ -58,6 +63,16 @@ const prog = (over: object = {}): object => ({
   bad_day_goal_minutes: 20,
   comeback: { active: false, lost_streak: 0, days_done: 0, days_needed: 3 },
   events: [],
+  ...over
+})
+const guardOf = (over: object = {}): object => ({
+  sleep: { enabled: true, start: '23:30', end: '05:30', active: false, minutes_until_end: null },
+  burnout: { focused_hours_today: 2, warning: false, heavy_stretch: false },
+  bad_day: {
+    today_active: false,
+    note: 'Bad-day mode keeps your streak safe with a smaller goal.'
+  },
+  messages: [],
   ...over
 })
 const renderToday = (): void => {
@@ -193,6 +208,55 @@ describe('Today screen', () => {
     setup(dash({ due_cards: 3, review_remaining_today: 40 }), [], prog())
     renderToday()
     await screen.findByText(/level 2/i)
+    expect(primaries()).toHaveLength(1)
+  })
+
+  it('shows supportive guard messages when it is late or the day was very long', async () => {
+    setup(
+      dash(),
+      [],
+      prog(),
+      guardOf({
+        messages: ['It is late. Sleep is when memory sticks.', 'You have studied a very long day.']
+      })
+    )
+    renderToday()
+    expect(await screen.findByText(/sleep is when memory sticks/i)).toBeInTheDocument()
+    expect(screen.getByText(/very long day/i)).toBeInTheDocument()
+  })
+
+  it('turns bad-day mode on', async () => {
+    const api = setup(dash(), [], prog(), guardOf())
+    renderToday()
+    await userEvent.click(await screen.findByRole('button', { name: /having a rough day/i }))
+    expect(api).toHaveBeenCalledWith({
+      method: 'PUT',
+      path: '/guard/bad-day',
+      body: { active: true }
+    })
+  })
+
+  it('shows bad-day mode as active and lets the owner switch it off', async () => {
+    const api = setup(
+      dash(),
+      [],
+      prog(),
+      guardOf({ bad_day: { today_active: true, note: 'Bad-day mode keeps your streak safe.' } })
+    )
+    renderToday()
+    expect(await screen.findByText(/bad-day mode is on for today/i)).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: /back to the normal goal/i }))
+    expect(api).toHaveBeenCalledWith({
+      method: 'PUT',
+      path: '/guard/bad-day',
+      body: { active: false }
+    })
+  })
+
+  it('never makes guard buttons primary', async () => {
+    setup(dash(), [], prog(), guardOf())
+    renderToday()
+    await screen.findByRole('button', { name: /having a rough day/i })
     expect(primaries()).toHaveLength(1)
   })
 })

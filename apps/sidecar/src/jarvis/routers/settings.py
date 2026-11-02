@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from jarvis.db.migrate import current_version
+from jarvis.guards.service import sleep_config
 from jarvis.llm.client import AllProvidersFailed
 from jarvis.llm.types import Message
 from jarvis.state import AppState
@@ -31,6 +32,9 @@ class SettingsOut(BaseModel):
     exam_target: str
     daily_goal_minutes: int
     bad_day_goal_minutes: int
+    sleep_guard_enabled: bool
+    sleep_start: str
+    sleep_end: str
     providers: list[ProviderInfo]
     db_version: int
 
@@ -44,6 +48,9 @@ class SettingsIn(BaseModel):
     exam_target: str | None = Field(default=None, min_length=1, max_length=60)
     daily_goal_minutes: int | None = Field(default=None, ge=10, le=600)
     bad_day_goal_minutes: int | None = Field(default=None, ge=5, le=300)
+    sleep_guard_enabled: bool | None = None
+    sleep_start: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    sleep_end: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
 
 
 class SecretIn(BaseModel):
@@ -97,6 +104,7 @@ def build_router(state: AppState) -> APIRouter:
             )
             for name, spec in state.routing.providers.items()
         ]
+        sleep_cfg = sleep_config(state.conn)
         return SettingsOut(
             library_path=_get(state, "library_path"),
             vault_path=_get(state, "vault_path"),
@@ -106,6 +114,9 @@ def build_router(state: AppState) -> APIRouter:
             exam_target=_get(state, "exam_target") or DEFAULT_EXAM_TARGET,
             daily_goal_minutes=_get(state, "daily_goal_minutes") or 60,
             bad_day_goal_minutes=_get(state, "bad_day_goal_minutes") or 20,
+            sleep_guard_enabled=sleep_cfg["enabled"],
+            sleep_start=sleep_cfg["start"],
+            sleep_end=sleep_cfg["end"],
             providers=providers,
             db_version=current_version(state.conn),
         )
@@ -138,6 +149,9 @@ def build_router(state: AppState) -> APIRouter:
                 "exam_target",
                 "daily_goal_minutes",
                 "bad_day_goal_minutes",
+                "sleep_guard_enabled",
+                "sleep_start",
+                "sleep_end",
             ):
                 if getattr(body, key) is not None:
                     _put(state, key, getattr(body, key))

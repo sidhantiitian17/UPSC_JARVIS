@@ -241,6 +241,13 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Today shows the level and streak card', levelShown)
+  await win.click('button:has-text("Having a rough day?")')
+  const badDayOn = await win
+    .waitForSelector('text=/Bad-day mode is on for today/', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('bad-day mode switches on from Today', badDayOn)
+  await win.click('button:has-text("Back to the normal goal")')
   const nextBlock = await win
     .waitForSelector('text=/e2e-polity, page/', { timeout: 10000 })
     .then(() => true)
@@ -257,7 +264,6 @@ try {
     return t.status
   })
   check('syllabus still served after session', sessionTags === 200)
-  await win.click('text=Back to library')
   await win.click('text=Syllabus')
   const banner = await win.locator('[role=alert]').count()
   check('no error banner', banner === 0)

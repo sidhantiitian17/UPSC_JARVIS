@@ -116,3 +116,8 @@ export const getToday = (): Promise<TodayDashboard> => api('GET', '/dashboard/to
 
 export type GameProgress = Schemas['ProgressOut']
 export const getProgress = (): Promise<GameProgress> => api('GET', '/gamification/progress')
+
+export type GuardStatus = Schemas['GuardOut']
+export const getGuard = (): Promise<GuardStatus> => api('GET', '/guard/status')
+export const setBadDay = (active: boolean): Promise<GuardStatus> =>
+  api('PUT', '/guard/bad-day', { active })

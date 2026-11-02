@@ -252,6 +252,37 @@
         "title": "AnswerOut",
         "type": "object"
       },
+      "BadDayIn": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "active"
+        ],
+        "title": "BadDayIn",
+        "type": "object"
+      },
+      "BadDayOut": {
+        "properties": {
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "today_active": {
+            "title": "Today Active",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "today_active",
+          "note"
+        ],
+        "title": "BadDayOut",
+        "type": "object"
+      },
       "BudgetAlert": {
         "properties": {
           "node_id": {
@@ -273,6 +304,29 @@
           "sources"
         ],
         "title": "BudgetAlert",
+        "type": "object"
+      },
+      "BurnoutOut": {
+        "properties": {
+          "focused_hours_today": {
+            "title": "Focused Hours Today",
+            "type": "number"
+          },
+          "heavy_stretch": {
+            "title": "Heavy Stretch",
+            "type": "boolean"
+          },
+          "warning": {
+            "title": "Warning",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "focused_hours_today",
+          "warning",
+          "heavy_stretch"
+        ],
+        "title": "BurnoutOut",
         "type": "object"
       },
       "ChunkOut": {
@@ -551,6 +605,34 @@
           "ordinal"
         ],
         "title": "GateQuestion",
+        "type": "object"
+      },
+      "GuardOut": {
+        "properties": {
+          "bad_day": {
+            "$ref": "#/components/schemas/BadDayOut"
+          },
+          "burnout": {
+            "$ref": "#/components/schemas/BurnoutOut"
+          },
+          "messages": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "sleep": {
+            "$ref": "#/components/schemas/SleepOut"
+          }
+        },
+        "required": [
+          "sleep",
+          "burnout",
+          "bad_day",
+          "messages"
+        ],
+        "title": "GuardOut",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1403,6 +1485,41 @@
             ],
             "title": "Review Daily Limit"
           },
+          "sleep_end": {
+            "anyOf": [
+              {
+                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep End"
+          },
+          "sleep_guard_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep Guard Enabled"
+          },
+          "sleep_start": {
+            "anyOf": [
+              {
+                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep Start"
+          },
           "vault_path": {
             "anyOf": [
               {
@@ -1466,6 +1583,18 @@
             "title": "Review Daily Limit",
             "type": "integer"
           },
+          "sleep_end": {
+            "title": "Sleep End",
+            "type": "string"
+          },
+          "sleep_guard_enabled": {
+            "title": "Sleep Guard Enabled",
+            "type": "boolean"
+          },
+          "sleep_start": {
+            "title": "Sleep Start",
+            "type": "string"
+          },
           "vault_path": {
             "anyOf": [
               {
@@ -1487,6 +1616,9 @@
           "exam_target",
           "daily_goal_minutes",
           "bad_day_goal_minutes",
+          "sleep_guard_enabled",
+          "sleep_start",
+          "sleep_end",
           "providers",
           "db_version"
         ],
@@ -1502,6 +1634,46 @@
           }
         },
         "title": "SkipIn",
+        "type": "object"
+      },
+      "SleepOut": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "minutes_until_end": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes Until End"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "start",
+          "end",
+          "active",
+          "minutes_until_end"
+        ],
+        "title": "SleepOut",
         "type": "object"
       },
       "StartIn": {
@@ -1793,6 +1965,68 @@
         "summary": "Get Progress",
         "tags": [
           "gamification"
+        ]
+      }
+    },
+    "/guard/bad-day": {
+      "put": {
+        "operationId": "put_bad_day_guard_bad_day_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BadDayIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Bad Day",
+        "tags": [
+          "guard"
+        ]
+      }
+    },
+    "/guard/status": {
+      "get": {
+        "operationId": "get_status_guard_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Status",
+        "tags": [
+          "guard"
         ]
       }
     },

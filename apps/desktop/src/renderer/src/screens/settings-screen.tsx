@@ -246,6 +246,70 @@ function GoalsCard({
   )
 }
 
+function SleepCard({
+  settings,
+  onSaved,
+  onError
+}: {
+  settings: SettingsOut
+  onSaved: (s: SettingsOut) => void
+  onError: (m: string) => void
+}): React.JSX.Element {
+  const [enabled, setEnabled] = useState(settings.sleep_guard_enabled)
+  const [start, setStart] = useState(settings.sleep_start)
+  const [end, setEnd] = useState(settings.sleep_end)
+  const save = async (): Promise<void> => {
+    try {
+      onSaved(
+        await putSettings({ sleep_guard_enabled: enabled, sleep_start: start, sleep_end: end })
+      )
+    } catch (e) {
+      onError(describeError(e))
+    }
+  }
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="text-xl font-semibold">Sleep guard</h2>
+      <p className="text-sm text-muted">
+        During this window Today shows a gentle note that sleep helps memory. Nothing is ever
+        locked.
+      </p>
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(e) => setEnabled(e.target.checked)}
+          aria-label="Sleep guard"
+        />
+        Remind me to sleep
+      </label>
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="flex flex-col gap-1 text-sm">
+          Sleep starts
+          <input
+            type="time"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+            className="min-h-10 rounded-lg border border-line bg-app-bg px-3"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Sleep ends
+          <input
+            type="time"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+            className="min-h-10 rounded-lg border border-line bg-app-bg px-3"
+          />
+        </label>
+        <Button onClick={save} aria-label="Save sleep guard">
+          Save
+        </Button>
+      </div>
+    </Card>
+  )
+}
+
 export function SettingsScreen(): React.JSX.Element {
   const [settings, setSettings] = useState<SettingsOut | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -329,6 +393,15 @@ export function SettingsScreen(): React.JSX.Element {
       {settings && (
         <ExamCard
           key={settings.exam_target}
+          settings={settings}
+          onSaved={setSettings}
+          onError={setError}
+        />
+      )}
+
+      {settings && (
+        <SleepCard
+          key={`${settings.sleep_guard_enabled}-${settings.sleep_start}-${settings.sleep_end}`}
           settings={settings}
           onSaved={setSettings}
           onError={setError}

@@ -55,6 +55,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/guard/bad-day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Bad Day */
+        put: operations["put_bad_day_guard_bad_day_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/guard/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Status */
+        get: operations["get_status_guard_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -576,6 +610,18 @@ export interface components {
             /** Source Quote */
             source_quote: string;
         };
+        /** BadDayIn */
+        BadDayIn: {
+            /** Active */
+            active: boolean;
+        };
+        /** BadDayOut */
+        BadDayOut: {
+            /** Note */
+            note: string;
+            /** Today Active */
+            today_active: boolean;
+        };
         /** BudgetAlert */
         BudgetAlert: {
             /** Node Id */
@@ -584,6 +630,15 @@ export interface components {
             sources: number;
             /** Title */
             title: string;
+        };
+        /** BurnoutOut */
+        BurnoutOut: {
+            /** Focused Hours Today */
+            focused_hours_today: number;
+            /** Heavy Stretch */
+            heavy_stretch: boolean;
+            /** Warning */
+            warning: boolean;
         };
         /** ChunkOut */
         ChunkOut: {
@@ -677,6 +732,14 @@ export interface components {
             stem: string;
             /** Style */
             style: string;
+        };
+        /** GuardOut */
+        GuardOut: {
+            bad_day: components["schemas"]["BadDayOut"];
+            burnout: components["schemas"]["BurnoutOut"];
+            /** Messages */
+            messages: string[];
+            sleep: components["schemas"]["SleepOut"];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -970,6 +1033,12 @@ export interface components {
             library_path?: string | null;
             /** Review Daily Limit */
             review_daily_limit?: number | null;
+            /** Sleep End */
+            sleep_end?: string | null;
+            /** Sleep Guard Enabled */
+            sleep_guard_enabled?: boolean | null;
+            /** Sleep Start */
+            sleep_start?: string | null;
             /** Vault Path */
             vault_path?: string | null;
         };
@@ -993,6 +1062,12 @@ export interface components {
             providers: components["schemas"]["ProviderInfo"][];
             /** Review Daily Limit */
             review_daily_limit: number;
+            /** Sleep End */
+            sleep_end: string;
+            /** Sleep Guard Enabled */
+            sleep_guard_enabled: boolean;
+            /** Sleep Start */
+            sleep_start: string;
             /** Vault Path */
             vault_path: string | null;
         };
@@ -1003,6 +1078,19 @@ export interface components {
              * @default true
              */
             penalty: boolean;
+        };
+        /** SleepOut */
+        SleepOut: {
+            /** Active */
+            active: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /** End */
+            end: string;
+            /** Minutes Until End */
+            minutes_until_end: number | null;
+            /** Start */
+            start: string;
         };
         /** StartIn */
         StartIn: {
@@ -1136,6 +1224,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProgressOut"];
+                };
+            };
+        };
+    };
+    put_bad_day_guard_bad_day_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BadDayIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_status_guard_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuardOut"];
                 };
             };
         };

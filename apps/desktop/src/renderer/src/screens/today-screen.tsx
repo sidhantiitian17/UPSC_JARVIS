@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getProgress, getToday, type GameProgress, type TodayDashboard } from '../api/client'
+import {
+  getGuard,
+  getProgress,
+  getToday,
+  setBadDay,
+  type GameProgress,
+  type GuardStatus,
+  type TodayDashboard
+} from '../api/client'
 import { EmptyState } from '../components/empty-state'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
@@ -80,12 +88,41 @@ function ProgressCard({ g }: { g: GameProgress }): React.JSX.Element {
   )
 }
 
+function GuardCard({
+  g,
+  onToggle
+}: {
+  g: GuardStatus
+  onToggle: (active: boolean) => void
+}): React.JSX.Element {
+  return (
+    <Card className="flex flex-col items-start gap-2">
+      {g.messages.map((m) => (
+        <p key={m} role="status">
+          {m}
+        </p>
+      ))}
+      {g.bad_day.today_active ? (
+        <>
+          <p>Bad-day mode is on for today. {g.bad_day.note}</p>
+          <Button onClick={() => onToggle(false)}>Back to the normal goal</Button>
+        </>
+      ) : (
+        <Button onClick={() => onToggle(true)} aria-label="Having a rough day? Use bad-day mode">
+          Having a rough day?
+        </Button>
+      )}
+    </Card>
+  )
+}
+
 export function TodayScreen(): React.JSX.Element {
   const m = SCREEN_META.today
   const navigate = useNavigate()
   const gate = useGate()
   const [data, setData] = useState<TodayDashboard | null>(null)
   const [game, setGame] = useState<GameProgress | null>(null)
+  const [guard, setGuard] = useState<GuardStatus | null>(null)
   const [reviewing, setReviewing] = useState(false)
   const [reloads, setReloads] = useState(0)
 
@@ -96,6 +133,9 @@ export function TodayScreen(): React.JSX.Element {
       .catch(() => undefined) // the dashboard still renders its empty state without data
     getProgress()
       .then((g) => alive && setGame(g))
+      .catch(() => undefined)
+    getGuard()
+      .then((g) => alive && setGuard(g))
       .catch(() => undefined)
     return () => {
       alive = false
@@ -141,6 +181,20 @@ export function TodayScreen(): React.JSX.Element {
             Finish recall gate
           </Button>
         </Card>
+      )}
+
+      {guard && (
+        <GuardCard
+          g={guard}
+          onToggle={async (active) => {
+            try {
+              setGuard(await setBadDay(active))
+              setReloads((n) => n + 1)
+            } catch {
+              /* keep the card as it was; the next refresh shows the real state */
+            }
+          }}
+        />
       )}
 
       {game && <ProgressCard g={game} />}

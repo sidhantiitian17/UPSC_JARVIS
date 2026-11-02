@@ -51,6 +51,9 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
     break_minutes: 10,
     review_daily_limit: 40,
     exam_target: 'Prelims 2028',
+    sleep_guard_enabled: true,
+    sleep_start: '23:30',
+    sleep_end: '05:30',
     daily_goal_minutes: 60,
     bad_day_goal_minutes: 20,
     providers,
@@ -222,6 +225,23 @@ describe('Settings screen', () => {
         method: 'PUT',
         path: '/settings',
         body: { daily_goal_minutes: 45, bad_day_goal_minutes: 20 }
+      })
+    )
+  })
+
+  it('shows the sleep window and saves changes', async () => {
+    const { api } = setup()
+    render(<SettingsScreen />)
+    expect(await screen.findByRole('checkbox', { name: /sleep guard/i })).toBeChecked()
+    expect(screen.getByLabelText(/sleep starts/i)).toHaveValue('23:30')
+    expect(screen.getByLabelText(/sleep ends/i)).toHaveValue('05:30')
+    await userEvent.click(screen.getByRole('checkbox', { name: /sleep guard/i }))
+    await userEvent.click(screen.getByRole('button', { name: /save sleep guard/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/settings',
+        body: { sleep_guard_enabled: false, sleep_start: '23:30', sleep_end: '05:30' }
       })
     )
   })
