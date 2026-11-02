@@ -148,4 +148,22 @@ describe('TimerProvider', () => {
     expect(out('status')).toBe('paused')
     expect(pet).toHaveBeenCalledWith('idle', undefined)
   })
+
+  it('tells Focus Guard when a focus block is running and when it is not', async () => {
+    bridge(0, 25)
+    const setSession = vi.fn(async () => undefined)
+    ;(window as unknown as { jarvis: { focus: unknown } }).jarvis.focus = {
+      setSession,
+      setEnabled: vi.fn()
+    }
+    await mount()
+    await act(async () => screen.getByText('start').click())
+    expect(setSession).toHaveBeenLastCalledWith(true)
+    await act(async () => screen.getByText('pause').click())
+    expect(setSession).toHaveBeenLastCalledWith(false)
+    await act(async () => screen.getByText('resume').click())
+    expect(setSession).toHaveBeenLastCalledWith(true)
+    await act(async () => screen.getByText('stop').click())
+    expect(setSession).toHaveBeenLastCalledWith(false)
+  })
 })

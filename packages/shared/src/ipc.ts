@@ -19,3 +19,9 @@ export type PetApi = {
   status: () => Promise<{ available: boolean; mode: string }>
   test: () => Promise<boolean>
 }
+
+/** Focus Guard bridge: the renderer only says whether the guard is on and whether a focus block is running. */
+export type FocusApi = {
+  setEnabled: (on: boolean) => Promise<void>
+  setSession: (on: boolean) => Promise<void>
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getTruth, type Truth } from '../api/client'
+import { getFocusSummary, getTruth, type FocusSummary, type Truth } from '../api/client'
 import { Card } from '../components/ui/card'
 import { SCREEN_META } from '../screens'
 
@@ -29,12 +29,16 @@ export function InsightsScreen(): React.JSX.Element {
   const m = SCREEN_META.insights
   const [data, setData] = useState<Truth | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [focus, setFocus] = useState<FocusSummary | null>(null)
 
   useEffect(() => {
     let alive = true
     getTruth()
       .then((t) => alive && setData(t))
       .catch(() => alive && setError('Could not load your insights. Is the local service running?'))
+    getFocusSummary()
+      .then((f) => alive && setFocus(f))
+      .catch(() => undefined)
     return () => {
       alive = false
     }
@@ -123,6 +127,33 @@ export function InsightsScreen(): React.JSX.Element {
             <p>
               About {data.forecast.projected_verified_hours} verified hours by then at this pace.
             </p>
+          </Card>
+
+          <Card>
+            <section aria-label="During focus blocks" className="flex flex-col gap-1">
+              <h2 className="text-xl font-semibold">During focus blocks, last 7 days</h2>
+              {focus?.enabled ? (
+                <>
+                  <p>
+                    {focus.totals.study_minutes} min study · {focus.totals.neutral_minutes} min
+                    neutral · {focus.totals.distraction_minutes} min distraction
+                  </p>
+                  {focus.top_distraction_apps.length > 0 && (
+                    <p className="text-sm text-muted">
+                      Most distracting apps:{' '}
+                      {focus.top_distraction_apps
+                        .map((a) => `${a.app} (${a.minutes} min)`)
+                        .join(', ')}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-muted">
+                  Focus Guard is off. Turn it on in Settings if you want to see where focus blocks
+                  go.
+                </p>
+              )}
+            </section>
           </Card>
 
           <Card className="flex flex-col gap-2">

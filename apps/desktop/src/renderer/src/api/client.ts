@@ -137,3 +137,6 @@ export type PrivacySummary = Schemas['PrivacyOut']
 export const getPrivacy = (): Promise<PrivacySummary> => api('GET', '/privacy/summary')
 export const deletePrivacyCategory = (id: string): Promise<PrivacySummary> =>
   api('DELETE', `/privacy/${id}?confirm=yes`)
+
+export type FocusSummary = Schemas['FocusSummaryOut']
+export const getFocusSummary = (): Promise<FocusSummary> => api('GET', '/focus/summary?days=7')

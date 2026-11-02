@@ -38,6 +38,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/focus/samples": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Samples */
+        post: operations["post_samples_focus_samples_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/focus/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Summary */
+        get: operations["get_summary_focus_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/gamification/progress": {
         parameters: {
             query?: never;
@@ -712,6 +746,13 @@ export interface components {
             /** Source Quote */
             source_quote: string;
         };
+        /** AppMinutes */
+        AppMinutes: {
+            /** App */
+            app: string;
+            /** Minutes */
+            minutes: number;
+        };
         /** BadDayIn */
         BadDayIn: {
             /** Active */
@@ -829,6 +870,17 @@ export interface components {
             /** Verified Hours */
             verified_hours: number;
         };
+        /** DayOut */
+        DayOut: {
+            /** Date */
+            date: string;
+            /** Distraction Minutes */
+            distraction_minutes: number;
+            /** Neutral Minutes */
+            neutral_minutes: number;
+            /** Study Minutes */
+            study_minutes: number;
+        };
         /** DocumentOut */
         DocumentOut: {
             /** Chunks */
@@ -861,6 +913,16 @@ export interface components {
             kind: string;
             /** Text */
             text: string;
+        };
+        /** FocusSummaryOut */
+        FocusSummaryOut: {
+            /** Days */
+            days: components["schemas"]["DayOut"][];
+            /** Enabled */
+            enabled: boolean;
+            /** Top Distraction Apps */
+            top_distraction_apps: components["schemas"]["AppMinutes"][];
+            totals: components["schemas"]["TotalsOut"];
         };
         /** Forecast */
         Forecast: {
@@ -1176,6 +1238,23 @@ export interface components {
             /** Total Cards */
             total_cards: number;
         };
+        /** Sample */
+        Sample: {
+            /** App */
+            app: string;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "study" | "neutral" | "distraction";
+            /** Ts */
+            ts?: string | null;
+        };
+        /** SamplesIn */
+        SamplesIn: {
+            /** Samples */
+            samples: components["schemas"]["Sample"][];
+        };
         /** SearchHit */
         SearchHit: {
             /** Char End */
@@ -1240,6 +1319,8 @@ export interface components {
             exam_date?: string | null;
             /** Exam Target */
             exam_target?: string | null;
+            /** Focus Guard Enabled */
+            focus_guard_enabled?: boolean | null;
             /** Focus Minutes */
             focus_minutes?: number | null;
             /** Library Path */
@@ -1271,6 +1352,8 @@ export interface components {
             exam_date: string | null;
             /** Exam Target */
             exam_target: string;
+            /** Focus Guard Enabled */
+            focus_guard_enabled: boolean;
             /** Focus Minutes */
             focus_minutes: number;
             /** Library Path */
@@ -1325,6 +1408,11 @@ export interface components {
             committed_today: components["schemas"]["Committed"] | null;
             yesterday: components["schemas"]["Yesterday"] | null;
         };
+        /** StoredOut */
+        StoredOut: {
+            /** Stored */
+            stored: number;
+        };
         /** SyllabusNodeOut */
         SyllabusNodeOut: {
             /** Children */
@@ -1371,6 +1459,15 @@ export interface components {
             verified_minutes_today: number;
             /** Verified Minutes Week */
             verified_minutes_week: number;
+        };
+        /** TotalsOut */
+        TotalsOut: {
+            /** Distraction Minutes */
+            distraction_minutes: number;
+            /** Neutral Minutes */
+            neutral_minutes: number;
+            /** Study Minutes */
+            study_minutes: number;
         };
         /** TruthOut */
         TruthOut: {
@@ -1459,6 +1556,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TodayOut"];
+                };
+            };
+        };
+    };
+    post_samples_focus_samples_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SamplesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoredOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_summary_focus_summary_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FocusSummaryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -414,6 +414,55 @@ function PetCard({
   )
 }
 
+function FocusGuardCard({
+  settings,
+  onSaved,
+  onError
+}: {
+  settings: SettingsOut
+  onSaved: (s: SettingsOut) => void
+  onError: (m: string) => void
+}): React.JSX.Element {
+  const [enabled, setEnabled] = useState(settings.focus_guard_enabled)
+  const save = async (): Promise<void> => {
+    try {
+      onSaved(await putSettings({ focus_guard_enabled: enabled }))
+      await window.jarvis?.focus?.setEnabled(enabled)
+    } catch (e) {
+      onError(describeError(e))
+    }
+  }
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="text-xl font-semibold">Focus Guard</h2>
+      <p className="text-sm text-muted">
+        Optional. While a focus block is running, JARVIS notices whether the foreground app is
+        study, neutral or a distraction, and gives one gentle nudge after about two minutes of
+        distraction.
+      </p>
+      <ul className="list-disc pl-5 text-sm text-muted">
+        <li>It watches only while a focus block is running.</li>
+        <li>It stores only the category and the app name, never window titles or web addresses.</li>
+        <li>Everything stays on this PC. You can delete it under Privacy.</li>
+      </ul>
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(e) => setEnabled(e.target.checked)}
+          aria-label="Focus Guard"
+        />
+        Turn on Focus Guard
+      </label>
+      <div>
+        <Button onClick={save} aria-label="Save Focus Guard">
+          Save
+        </Button>
+      </div>
+    </Card>
+  )
+}
+
 export function SettingsScreen(): React.JSX.Element {
   const [settings, setSettings] = useState<SettingsOut | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -497,6 +546,15 @@ export function SettingsScreen(): React.JSX.Element {
       {settings && (
         <ExamCard
           key={settings.exam_target}
+          settings={settings}
+          onSaved={setSettings}
+          onError={setError}
+        />
+      )}
+
+      {settings && (
+        <FocusGuardCard
+          key={String(settings.focus_guard_enabled)}
           settings={settings}
           onSaved={setSettings}
           onError={setError}

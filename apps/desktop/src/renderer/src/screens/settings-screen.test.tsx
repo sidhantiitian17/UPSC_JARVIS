@@ -53,6 +53,7 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
     exam_target: 'Prelims 2028',
     exam_date: null,
     pet_mode: 'coach',
+    focus_guard_enabled: false,
     sleep_guard_enabled: true,
     sleep_start: '23:30',
     sleep_end: '05:30',
@@ -309,5 +310,29 @@ describe('Settings screen', () => {
     }
     render(<SettingsScreen />)
     expect(await screen.findByText(/openpets is not running/i)).toBeInTheDocument()
+  })
+
+  it('Focus Guard is off by default, explains what it stores, and is switched on with consent', async () => {
+    const { api } = setup()
+    const setEnabled = vi.fn(async () => undefined)
+    ;(window as unknown as { jarvis: { focus: unknown } }).jarvis.focus = {
+      setEnabled,
+      setSession: vi.fn()
+    }
+    render(<SettingsScreen />)
+    const box = await screen.findByRole('checkbox', { name: /focus guard/i })
+    expect(box).not.toBeChecked()
+    expect(screen.getByText(/never window titles or web addresses/i)).toBeInTheDocument()
+    expect(screen.getByText(/only while a focus block is running/i)).toBeInTheDocument()
+    await userEvent.click(box)
+    await userEvent.click(screen.getByRole('button', { name: /save focus guard/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/settings',
+        body: { focus_guard_enabled: true }
+      })
+    )
+    expect(setEnabled).toHaveBeenCalledWith(true)
   })
 })

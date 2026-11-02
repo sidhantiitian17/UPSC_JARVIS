@@ -63,7 +63,7 @@
 | `trafilatura` ya equivalent | Article text extraction (RSS ke baad) | Verify at P6 |
 | `electron-vite`, `shadcn/ui`, `Tailwind` | UI toolchain | Verify at WU-P01-002 |
 | `parselmouth` / `librosa` | Audio prosody | Verify at P9 |
-| `active-win` | Active window title (Focus Guard) | Verify at P3 |
+| `active-win` 9.0.0 | Foreground window for Focus Guard (pinned; install script fetches a prebuilt N-API binary, allowed in `pnpm-workspace.yaml`) | MIT (`npm view`); worked on the owner laptop (spike); `npm audit` notes a moderate `minimatch` advisory in its install-time dependency tree |
 
 > **Note:** "Verify" ka matlab: us WU ke andar agent ko pehle `npm view`/`pip index` + LICENSE check karna hai. Bina check ke dependency add nahi hogi.
 

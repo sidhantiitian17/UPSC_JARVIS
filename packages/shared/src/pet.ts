@@ -67,15 +67,20 @@ const COACH: Record<PetEvent, Template> = {
     c.retentionPct !== undefined
       ? `Gate pass, ${c.retentionPct}% yaad. Shabaash.`
       : 'Gate pass! Jo padha, wo yaad bhi hai. Shabaash.',
-  gate_not_passed: () => 'Is baar gate nahi nikla, koi baat nahi. Restudy list dekhte hain, phir dobara.',
-  level_up: (c) => (c.level !== undefined ? `Level ${c.level}! Steady chal rahe ho.` : 'Level badh gaya! Steady chal rahe ho.'),
+  gate_not_passed: () =>
+    'Is baar gate nahi nikla, koi baat nahi. Restudy list dekhte hain, phir dobara.',
+  level_up: (c) =>
+    c.level !== undefined
+      ? `Level ${c.level}! Steady chal rahe ho.`
+      : 'Level badh gaya! Steady chal rahe ho.',
   distraction: () => 'Wapas page par? Ek gehri saans, phir bas ek paragraph.'
 }
 
 const STRICT: Record<PetEvent, Template> = {
   session_start: () => 'Session shuru. Sirf padhai.',
   idle: () => 'Idle ho. Resume karo ya break lo.',
-  gate_pass: (c) => (c.retentionPct !== undefined ? `Gate pass. Retention ${c.retentionPct}%.` : 'Gate pass.'),
+  gate_pass: (c) =>
+    c.retentionPct !== undefined ? `Gate pass. Retention ${c.retentionPct}%.` : 'Gate pass.',
   gate_not_passed: () => 'Gate nahi nikla. Restudy list dekho.',
   level_up: (c) => (c.level !== undefined ? `Level ${c.level}.` : 'Level up.'),
   distraction: () => 'Focus block chal raha hai. Wapas padhai par.'
@@ -86,5 +91,8 @@ export function petMessage(event: PetEvent, mode: PetMode, ctx: PetContext = {})
   const reaction = REACTION[event]
   if (mode === 'silent') return { reaction }
   const text = (mode === 'strict' ? STRICT : COACH)[event](ctx)
-  return { reaction, say: text.length > PET_MAX_SAY ? text.slice(0, PET_MAX_SAY - 1) + '…' : text }
+  return {
+    reaction,
+    say: text.length > PET_MAX_SAY ? text.slice(0, PET_MAX_SAY - 1) + '…' : text
+  }
 }

@@ -63,6 +63,11 @@ export function TimerProvider({ children }: { children: React.ReactNode }): Reac
   }, [])
 
   const running = state.status === 'running'
+  const focusRunning = running && state.kind === 'focus'
+  useEffect(() => {
+    // Focus Guard watches the foreground window only while a focus block is actually running.
+    void Promise.resolve(window.jarvis?.focus?.setSession(focusRunning)).catch(() => undefined)
+  }, [focusRunning])
   useEffect(() => {
     if (!running) return
     const id = setInterval(() => {

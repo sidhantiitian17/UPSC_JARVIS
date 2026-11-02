@@ -252,6 +252,24 @@
         "title": "AnswerOut",
         "type": "object"
       },
+      "AppMinutes": {
+        "properties": {
+          "app": {
+            "title": "App",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "app",
+          "minutes"
+        ],
+        "title": "AppMinutes",
+        "type": "object"
+      },
       "BadDayIn": {
         "properties": {
           "active": {
@@ -574,6 +592,34 @@
         "title": "Day",
         "type": "object"
       },
+      "DayOut": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "distraction_minutes": {
+            "title": "Distraction Minutes",
+            "type": "number"
+          },
+          "neutral_minutes": {
+            "title": "Neutral Minutes",
+            "type": "number"
+          },
+          "study_minutes": {
+            "title": "Study Minutes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "study_minutes",
+          "neutral_minutes",
+          "distraction_minutes"
+        ],
+        "title": "DayOut",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "chunks": {
@@ -671,6 +717,39 @@
           "text"
         ],
         "title": "Event",
+        "type": "object"
+      },
+      "FocusSummaryOut": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "top_distraction_apps": {
+            "items": {
+              "$ref": "#/components/schemas/AppMinutes"
+            },
+            "title": "Top Distraction Apps",
+            "type": "array"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/TotalsOut"
+          }
+        },
+        "required": [
+          "enabled",
+          "days",
+          "totals",
+          "top_distraction_apps"
+        ],
+        "title": "FocusSummaryOut",
         "type": "object"
       },
       "Forecast": {
@@ -1568,6 +1647,60 @@
         "title": "ReviewStats",
         "type": "object"
       },
+      "Sample": {
+        "additionalProperties": false,
+        "properties": {
+          "app": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "App",
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "study",
+              "neutral",
+              "distraction"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ts"
+          }
+        },
+        "required": [
+          "category",
+          "app"
+        ],
+        "title": "Sample",
+        "type": "object"
+      },
+      "SamplesIn": {
+        "properties": {
+          "samples": {
+            "items": {
+              "$ref": "#/components/schemas/Sample"
+            },
+            "maxItems": 200,
+            "title": "Samples",
+            "type": "array"
+          }
+        },
+        "required": [
+          "samples"
+        ],
+        "title": "SamplesIn",
+        "type": "object"
+      },
       "SearchHit": {
         "properties": {
           "char_end": {
@@ -1798,6 +1931,17 @@
             ],
             "title": "Exam Target"
           },
+          "focus_guard_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focus Guard Enabled"
+          },
           "focus_minutes": {
             "anyOf": [
               {
@@ -1934,6 +2078,10 @@
             "title": "Exam Target",
             "type": "string"
           },
+          "focus_guard_enabled": {
+            "title": "Focus Guard Enabled",
+            "type": "boolean"
+          },
           "focus_minutes": {
             "title": "Focus Minutes",
             "type": "integer"
@@ -2002,6 +2150,7 @@
           "sleep_end",
           "exam_date",
           "pet_mode",
+          "focus_guard_enabled",
           "providers",
           "db_version"
         ],
@@ -2110,6 +2259,19 @@
           "catch_up_due"
         ],
         "title": "StatusOut",
+        "type": "object"
+      },
+      "StoredOut": {
+        "properties": {
+          "stored": {
+            "title": "Stored",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "stored"
+        ],
+        "title": "StoredOut",
         "type": "object"
       },
       "SyllabusNodeOut": {
@@ -2269,6 +2431,29 @@
           "review_remaining_today"
         ],
         "title": "TodayOut",
+        "type": "object"
+      },
+      "TotalsOut": {
+        "properties": {
+          "distraction_minutes": {
+            "title": "Distraction Minutes",
+            "type": "number"
+          },
+          "neutral_minutes": {
+            "title": "Neutral Minutes",
+            "type": "number"
+          },
+          "study_minutes": {
+            "title": "Study Minutes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "study_minutes",
+          "neutral_minutes",
+          "distraction_minutes"
+        ],
+        "title": "TotalsOut",
         "type": "object"
       },
       "TruthOut": {
@@ -2455,6 +2640,92 @@
         "summary": "Today",
         "tags": [
           "coverage"
+        ]
+      }
+    },
+    "/focus/samples": {
+      "post": {
+        "operationId": "post_samples_focus_samples_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SamplesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoredOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Post Samples",
+        "tags": [
+          "focus"
+        ]
+      }
+    },
+    "/focus/summary": {
+      "get": {
+        "operationId": "get_summary_focus_summary_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 7,
+              "maximum": 31,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FocusSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Summary",
+        "tags": [
+          "focus"
         ]
       }
     },

@@ -267,13 +267,53 @@ try {
     typeof petStatus.available === 'boolean' && petStatus.mode === 'coach',
     JSON.stringify(petStatus)
   )
+  const focusOff = await win.evaluate(() =>
+    window.jarvis.api({ method: 'GET', path: '/focus/summary' })
+  )
+  check('Focus Guard is off by default', focusOff.status === 200 && focusOff.body.enabled === false)
+  const refusedSamples = await win.evaluate(() =>
+    window.jarvis.api({
+      method: 'POST',
+      path: '/focus/samples',
+      body: { samples: [{ category: 'study', app: 'x' }] }
+    })
+  )
+  check('samples are refused while Focus Guard is off', refusedSamples.status === 409)
+  await win.evaluate(async () => {
+    await window.jarvis.api({
+      method: 'PUT',
+      path: '/settings',
+      body: { focus_guard_enabled: true }
+    })
+    await window.jarvis.focus.setEnabled(true)
+  })
+  const accepted = await win.evaluate(() =>
+    window.jarvis.api({
+      method: 'POST',
+      path: '/focus/samples',
+      body: { samples: [{ category: 'study', app: 'Acrobat' }] }
+    })
+  )
+  check(
+    'samples are accepted once the owner turns it on',
+    accepted.status === 200 && accepted.body.stored === 1
+  )
+  await win.evaluate(async () => {
+    await window.jarvis.api({
+      method: 'PUT',
+      path: '/settings',
+      body: { focus_guard_enabled: false }
+    })
+    await window.jarvis.focus.setEnabled(false)
+    await window.jarvis.api({ method: 'DELETE', path: '/privacy/focus?confirm=yes' })
+  })
   const privacy = await win.evaluate(() =>
     window.jarvis.api({ method: 'GET', path: '/privacy/summary' })
   )
   check(
     'privacy summary lists stored data categories',
     privacy.status === 200 &&
-      privacy.body.categories.length === 4 &&
+      privacy.body.categories.length === 5 &&
       privacy.body.categories[1].count >= 1
   )
   await win.click('nav[aria-label="Main"] >> text=Today')

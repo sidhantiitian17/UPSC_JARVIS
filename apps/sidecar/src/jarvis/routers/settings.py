@@ -39,6 +39,7 @@ class SettingsOut(BaseModel):
     sleep_end: str
     exam_date: str | None
     pet_mode: str
+    focus_guard_enabled: bool
     providers: list[ProviderInfo]
     db_version: int
 
@@ -53,6 +54,7 @@ class SettingsIn(BaseModel):
     daily_goal_minutes: int | None = Field(default=None, ge=10, le=600)
     bad_day_goal_minutes: int | None = Field(default=None, ge=5, le=300)
     sleep_guard_enabled: bool | None = None
+    focus_guard_enabled: bool | None = None
     pet_mode: Literal["coach", "strict", "silent"] | None = None
     exam_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     sleep_start: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
@@ -129,6 +131,7 @@ def build_router(state: AppState) -> APIRouter:
             bad_day_goal_minutes=_get(state, "bad_day_goal_minutes") or 20,
             exam_date=_get(state, "exam_date"),
             pet_mode=_get(state, "pet_mode") or "coach",
+            focus_guard_enabled=bool(_get(state, "focus_guard_enabled")),
             sleep_guard_enabled=sleep_cfg["enabled"],
             sleep_start=sleep_cfg["start"],
             sleep_end=sleep_cfg["end"],
@@ -167,6 +170,7 @@ def build_router(state: AppState) -> APIRouter:
                 "sleep_guard_enabled",
                 "exam_date",
                 "pet_mode",
+                "focus_guard_enabled",
                 "sleep_start",
                 "sleep_end",
             ):

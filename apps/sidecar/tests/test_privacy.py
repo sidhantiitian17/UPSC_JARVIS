@@ -70,7 +70,7 @@ def test_summary_lists_categories_with_counts_and_locations(client):
     seed_everything(conn_of(client))
     s = summary(conn_of(client), data_dir="/data", vault_path="/vault", library_path="/lib")
     cats = {c["id"]: c for c in s["categories"]}
-    assert set(cats) == set(CATEGORY_IDS) == {"library", "study_history", "review", "ai_cache"}
+    assert set(cats) == set(CATEGORY_IDS) == {"library", "study_history", "review", "ai_cache", "focus"}
     assert cats["library"]["count"] == 1 and cats["study_history"]["count"] == 1
     assert cats["review"]["count"] == 1 and cats["ai_cache"]["count"] == 2
     assert all(c["where"] and c["retention"] for c in s["categories"])

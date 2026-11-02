@@ -41,10 +41,18 @@ const TRUTH = {
 }
 
 type Res = { status: number; body: unknown }
-function setup(res: Res): void {
+const FOCUS_OFF = {
+  enabled: false,
+  days: [],
+  totals: { study_minutes: 0, neutral_minutes: 0, distraction_minutes: 0 },
+  top_distraction_apps: []
+}
+function setup(res: Res, focus: object = FOCUS_OFF): void {
   ;(window as unknown as { jarvis: unknown }).jarvis = {
     platform: 'test',
-    api: vi.fn(async () => res),
+    api: vi.fn(async (req: { path: string }) =>
+      req.path.startsWith('/focus/summary') ? { status: 200, body: focus } : res
+    ),
     status: async () => ({ ready: true })
   }
 }
@@ -96,5 +104,28 @@ describe('Insights (Truth Dashboard)', () => {
     setup({ status: 500, body: null })
     render(<InsightsScreen />)
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not load/i)
+  })
+
+  it('shows minutes per category during focus blocks when Focus Guard is on', async () => {
+    setup(
+      { status: 200, body: TRUTH },
+      {
+        enabled: true,
+        days: [],
+        totals: { study_minutes: 310.5, neutral_minutes: 40, distraction_minutes: 25.5 },
+        top_distraction_apps: [{ app: 'Steam', minutes: 20 }]
+      }
+    )
+    render(<InsightsScreen />)
+    const card = await screen.findByRole('region', { name: /during focus blocks/i })
+    expect(within(card).getByText(/310.5 min study/i)).toBeInTheDocument()
+    expect(within(card).getByText(/25.5 min distraction/i)).toBeInTheDocument()
+    expect(within(card).getByText(/Steam/)).toBeInTheDocument()
+  })
+
+  it('says Focus Guard is off and where to turn it on', async () => {
+    setup({ status: 200, body: TRUTH })
+    render(<InsightsScreen />)
+    expect(await screen.findByText(/focus guard is off/i)).toBeInTheDocument()
   })
 })

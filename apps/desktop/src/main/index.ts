@@ -6,6 +6,8 @@ import icon from '../../resources/icon.png?asset'
 import type { ApiRequest, SidecarState } from '@jarvis/shared'
 import { createApiProxy } from './api-proxy'
 import { createSecretStore } from './secret-store'
+import { createFocusGuard } from './focus/focus-guard'
+import { readActiveWindow } from './focus/active-window'
 import { createPetService } from './pet/pet-service'
 import { createOpenPetsTransport } from './pet/openpets-transport'
 import { resolveSidecarCommand, startSidecar, type RunningSidecar } from './sidecar'
@@ -17,6 +19,7 @@ let sidecar: RunningSidecar | null = null
 let proxy: ReturnType<typeof createApiProxy> | null = null
 let sidecarState: SidecarState = { ready: false }
 let secretStore: ReturnType<typeof createSecretStore> | null = null
+let focusGuardRef: ReturnType<typeof createFocusGuard> | null = null
 
 async function pushSecretsToSidecar(): Promise<void> {
   if (!proxy || !secretStore) return
@@ -26,6 +29,18 @@ async function pushSecretsToSidecar(): Promise<void> {
     } catch {
       /* a stale or rejected secret must not stop the app */
     }
+  }
+}
+
+/** Focus Guard is opt-in: it only turns on if the saved setting says so. */
+async function syncFocusGuardSetting(): Promise<void> {
+  if (!proxy || !focusGuardRef) return
+  try {
+    const res = await proxy({ method: 'GET', path: '/settings' })
+    const body = res.body as { focus_guard_enabled?: boolean } | null
+    focusGuardRef.setEnabled(res.status === 200 && body?.focus_guard_enabled === true)
+  } catch {
+    /* keep it off */
   }
 }
 
@@ -40,6 +55,7 @@ async function bootSidecar(): Promise<void> {
     )
     proxy = createApiProxy({ baseUrl: sidecar.baseUrl, token: sidecar.token, fetchImpl: fetch })
     await pushSecretsToSidecar()
+    await syncFocusGuardSetting()
     sidecarState = { ready: true }
   } catch (e) {
     sidecarState = { ready: false, error: e instanceof Error ? e.message : String(e) }
@@ -153,6 +169,23 @@ app.whenReady().then(() => {
   ipcMain.handle('pet:test', (event) => {
     assertTrusted(event.senderFrame?.url)
     return pet.test()
+  })
+  const focus = createFocusGuard({
+    activeWindow: readActiveWindow,
+    postSamples: async (samples) => {
+      if (proxy) await proxy({ method: 'POST', path: '/focus/samples', body: { samples } })
+    },
+    onDistraction: () => void pet.event('distraction')
+  })
+  focus.start()
+  focusGuardRef = focus
+  ipcMain.handle('focus:setEnabled', (event, on: boolean) => {
+    assertTrusted(event.senderFrame?.url)
+    focus.setEnabled(on === true)
+  })
+  ipcMain.handle('focus:setSession', (event, on: boolean) => {
+    assertTrusted(event.senderFrame?.url)
+    focus.setSessionActive(on === true)
   })
   ipcMain.handle('system:idleSeconds', (event) => {
     assertTrusted(event.senderFrame?.url)

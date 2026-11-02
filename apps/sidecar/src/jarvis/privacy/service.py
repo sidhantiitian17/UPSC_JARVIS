@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 
-CATEGORY_IDS = ("library", "study_history", "review", "ai_cache")
+CATEGORY_IDS = ("library", "study_history", "review", "ai_cache", "focus")
 RETENTION = "Kept until you delete it."
 
 _CATEGORIES = {
@@ -22,6 +22,11 @@ _CATEGORIES = {
         "title": "Review cards",
         "description": "Spaced-repetition cards and the log of every review.",
         "warning": "Cards for questions you got wrong will no longer come back.",
+    },
+    "focus": {
+        "title": "Focus Guard samples",
+        "description": "Only the category (study, neutral, distraction) and the app name, sampled every 5 seconds during focus blocks while Focus Guard is on. Window titles and web addresses are never stored.",
+        "warning": "Your focus summary on Insights will start again from zero.",
     },
     "ai_cache": {
         "title": "AI cache and usage log",
@@ -47,6 +52,7 @@ def _counts(conn: sqlite3.Connection) -> dict[str, int]:
         "review": _count(conn, "select count(*) from card"),
         "ai_cache": _count(conn, "select count(*) from llm_cache")
         + _count(conn, "select count(*) from llm_usage"),
+        "focus": _count(conn, "select count(*) from focus_sample"),
     }
 
 
@@ -94,6 +100,8 @@ def delete_category(conn: sqlite3.Connection, category: str) -> None:
         elif category == "review":
             conn.execute("delete from review_log")
             conn.execute("delete from card")
+        elif category == "focus":
+            conn.execute("delete from focus_sample")
         else:
             conn.execute("delete from llm_cache")
             conn.execute("delete from llm_usage")
