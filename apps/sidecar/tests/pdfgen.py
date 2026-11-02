@@ -23,7 +23,9 @@ def make_pdf(pages: list[str]) -> bytes:
         )
         lines = text.split("\n") if text else []
         body = (
-            "BT /F1 11 Tf 14 TL 50 740 Td " + " ".join(f"({_esc(ln)}) Tj T*" for ln in lines) + " ET"
+            "BT /F1 11 Tf 14 TL 50 740 Td "
+            + " ".join(f"({_esc(ln)}) Tj T*" if ln else "0 -14 Td" for ln in lines)
+            + " ET"
             if lines
             else ""
         )

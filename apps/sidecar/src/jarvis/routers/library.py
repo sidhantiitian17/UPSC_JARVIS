@@ -10,6 +10,7 @@ from jarvis.library.service import (
     add_pdf,
     get_document,
     list_documents,
+    page_chunks,
     search,
     set_position,
 )
@@ -37,6 +38,15 @@ class AddDocumentOut(DocumentOut):
 
 class PositionIn(BaseModel):
     page: int
+
+
+class ChunkOut(BaseModel):
+    id: int
+    page: int
+    ordinal: int
+    text: str
+    char_start: int
+    char_end: int
 
 
 class SearchHit(BaseModel):
@@ -94,6 +104,11 @@ def build_router(state: AppState) -> APIRouter:
             raise HTTPException(status_code=404, detail="document not found") from e
         except LibraryError as e:
             raise HTTPException(status_code=422, detail=str(e)) from e
+
+    @router.get("/documents/{doc_id}/pages/{page}/chunks", response_model=list[ChunkOut])
+    def chunks_of_page(doc_id: int, page: int) -> list[dict]:
+        with state.lock:
+            return page_chunks(state.conn, doc_id, page)
 
     @router.get("/search", response_model=list[SearchHit])
     def search_chunks(q: str = Query(max_length=300), limit: int = Query(20, ge=1, le=100)) -> list[dict]:

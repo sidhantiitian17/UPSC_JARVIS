@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { getDocumentFile, getDocumentInfo, savePosition, type LibraryDocument } from '../api/client'
 import { Button } from '../components/ui/button'
 import type { PdfDocHandle, PdfEngine } from './pdf-engine'
+import { BookmarkPanel } from './bookmark-panel'
 import { pdfjsEngine } from './pdfjs-engine'
 import { ZOOM_STEPS, clampPage, nextZoom } from './reader-state'
 
@@ -159,22 +160,25 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
         </div>
       )}
 
-      <div
-        ref={scrollRef}
-        className="min-h-0 flex-1 overflow-auto rounded-card border border-line bg-surface-2 p-4"
-      >
+      <div className="flex min-h-0 flex-1 gap-3">
         <div
-          data-testid="page-stage"
-          data-invert={String(invert)}
-          className="relative mx-auto w-fit"
+          ref={scrollRef}
+          className="min-h-0 flex-1 overflow-auto rounded-card border border-line bg-surface-2 p-4"
         >
-          <canvas
-            ref={canvasRef}
-            style={invert ? { filter: 'invert(1) hue-rotate(180deg)' } : undefined}
-            aria-label={`Page ${page}`}
-          />
-          <div ref={textRef} className="textLayer absolute left-0 top-0" />
+          <div
+            data-testid="page-stage"
+            data-invert={String(invert)}
+            className="relative mx-auto w-fit"
+          >
+            <canvas
+              ref={canvasRef}
+              style={invert ? { filter: 'invert(1) hue-rotate(180deg)' } : undefined}
+              aria-label={`Page ${page}`}
+            />
+            <div ref={textRef} className="textLayer absolute left-0 top-0" />
+          </div>
         </div>
+        <BookmarkPanel documentId={documentId} page={page} />
       </div>
     </section>
   )

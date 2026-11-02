@@ -139,6 +139,67 @@
         "title": "AiTestOut",
         "type": "object"
       },
+      "BudgetAlert": {
+        "properties": {
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          },
+          "sources": {
+            "title": "Sources",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id",
+          "title",
+          "sources"
+        ],
+        "title": "BudgetAlert",
+        "type": "object"
+      },
+      "ChunkOut": {
+        "properties": {
+          "char_end": {
+            "title": "Char End",
+            "type": "integer"
+          },
+          "char_start": {
+            "title": "Char Start",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "page",
+          "ordinal",
+          "text",
+          "char_start",
+          "char_end"
+        ],
+        "title": "ChunkOut",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "chunks": {
@@ -189,6 +250,32 @@
         "title": "DocumentOut",
         "type": "object"
       },
+      "EndIn": {
+        "properties": {
+          "end_chunk_id": {
+            "title": "End Chunk Id",
+            "type": "integer"
+          },
+          "focused_seconds": {
+            "anyOf": [
+              {
+                "maximum": 86400.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focused Seconds"
+          }
+        },
+        "required": [
+          "end_chunk_id"
+        ],
+        "title": "EndIn",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -219,6 +306,29 @@
           "version"
         ],
         "title": "Health",
+        "type": "object"
+      },
+      "Point": {
+        "properties": {
+          "chunk_id": {
+            "title": "Chunk Id",
+            "type": "integer"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "chunk_id",
+          "page",
+          "ordinal"
+        ],
+        "title": "Point",
         "type": "object"
       },
       "PositionIn": {
@@ -372,6 +482,99 @@
         "title": "SecretOut",
         "type": "object"
       },
+      "SessionOut": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "integer"
+          },
+          "document_title": {
+            "title": "Document Title",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "focused_seconds": {
+            "title": "Focused Seconds",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "needs_tagging": {
+            "title": "Needs Tagging",
+            "type": "boolean"
+          },
+          "source_budget": {
+            "items": {
+              "$ref": "#/components/schemas/BudgetAlert"
+            },
+            "title": "Source Budget",
+            "type": "array"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/TagOut"
+            },
+            "title": "Tags",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "document_title",
+          "status",
+          "started_at",
+          "ended_at",
+          "focused_seconds",
+          "start",
+          "end",
+          "tags",
+          "needs_tagging",
+          "source_budget"
+        ],
+        "title": "SessionOut",
+        "type": "object"
+      },
       "SettingsIn": {
         "properties": {
           "library_path": {
@@ -445,6 +648,24 @@
         "title": "SettingsOut",
         "type": "object"
       },
+      "StartIn": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "integer"
+          },
+          "start_chunk_id": {
+            "title": "Start Chunk Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "document_id",
+          "start_chunk_id"
+        ],
+        "title": "StartIn",
+        "type": "object"
+      },
       "SyllabusNodeOut": {
         "properties": {
           "children": {
@@ -508,6 +729,41 @@
           "children"
         ],
         "title": "SyllabusNodeOut",
+        "type": "object"
+      },
+      "TagOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "TagOut",
+        "type": "object"
+      },
+      "TagsIn": {
+        "properties": {
+          "node_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Node Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "node_ids"
+        ],
+        "title": "TagsIn",
         "type": "object"
       },
       "ValidationError": {
@@ -717,6 +973,61 @@
           }
         },
         "summary": "Document File",
+        "tags": [
+          "library"
+        ]
+      }
+    },
+    "/library/documents/{doc_id}/pages/{page}/chunks": {
+      "get": {
+        "operationId": "chunks_of_page_library_documents__doc_id__pages__page__chunks_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "title": "Doc Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "title": "Page",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChunkOut"
+                  },
+                  "title": "Response Chunks Of Page Library Documents  Doc Id  Pages  Page  Chunks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Chunks Of Page",
         "tags": [
           "library"
         ]
@@ -935,6 +1246,222 @@
           }
         },
         "summary": "Put Secret"
+      }
+    },
+    "/sessions": {
+      "post": {
+        "operationId": "start_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/sessions/active": {
+      "get": {
+        "operationId": "active_sessions_active_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SessionOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Active Sessions Active Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Active",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/sessions/{session_id}/cancel": {
+      "post": {
+        "operationId": "cancel_sessions__session_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/sessions/{session_id}/end": {
+      "post": {
+        "operationId": "end_sessions__session_id__end_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "End",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/sessions/{session_id}/tags": {
+      "put": {
+        "operationId": "tags_sessions__session_id__tags_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Tags",
+        "tags": [
+          "sessions"
+        ]
       }
     },
     "/settings": {

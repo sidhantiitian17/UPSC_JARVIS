@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from jarvis import __version__
 from jarvis.llm.providers import build_providers
 from jarvis.routers import library as library_router
+from jarvis.routers import sessions as sessions_router
 from jarvis.routers import settings as settings_router
 from jarvis.routers import syllabus as syllabus_router
 from jarvis.security import MIN_TOKEN_LENGTH, make_token_dependency
@@ -48,6 +49,7 @@ def create_app(
 
     app.include_router(settings_router.build_router(state), dependencies=[Depends(require_token)])
     app.include_router(library_router.build_router(state), dependencies=[Depends(require_token)])
+    app.include_router(sessions_router.build_router(state), dependencies=[Depends(require_token)])
     syl_dir = syllabus_dir or DEFAULT_SYLLABUS
     try:  # a broken ontology must not stop the app; POST /syllabus/reload reports the error
         sync_ontology(state.conn, load_ontology(syl_dir))

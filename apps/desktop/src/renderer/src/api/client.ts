@@ -54,3 +54,17 @@ export const getDocumentFile = (id: number): Promise<{ contentType: string; base
   api('GET', `/library/documents/${id}/file`)
 export const savePosition = (id: number, page: number): Promise<LibraryDocument> =>
   api('PUT', `/library/documents/${id}/position`, { page })
+
+export type StudySession = Schemas['SessionOut']
+export type ChunkInfo = Schemas['ChunkOut']
+export const listChunks = (docId: number, page: number): Promise<ChunkInfo[]> =>
+  api('GET', `/library/documents/${docId}/pages/${page}/chunks`)
+export const getActiveSession = (): Promise<StudySession | null> => api('GET', '/sessions/active')
+export const startSession = (document_id: number, start_chunk_id: number): Promise<StudySession> =>
+  api('POST', '/sessions', { document_id, start_chunk_id })
+export const endSession = (id: number, end_chunk_id: number): Promise<StudySession> =>
+  api('POST', `/sessions/${id}/end`, { end_chunk_id })
+export const cancelSession = (id: number): Promise<StudySession> =>
+  api('POST', `/sessions/${id}/cancel`)
+export const setSessionTags = (id: number, node_ids: string[]): Promise<StudySession> =>
+  api('PUT', `/sessions/${id}/tags`, { node_ids })

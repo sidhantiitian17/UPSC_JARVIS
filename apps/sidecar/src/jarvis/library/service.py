@@ -110,3 +110,12 @@ def set_position(conn: sqlite3.Connection, doc_id: int, page: int) -> dict:
         raise LibraryError(f"Page {page} is outside this document (1 to {doc['page_count']}).")
     conn.execute("update document set last_page = ? where id = ?", (page, doc_id))
     return _doc_row(conn, doc_id)
+
+
+def page_chunks(conn: sqlite3.Connection, doc_id: int, page: int) -> list[dict]:
+    rows = conn.execute(
+        "select id, page, ordinal, text, char_start, char_end from chunk "
+        "where document_id = ? and page = ? order by ordinal",
+        (doc_id, page),
+    ).fetchall()
+    return [dict(r) for r in rows]

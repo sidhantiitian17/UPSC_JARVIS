@@ -109,7 +109,10 @@ try {
   const pdfPath = path.join(userData, 'e2e-polity.pdf')
   writeFileSync(
     pdfPath,
-    tinyPdf(['Article 14 guarantees equality before law.', 'Article 21 protects life.'])
+    tinyPdf([
+      'Article 14 of the Constitution guarantees equality before law.',
+      'Article 21 protects life.'
+    ])
   )
   const added = await win.evaluate(
     (p) => window.jarvis.api({ method: 'POST', path: '/library/documents', body: { path: p } }),
@@ -150,6 +153,19 @@ try {
     return false
   })
   check('reader canvas has painted pixels', painted)
+  await win.click('button[aria-label="Set start bookmark at paragraph 1"]')
+  await win.waitForSelector('[role="status"] >> text=Reading since page 1')
+  await win.click('button[aria-label="Set end bookmark at paragraph 1"]')
+  const saved = await win
+    .waitForSelector('section[aria-label="Session saved"]', { timeout: 30000 })
+    .then(() => true)
+    .catch(() => false)
+  check('start/end bookmarks save a session', saved)
+  const sessionTags = await win.evaluate(async () => {
+    const t = await window.jarvis.api({ method: 'GET', path: '/syllabus/tree' })
+    return t.status
+  })
+  check('syllabus still served after session', sessionTags === 200)
   await win.click('text=Back to library')
   await win.click('text=Syllabus')
   const banner = await win.locator('[role=alert]').count()

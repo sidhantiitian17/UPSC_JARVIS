@@ -47,6 +47,8 @@ function setup(
     if (req.path === `/library/documents/${doc.id}`) return { status: 200, body: doc }
     if (req.path === `/library/documents/${doc.id}/file`)
       return fileRes ?? { status: 200, body: { contentType: 'application/pdf', base64: PDF_B64 } }
+    if (req.path === '/sessions/active') return { status: 200, body: null }
+    if (req.path.includes('/chunks')) return { status: 200, body: [] }
     if (req.method === 'PUT' && req.path.endsWith('/position'))
       return { status: 200, body: { ...doc, last_page: (req.body as { page: number }).page } }
     return { status: 404, body: null }
