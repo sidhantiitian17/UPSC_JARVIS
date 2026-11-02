@@ -362,6 +362,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/pyq/drift": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Drift */
+        get: operations["get_drift_pyq_drift_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/pyq/import": {
         parameters: {
             query?: never;
@@ -510,6 +527,23 @@ export interface paths {
         put?: never;
         /** Batch */
         post: operations["batch_pyq_suggest_tags_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/trends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Trends */
+        get: operations["get_trends_pyq_trends_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1075,6 +1109,43 @@ export interface components {
             scanned: boolean;
             /** Title */
             title: string;
+        };
+        /** DriftAlert */
+        DriftAlert: {
+            /** Kind */
+            kind: string;
+            /** Subject Id */
+            subject_id: string;
+            /** Text */
+            text: string;
+            /** Time Share Pct */
+            time_share_pct: number;
+            /** Weight Share Pct */
+            weight_share_pct: number;
+        };
+        /** DriftOut */
+        DriftOut: {
+            /** Alerts */
+            alerts: components["schemas"]["DriftAlert"][];
+            /** Enough Data */
+            enough_data: boolean;
+            /** Message */
+            message: string;
+            /** Rows */
+            rows: components["schemas"]["DriftRow"][];
+        };
+        /** DriftRow */
+        DriftRow: {
+            /** Subject Id */
+            subject_id: string;
+            /** Time Share Pct */
+            time_share_pct: number;
+            /** Title */
+            title: string;
+            /** Verified Minutes */
+            verified_minutes: number;
+            /** Weight Share Pct */
+            weight_share_pct: number;
         };
         /** EditIn */
         EditIn: {
@@ -1695,6 +1766,21 @@ export interface components {
             /** Stored */
             stored: number;
         };
+        /** SubjectTrend */
+        SubjectTrend: {
+            /** Counts By Year */
+            counts_by_year: {
+                [key: string]: number;
+            };
+            /** Id */
+            id: string;
+            /** Share Pct */
+            share_pct: number;
+            /** Title */
+            title: string;
+            /** Total */
+            total: number;
+        };
         /** SyllabusNodeOut */
         SyllabusNodeOut: {
             /** Children */
@@ -1750,6 +1836,19 @@ export interface components {
             neutral_minutes: number;
             /** Study Minutes */
             study_minutes: number;
+        };
+        /** TrendsOut */
+        TrendsOut: {
+            /** Questions With Text */
+            questions_with_text: number;
+            /** Subjects */
+            subjects: components["schemas"]["SubjectTrend"][];
+            /** Tagged Pct */
+            tagged_pct: number | null;
+            /** Tagged Questions */
+            tagged_questions: number;
+            /** Years */
+            years: number[];
         };
         /** TruthOut */
         TruthOut: {
@@ -2392,6 +2491,26 @@ export interface operations {
             };
         };
     };
+    get_drift_pyq_drift_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DriftOut"];
+                };
+            };
+        };
+    };
     import__pyq_import_post: {
         parameters: {
             query?: never;
@@ -2709,6 +2828,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_trends_pyq_trends_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrendsOut"];
                 };
             };
         };

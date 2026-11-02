@@ -261,6 +261,11 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Insights shows claimed versus verified', insightsOk)
+  const pyqCard = await win
+    .waitForSelector('section[aria-label="PYQ weightage versus your time"]', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('Insights shows the PYQ weightage card', pyqCard)
   await win.click('nav[aria-label="Main"] >> text=PYQ Lab')
   await win.waitForSelector('[data-testid="empty-state"]', { timeout: 10000 })
   await win.click('button:has-text("Import PYQs")')

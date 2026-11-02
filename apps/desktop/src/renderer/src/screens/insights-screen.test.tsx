@@ -47,12 +47,23 @@ const FOCUS_OFF = {
   totals: { study_minutes: 0, neutral_minutes: 0, distraction_minutes: 0 },
   top_distraction_apps: []
 }
+let pyqTrends: object = {
+  years: [],
+  subjects: [],
+  tagged_questions: 0,
+  questions_with_text: 0,
+  tagged_pct: null
+}
+let pyqDrift: object = { enough_data: false, message: 'Not enough data yet.', alerts: [], rows: [] }
 function setup(res: Res, focus: object = FOCUS_OFF): void {
   ;(window as unknown as { jarvis: unknown }).jarvis = {
     platform: 'test',
-    api: vi.fn(async (req: { path: string }) =>
-      req.path.startsWith('/focus/summary') ? { status: 200, body: focus } : res
-    ),
+    api: vi.fn(async (req: { path: string }) => {
+      if (req.path.startsWith('/focus/summary')) return { status: 200, body: focus }
+      if (req.path === '/pyq/trends') return { status: 200, body: pyqTrends }
+      if (req.path === '/pyq/drift') return { status: 200, body: pyqDrift }
+      return res
+    }),
     status: async () => ({ ready: true })
   }
 }
@@ -127,5 +138,93 @@ describe('Insights (Truth Dashboard)', () => {
     setup({ status: 200, body: TRUTH })
     render(<InsightsScreen />)
     expect(await screen.findByText(/focus guard is off/i)).toBeInTheDocument()
+  })
+
+  it('shows the PYQ weightage per subject next to your verified time, and drift alerts kindly', async () => {
+    pyqTrends = {
+      years: [2022, 2023],
+      subjects: [
+        {
+          id: 'gs2.polity',
+          title: 'Constitution and Polity',
+          counts_by_year: { '2022': 3, '2023': 1 },
+          total: 4,
+          share_pct: 80
+        },
+        {
+          id: 'gs3.economy',
+          title: 'Indian Economy',
+          counts_by_year: { '2023': 1 },
+          total: 1,
+          share_pct: 20
+        }
+      ],
+      tagged_questions: 5,
+      questions_with_text: 10,
+      tagged_pct: 50
+    }
+    pyqDrift = {
+      enough_data: true,
+      message: 'Compared over the last 4 weeks.',
+      alerts: [
+        {
+          subject_id: 'gs2.polity',
+          kind: 'under_served',
+          weight_share_pct: 80,
+          time_share_pct: 10,
+          text: 'Constitution and Polity makes up 80% of tagged PYQs but only 10% of your verified time. Try giving one of your next focus blocks to it.'
+        }
+      ],
+      rows: [
+        {
+          subject_id: 'gs2.polity',
+          title: 'Constitution and Polity',
+          weight_share_pct: 80,
+          time_share_pct: 10,
+          verified_minutes: 30
+        },
+        {
+          subject_id: 'gs3.economy',
+          title: 'Indian Economy',
+          weight_share_pct: 20,
+          time_share_pct: 90,
+          verified_minutes: 270
+        }
+      ]
+    }
+    setup({ status: 200, body: TRUTH })
+    render(<InsightsScreen />)
+    const card = await screen.findByRole('region', { name: /pyq weightage versus your time/i })
+    expect(within(card).getByText(/50% of questions with text are tagged/i)).toBeInTheDocument()
+    const table = within(card).getByRole('table', { name: /weightage and time/i })
+    const rows = within(table).getAllByRole('row')
+    expect(within(rows[1]).getByText('Constitution and Polity')).toBeInTheDocument()
+    expect(within(rows[1]).getByText('80%')).toBeInTheDocument()
+    expect(within(rows[1]).getByText('10%')).toBeInTheDocument()
+    expect(within(card).getByRole('alert')).toHaveTextContent(
+      /try giving one of your next focus blocks/i
+    )
+    expect(document.body.textContent?.toLowerCase()).not.toContain('predicted')
+  })
+
+  it('says why there is no drift alert when data is thin', async () => {
+    pyqTrends = {
+      years: [],
+      subjects: [],
+      tagged_questions: 0,
+      questions_with_text: 0,
+      tagged_pct: null
+    }
+    pyqDrift = {
+      enough_data: false,
+      message: 'Not enough data yet. Tag at least 30 PYQs.',
+      alerts: [],
+      rows: []
+    }
+    setup({ status: 200, body: TRUTH })
+    render(<InsightsScreen />)
+    const card = await screen.findByRole('region', { name: /pyq weightage versus your time/i })
+    expect(within(card).getByText(/not enough data yet/i)).toBeInTheDocument()
+    expect(within(card).queryByRole('alert')).not.toBeInTheDocument()
   })
 })

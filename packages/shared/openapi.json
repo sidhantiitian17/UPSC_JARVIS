@@ -724,6 +724,106 @@
         "title": "DocumentOut",
         "type": "object"
       },
+      "DriftAlert": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "time_share_pct": {
+            "title": "Time Share Pct",
+            "type": "integer"
+          },
+          "weight_share_pct": {
+            "title": "Weight Share Pct",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "subject_id",
+          "kind",
+          "weight_share_pct",
+          "time_share_pct",
+          "text"
+        ],
+        "title": "DriftAlert",
+        "type": "object"
+      },
+      "DriftOut": {
+        "properties": {
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/DriftAlert"
+            },
+            "title": "Alerts",
+            "type": "array"
+          },
+          "enough_data": {
+            "title": "Enough Data",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/DriftRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "enough_data",
+          "message",
+          "alerts",
+          "rows"
+        ],
+        "title": "DriftOut",
+        "type": "object"
+      },
+      "DriftRow": {
+        "properties": {
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "time_share_pct": {
+            "title": "Time Share Pct",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verified_minutes": {
+            "title": "Verified Minutes",
+            "type": "integer"
+          },
+          "weight_share_pct": {
+            "title": "Weight Share Pct",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "subject_id",
+          "title",
+          "weight_share_pct",
+          "time_share_pct",
+          "verified_minutes"
+        ],
+        "title": "DriftRow",
+        "type": "object"
+      },
       "EditIn": {
         "properties": {
           "answer": {
@@ -2669,6 +2769,42 @@
         "title": "StoredOut",
         "type": "object"
       },
+      "SubjectTrend": {
+        "properties": {
+          "counts_by_year": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Counts By Year",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "share_pct": {
+            "title": "Share Pct",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "counts_by_year",
+          "total",
+          "share_pct"
+        ],
+        "title": "SubjectTrend",
+        "type": "object"
+      },
       "SyllabusNodeOut": {
         "properties": {
           "children": {
@@ -2849,6 +2985,52 @@
           "distraction_minutes"
         ],
         "title": "TotalsOut",
+        "type": "object"
+      },
+      "TrendsOut": {
+        "properties": {
+          "questions_with_text": {
+            "title": "Questions With Text",
+            "type": "integer"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectTrend"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "tagged_pct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tagged Pct"
+          },
+          "tagged_questions": {
+            "title": "Tagged Questions",
+            "type": "integer"
+          },
+          "years": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Years",
+            "type": "array"
+          }
+        },
+        "required": [
+          "years",
+          "subjects",
+          "tagged_questions",
+          "questions_with_text",
+          "tagged_pct"
+        ],
+        "title": "TrendsOut",
         "type": "object"
       },
       "TruthOut": {
@@ -3752,6 +3934,27 @@
         ]
       }
     },
+    "/pyq/drift": {
+      "get": {
+        "operationId": "get_drift_pyq_drift_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriftOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Drift",
+        "tags": [
+          "pyq"
+        ]
+      }
+    },
     "/pyq/import": {
       "post": {
         "operationId": "import__pyq_import_post",
@@ -4286,6 +4489,27 @@
           }
         },
         "summary": "Batch",
+        "tags": [
+          "pyq"
+        ]
+      }
+    },
+    "/pyq/trends": {
+      "get": {
+        "operationId": "get_trends_pyq_trends_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Trends",
         "tags": [
           "pyq"
         ]

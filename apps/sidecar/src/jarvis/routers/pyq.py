@@ -15,6 +15,7 @@ from jarvis.pyq.service import (
     update_question,
 )
 from jarvis.pyq.tags import add_manual, decide, suggest_batch, suggest_tags
+from jarvis.pyq.trends import drift, trends
 from jarvis.state import DEFAULT_PYQ, AppState
 
 
@@ -88,6 +89,45 @@ class BatchOut(BaseModel):
     remaining: int
 
 
+class SubjectTrend(BaseModel):
+    id: str
+    title: str
+    counts_by_year: dict[str, float]
+    total: float
+    share_pct: int
+
+
+class TrendsOut(BaseModel):
+    years: list[int]
+    subjects: list[SubjectTrend]
+    tagged_questions: int
+    questions_with_text: int
+    tagged_pct: int | None
+
+
+class DriftRow(BaseModel):
+    subject_id: str
+    title: str
+    weight_share_pct: int
+    time_share_pct: int
+    verified_minutes: int
+
+
+class DriftAlert(BaseModel):
+    subject_id: str
+    kind: str
+    weight_share_pct: int
+    time_share_pct: int
+    text: str
+
+
+class DriftOut(BaseModel):
+    enough_data: bool
+    message: str
+    alerts: list[DriftAlert]
+    rows: list[DriftRow]
+
+
 class EditIn(BaseModel):
     stem: str | None = None
     options: list[str] | None = None
@@ -110,6 +150,14 @@ def build_router(state: AppState) -> APIRouter:
     def import_(body: ImportIn | None = None) -> dict:
         root = Path(body.root) if body and body.root else DEFAULT_PYQ
         return guarded(lambda: import_dataset(state.conn, root))
+
+    @router.get("/trends", response_model=TrendsOut)
+    def get_trends() -> dict:
+        return guarded(lambda: trends(state.conn))
+
+    @router.get("/drift", response_model=DriftOut)
+    def get_drift() -> dict:
+        return guarded(lambda: drift(state.conn))
 
     @router.get("/papers", response_model=list[PaperOut])
     def papers() -> list[dict]:

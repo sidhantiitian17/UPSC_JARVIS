@@ -174,3 +174,8 @@ export const decidePyqTag = (
   api('PUT', `/pyq/questions/${id}/tags/${encodeURIComponent(node)}`, { decision })
 export const addPyqTag = (id: string, node_id: string): Promise<PyqTag[]> =>
   api('POST', `/pyq/questions/${id}/tags`, { node_id })
+
+export type PyqTrends = Schemas['TrendsOut']
+export type PyqDrift = Schemas['DriftOut']
+export const getPyqTrends = (): Promise<PyqTrends> => api('GET', '/pyq/trends')
+export const getPyqDrift = (): Promise<PyqDrift> => api('GET', '/pyq/drift')

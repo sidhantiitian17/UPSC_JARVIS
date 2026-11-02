@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
-import { getFocusSummary, getTruth, type FocusSummary, type Truth } from '../api/client'
+import {
+  getFocusSummary,
+  getPyqDrift,
+  getPyqTrends,
+  getTruth,
+  type FocusSummary,
+  type PyqDrift,
+  type PyqTrends,
+  type Truth
+} from '../api/client'
 import { Card } from '../components/ui/card'
 import { SCREEN_META } from '../screens'
 
@@ -30,6 +39,7 @@ export function InsightsScreen(): React.JSX.Element {
   const [data, setData] = useState<Truth | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [focus, setFocus] = useState<FocusSummary | null>(null)
+  const [pyq, setPyq] = useState<{ trends: PyqTrends; drift: PyqDrift } | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -38,6 +48,9 @@ export function InsightsScreen(): React.JSX.Element {
       .catch(() => alive && setError('Could not load your insights. Is the local service running?'))
     getFocusSummary()
       .then((f) => alive && setFocus(f))
+      .catch(() => undefined)
+    Promise.all([getPyqTrends(), getPyqDrift()])
+      .then(([trends, drift]) => alive && setPyq({ trends, drift }))
       .catch(() => undefined)
     return () => {
       alive = false
@@ -155,6 +168,49 @@ export function InsightsScreen(): React.JSX.Element {
               )}
             </section>
           </Card>
+
+          {pyq && (
+            <Card>
+              <section aria-label="PYQ weightage versus your time" className="flex flex-col gap-3">
+                <h2 className="text-xl font-semibold">PYQ weightage versus your time</h2>
+                <p className="text-sm text-muted">
+                  {pyq.trends.tagged_pct === null
+                    ? 'No PYQ text is imported yet. Import and tag PYQs in the PYQ Lab.'
+                    : `${pyq.trends.tagged_pct}% of questions with text are tagged (${pyq.trends.tagged_questions} of ${pyq.trends.questions_with_text}). Only tags you accepted are counted.`}
+                </p>
+                {!pyq.drift.enough_data && <p className="text-sm">{pyq.drift.message}</p>}
+                {pyq.drift.alerts.map((a) => (
+                  <p
+                    key={a.subject_id}
+                    role="alert"
+                    className="rounded-lg border border-warning p-2 text-sm"
+                  >
+                    {a.text}
+                  </p>
+                ))}
+                {pyq.drift.rows.length > 0 && (
+                  <table aria-label="Weightage and time" className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-muted">
+                        <th>Subject</th>
+                        <th>PYQ weightage</th>
+                        <th>Your verified time (4 weeks)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pyq.drift.rows.map((r) => (
+                        <tr key={r.subject_id}>
+                          <td>{r.title}</td>
+                          <td>{r.weight_share_pct}%</td>
+                          <td>{r.time_share_pct}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </section>
+            </Card>
+          )}
 
           <Card className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold">Weekly honesty report</h2>
