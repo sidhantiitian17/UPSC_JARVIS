@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -7,6 +9,8 @@ from jarvis.gate.generate import GateError, build_gate, gate_view, report_questi
 from jarvis.gate.scoring import answer_question, finish_gate, skip_gate
 from jarvis.state import AppState
 from jarvis.study.sessions import SessionConflict
+from jarvis.vault.mirror import mirror_after_gate
+from jarvis.vault.writer import VaultWriter
 
 
 class GateQuestion(BaseModel):
@@ -129,14 +133,30 @@ def build_router(state: AppState) -> APIRouter:
             )
         )
 
+    def mirror(session_id: int) -> None:
+        """Best-effort Obsidian mirror: a missing or broken vault must never break studying."""
+        try:
+            with state.lock:
+                row = state.conn.execute("select value_json from setting where key='vault_path'").fetchone()
+                if row is None:
+                    return
+                writer = VaultWriter(json.loads(row["value_json"]), secrets=state.secrets.values)
+                mirror_after_gate(state.conn, writer, session_id)
+        except Exception:  # noqa: BLE001 - deliberately swallow every mirror failure
+            return
+
     @router.post("/sessions/{session_id}/gate/finish", response_model=ResultOut)
     def finish(session_id: int) -> dict:
-        return run(lambda: finish_gate(state.conn, session_id))
+        result = run(lambda: finish_gate(state.conn, session_id))
+        mirror(session_id)
+        return result
 
     @router.post("/sessions/{session_id}/gate/skip", response_model=ResultOut)
     def skip(session_id: int, body: SkipIn | None = None) -> dict:
         penalty = body.penalty if body else True
-        return run(lambda: skip_gate(state.conn, session_id, penalty=penalty))
+        result = run(lambda: skip_gate(state.conn, session_id, penalty=penalty))
+        mirror(session_id)
+        return result
 
     @router.post("/questions/{question_id}/report", response_model=ReportOut)
     def report(question_id: int, body: ReportIn) -> dict:

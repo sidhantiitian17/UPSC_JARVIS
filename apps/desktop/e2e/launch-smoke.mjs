@@ -5,7 +5,7 @@ import { _electron as electron } from 'playwright-core'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { execSync } from 'node:child_process'
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
 
@@ -119,6 +119,13 @@ try {
       'The Finance Commission is constituted every fifth year under Article 280.'
     ])
   )
+  const vaultDir = path.join(userData, 'vault')
+  mkdirSync(vaultDir)
+  const vaultSet = await win.evaluate(
+    (v) => window.jarvis.api({ method: 'PUT', path: '/settings', body: { vault_path: v } }),
+    vaultDir
+  )
+  check('vault folder accepted', vaultSet.status === 200)
   const added = await win.evaluate(
     (p) => window.jarvis.api({ method: 'POST', path: '/library/documents', body: { path: p } }),
     pdfPath
@@ -205,6 +212,16 @@ try {
   })
   check('finished gate no longer awaits', noGateWaiting)
   await win.click('button:has-text("Done")')
+  const sessionNotes = readdirSync(path.join(vaultDir, 'JARVIS', 'Sessions')).filter((f) =>
+    f.endsWith('.md')
+  )
+  const dailyNotes = readdirSync(path.join(vaultDir, 'JARVIS', 'Daily')).filter((f) =>
+    f.endsWith('.md')
+  )
+  check(
+    'Obsidian mirror wrote a session note and a daily note',
+    sessionNotes.length === 1 && dailyNotes.length === 1
+  )
   const stats = await win.evaluate(() =>
     window.jarvis.api({ method: 'GET', path: '/review/stats' })
   )
