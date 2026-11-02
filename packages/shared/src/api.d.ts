@@ -362,6 +362,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/pyq/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import */
+        post: operations["import__pyq_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Papers */
+        get: operations["papers_pyq_papers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Questions */
+        get: operations["questions_pyq_questions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/questions/{qid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One */
+        get: operations["one_pyq_questions__qid__get"];
+        /** Edit */
+        put: operations["edit_pyq_questions__qid__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/questions/{qid}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify */
+        post: operations["verify_pyq_questions__qid__verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/questions/{question_id}/report": {
         parameters: {
             query?: never;
@@ -898,6 +984,15 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** EditIn */
+        EditIn: {
+            /** Answer */
+            answer?: string | null;
+            /** Options */
+            options?: string[] | null;
+            /** Stem */
+            stem?: string | null;
+        };
         /** EndIn */
         EndIn: {
             /** End Chunk Id */
@@ -1001,6 +1096,24 @@ export interface components {
             /** Minutes */
             minutes: number;
         };
+        /** ImportIn */
+        ImportIn: {
+            /** Root */
+            root?: string | null;
+        };
+        /** ImportOut */
+        ImportOut: {
+            /** Files */
+            files: number;
+            /** Inserted */
+            inserted: number;
+            /** Kept Owner Edits */
+            kept_owner_edits: number;
+            /** Questions */
+            questions: number;
+            /** Updated */
+            updated: number;
+        };
         /** LocationsOut */
         LocationsOut: {
             /** Data Dir */
@@ -1044,6 +1157,25 @@ export interface components {
             id: string;
             /** Title */
             title: string;
+        };
+        /** PaperOut */
+        PaperOut: {
+            /** Failed */
+            failed: number;
+            /** Paper */
+            paper: string;
+            /** Parsed */
+            parsed: number;
+            /** Phase */
+            phase: string;
+            /** Reviewed */
+            reviewed: number;
+            /** Total */
+            total: number;
+            /** Verified */
+            verified: number;
+            /** Year */
+            year: number;
         };
         /** PlanIn */
         PlanIn: {
@@ -1129,6 +1261,43 @@ export interface components {
             needs_key: boolean;
             /** Secret Name */
             secret_name?: string | null;
+        };
+        /** PyqOut */
+        PyqOut: {
+            /** Answer */
+            answer: string | null;
+            /** Answer Source */
+            answer_source: string;
+            /** Id */
+            id: string;
+            /** Marks */
+            marks: number | null;
+            /** Negative Marks */
+            negative_marks: number | null;
+            /** Number */
+            number: number;
+            /** Options */
+            options: string[];
+            /** Page */
+            page: number | null;
+            /** Paper */
+            paper: string;
+            /** Phase */
+            phase: string;
+            /** Raw Text */
+            raw_text: string | null;
+            /** Source Sha256 */
+            source_sha256: string | null;
+            /** Source Url */
+            source_url: string | null;
+            /** Status */
+            status: string;
+            /** Stem */
+            stem: string;
+            /** Suggested Answer */
+            suggested_answer: string | null;
+            /** Year */
+            year: number;
         };
         /** RateIn */
         RateIn: {
@@ -2097,6 +2266,192 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PrivacyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import__pyq_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ImportIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    papers_pyq_papers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaperOut"][];
+                };
+            };
+        };
+    };
+    questions_pyq_questions_get: {
+        parameters: {
+            query?: {
+                phase?: string | null;
+                year?: number | null;
+                paper?: string | null;
+                status?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PyqOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    one_pyq_questions__qid__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                qid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PyqOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_pyq_questions__qid__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                qid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PyqOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_pyq_questions__qid__verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                qid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PyqOut"];
                 };
             };
             /** @description Validation Error */

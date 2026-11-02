@@ -140,3 +140,25 @@ export const deletePrivacyCategory = (id: string): Promise<PrivacySummary> =>
 
 export type FocusSummary = Schemas['FocusSummaryOut']
 export const getFocusSummary = (): Promise<FocusSummary> => api('GET', '/focus/summary?days=7')
+
+export type PyqPaper = Schemas['PaperOut']
+export type PyqQuestion = Schemas['PyqOut']
+export type PyqImportResult = Schemas['ImportOut']
+export const importPyq = (): Promise<PyqImportResult> => api('POST', '/pyq/import', {})
+export const getPyqPapers = (): Promise<PyqPaper[]> => api('GET', '/pyq/papers')
+export const getPyqQuestions = (
+  phase: string,
+  year: number,
+  paper: string,
+  status?: string
+): Promise<PyqQuestion[]> =>
+  api(
+    'GET',
+    `/pyq/questions?phase=${phase}&year=${year}&paper=${encodeURIComponent(paper)}${status ? `&status=${status}` : ''}&limit=200`
+  )
+export const savePyq = (
+  id: string,
+  body: { stem?: string; options?: string[]; answer?: string }
+): Promise<PyqQuestion> => api('PUT', `/pyq/questions/${id}`, body)
+export const verifyPyq = (id: string): Promise<PyqQuestion> =>
+  api('POST', `/pyq/questions/${id}/verify`)

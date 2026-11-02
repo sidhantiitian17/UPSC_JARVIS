@@ -5,6 +5,7 @@ import { NotFound } from './screens/not-found'
 import { ScreenView } from './screens/screen-view'
 import { LibraryScreen } from './screens/library-screen'
 import { InsightsScreen } from './screens/insights-screen'
+import { PyqScreen } from './screens/pyq-screen'
 import { SettingsScreen } from './screens/settings-screen'
 import { TodayScreen } from './screens/today-screen'
 import { SyllabusScreen } from './screens/syllabus-screen'
@@ -12,6 +13,7 @@ import { SyllabusScreen } from './screens/syllabus-screen'
 const SCREEN_ELEMENT: Partial<Record<(typeof SCREENS)[number], React.JSX.Element>> = {
   today: <TodayScreen />,
   insights: <InsightsScreen />,
+  pyq: <PyqScreen />,
   study: <LibraryScreen />,
   settings: <SettingsScreen />,
   syllabus: <SyllabusScreen />

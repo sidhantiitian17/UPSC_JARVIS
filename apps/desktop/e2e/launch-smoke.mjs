@@ -261,6 +261,23 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Insights shows claimed versus verified', insightsOk)
+  await win.click('nav[aria-label="Main"] >> text=PYQ Lab')
+  await win.waitForSelector('[data-testid="empty-state"]', { timeout: 10000 })
+  await win.click('button:has-text("Import PYQs")')
+  const pyqListed = await win
+    .waitForSelector('li[aria-label="Prelims 2023 gs-paper-1"]', { timeout: 30000 })
+    .then(() => true)
+    .catch(() => false)
+  check('PYQ Lab imports the real Phase 0 dataset and lists its papers', pyqListed)
+  const pyqPapers = await win.evaluate(() =>
+    window.jarvis.api({ method: 'GET', path: '/pyq/papers' })
+  )
+  check(
+    'all 22 papers and 1587 questions are in SQLite',
+    pyqPapers.status === 200 &&
+      pyqPapers.body.length === 22 &&
+      pyqPapers.body.reduce((n, p) => n + p.total, 0) === 1587
+  )
   const petStatus = await win.evaluate(() => window.jarvis.pet.status())
   check(
     'pet bridge answers (OpenPets itself is optional)',
