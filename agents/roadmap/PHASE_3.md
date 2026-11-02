@@ -32,7 +32,7 @@ PYQ, Mains, CA, Telegram, browser, interview, mobile.
 ## Work Units
 | ID | Goal | Acceptance | Scope | Deps | Verification | Status | Commit |
 |---|---|---|---|---|---|---|---|
-| WU-P03-001 | XP / level / streak / freeze model | XP from verified retained minutes; streak freeze; comeback quest; event log | sidecar gamification | P2 | pytest: rules table | ready-for-review | this commit |
+| WU-P03-001 | XP / level / streak / freeze model | XP from verified retained minutes; streak freeze; comeback quest; event log | sidecar gamification | P2 | pytest: rules table | ready-for-review | 7324283 |
 | WU-P03-002 | Motivation popup engine + quote bank | `quote(text, author, citation, tags, verified)`; only `verified=1` shown; "Mains mein kaise use karein" line; owner reviews ≥ 100 seed entries | sidecar + desktop popup | 001 | pytest: unverified never returned; **owner review** (`content-review`) | planned | — |
 | WU-P03-003 | OpenPets integration spike (**decided: use OpenPets**) | Windows installer running; `@open-pets/client` from Electron main over named-pipe IPC sends `react`/`say`; message limits respected; chosen pet's licence recorded; official plugins (Focus Buddy, Mood Check-in, Water Reminder, Anxiety Aid) enabled/configured; ADR with API-stability notes | `agents/docs/`, desktop main | P2 | spike report; licence verified; manual: pet reacts on session start | planned | — |
 | WU-P03-004 | Pet adapter + modes + language rules | Events: session start, idle, gate pass/fail, level-up; Coach/Strict/Silent; message templates reviewed against rules; fallback: own transparent window if spike says so | desktop main | 003, 001 | unit tests on message rules; manual | planned | — |
