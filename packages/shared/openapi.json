@@ -139,6 +139,119 @@
         "title": "AiTestOut",
         "type": "object"
       },
+      "AnswerIn": {
+        "properties": {
+          "chosen_index": {
+            "maximum": 3.0,
+            "minimum": 0.0,
+            "title": "Chosen Index",
+            "type": "integer"
+          },
+          "confidence": {
+            "pattern": "^[GAR]$",
+            "title": "Confidence",
+            "type": "string"
+          },
+          "question_id": {
+            "title": "Question Id",
+            "type": "integer"
+          },
+          "time_ms": {
+            "anyOf": [
+              {
+                "maximum": 3600000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Ms"
+          }
+        },
+        "required": [
+          "question_id",
+          "chosen_index",
+          "confidence"
+        ],
+        "title": "AnswerIn",
+        "type": "object"
+      },
+      "AnswerOut": {
+        "properties": {
+          "answer_index": {
+            "title": "Answer Index",
+            "type": "integer"
+          },
+          "chosen_index": {
+            "title": "Chosen Index",
+            "type": "integer"
+          },
+          "chunk_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Id"
+          },
+          "correct": {
+            "title": "Correct",
+            "type": "boolean"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "ordinal": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordinal"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "question_id": {
+            "title": "Question Id",
+            "type": "integer"
+          },
+          "source_quote": {
+            "title": "Source Quote",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question_id",
+          "correct",
+          "chosen_index",
+          "answer_index",
+          "explanation",
+          "source_quote",
+          "chunk_id",
+          "page",
+          "ordinal"
+        ],
+        "title": "AnswerOut",
+        "type": "object"
+      },
       "BudgetAlert": {
         "properties": {
           "node_id": {
@@ -421,6 +534,24 @@
         "title": "Health",
         "type": "object"
       },
+      "NodeRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "NodeRef",
+        "type": "object"
+      },
       "Point": {
         "properties": {
           "chunk_id": {
@@ -552,6 +683,103 @@
           "status"
         ],
         "title": "ReportOut",
+        "type": "object"
+      },
+      "RestudyItem": {
+        "properties": {
+          "book": {
+            "title": "Book",
+            "type": "string"
+          },
+          "chunk_id": {
+            "title": "Chunk Id",
+            "type": "integer"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chunk_id",
+          "book",
+          "page",
+          "ordinal",
+          "quote"
+        ],
+        "title": "RestudyItem",
+        "type": "object"
+      },
+      "ResultOut": {
+        "properties": {
+          "correct": {
+            "title": "Correct",
+            "type": "integer"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/NodeRef"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "pass_mark": {
+            "title": "Pass Mark",
+            "type": "integer"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "restudy": {
+            "items": {
+              "$ref": "#/components/schemas/RestudyItem"
+            },
+            "title": "Restudy",
+            "type": "array"
+          },
+          "retention_pct": {
+            "title": "Retention Pct",
+            "type": "integer"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "integer"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "boolean"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "total",
+          "correct",
+          "retention_pct",
+          "passed",
+          "skipped",
+          "xp",
+          "pass_mark",
+          "restudy",
+          "nodes"
+        ],
+        "title": "ResultOut",
         "type": "object"
       },
       "SearchHit": {
@@ -825,6 +1053,17 @@
           "db_version"
         ],
         "title": "SettingsOut",
+        "type": "object"
+      },
+      "SkipIn": {
+        "properties": {
+          "penalty": {
+            "default": true,
+            "title": "Penalty",
+            "type": "boolean"
+          }
+        },
+        "title": "SkipIn",
         "type": "object"
       },
       "StartIn": {
@@ -1549,6 +1788,35 @@
         ]
       }
     },
+    "/sessions/awaiting-gate": {
+      "get": {
+        "operationId": "awaiting_gate_sessions_awaiting_gate_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SessionOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Awaiting Gate Sessions Awaiting Gate Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Awaiting Gate",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
     "/sessions/{session_id}/cancel": {
       "post": {
         "operationId": "cancel_sessions__session_id__cancel_post",
@@ -1720,6 +1988,159 @@
           }
         },
         "summary": "Create Gate",
+        "tags": [
+          "gate"
+        ]
+      }
+    },
+    "/sessions/{session_id}/gate/answer": {
+      "post": {
+        "operationId": "answer_sessions__session_id__gate_answer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer",
+        "tags": [
+          "gate"
+        ]
+      }
+    },
+    "/sessions/{session_id}/gate/finish": {
+      "post": {
+        "operationId": "finish_sessions__session_id__gate_finish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finish",
+        "tags": [
+          "gate"
+        ]
+      }
+    },
+    "/sessions/{session_id}/gate/skip": {
+      "post": {
+        "operationId": "skip_sessions__session_id__gate_skip_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SkipIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Skip",
         "tags": [
           "gate"
         ]

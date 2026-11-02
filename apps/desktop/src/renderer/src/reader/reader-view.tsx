@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { getDocumentFile, getDocumentInfo, savePosition, type LibraryDocument } from '../api/client'
 import { Button } from '../components/ui/button'
 import type { PdfDocHandle, PdfEngine } from './pdf-engine'
+import { useGate } from '../gate/gate-host'
 import { useTimer } from '../timer/timer-context'
 import { BookmarkPanel } from './bookmark-panel'
 import { pdfjsEngine } from './pdfjs-engine'
@@ -20,9 +21,14 @@ function describe(e: unknown): string {
   return `Could not open this PDF${e instanceof Error && e.message ? ` (${e.message})` : ''}.`
 }
 
-type Props = { documentId: number; onBack: () => void; engine?: PdfEngine }
+type Props = { documentId: number; onBack: () => void; engine?: PdfEngine; initialPage?: number }
 
-export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props): React.JSX.Element {
+export function ReaderView({
+  documentId,
+  onBack,
+  engine = pdfjsEngine,
+  initialPage
+}: Props): React.JSX.Element {
   const [doc, setDoc] = useState<LibraryDocument | null>(null)
   const [pdf, setPdf] = useState<PdfDocHandle | null>(null)
   const [page, setPage] = useState(1)
@@ -31,6 +37,7 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
   const [error, setError] = useState<string | null>(null)
   const [pageText, setPageText] = useState('1')
   const timer = useTimer()
+  const gate = useGate()
   const [sessionRunning, setSessionRunning] = useState(false)
   const locked = timer.state.status === 'expired' && timer.state.kind === 'focus'
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -50,7 +57,7 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
         const opened = await engine.open(decodeBase64(file.base64))
         if (!alive) return opened.destroy()
         handle = opened
-        const start = clampPage(info.last_page, opened.numPages)
+        const start = clampPage(initialPage ?? info.last_page, opened.numPages)
         savedPage.current = start
         setDoc(info)
         setPage(start)
@@ -64,6 +71,7 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
       alive = false
       handle?.destroy()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialPage is only used when opening
   }, [documentId, engine])
 
   useEffect(() => {
@@ -222,9 +230,10 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
             setSessionRunning(true)
             timer.startFocus()
           }}
-          onEnded={() => {
+          onEnded={(s) => {
             setSessionRunning(false)
             timer.stop()
+            gate.openGate({ sessionId: s.id, documentId })
           }}
           onCancelled={() => {
             setSessionRunning(false)

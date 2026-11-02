@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 from jarvis.brain.context_pack import build_context_pack
 from jarvis.gate.fallback import cloze_questions
@@ -173,7 +173,7 @@ def gate_view(conn: sqlite3.Connection, session_id: int) -> dict:
     }
 
 
-def build_gate(conn: sqlite3.Connection, llm: LLMClient, session_id: int) -> dict:
+def build_gate(conn: sqlite3.Connection, llm: LLMClient, session_id: int, today: date | None = None) -> dict:
     session = conn.execute("select * from study_session where id = ?", (session_id,)).fetchone()
     if session is None:
         raise KeyError(session_id)
@@ -185,7 +185,9 @@ def build_gate(conn: sqlite3.Connection, llm: LLMClient, session_id: int) -> dic
     chunks = _range_chunks(conn, session)
     if not chunks:
         raise GateError("This range has no readable text to build questions from.")
-    multiplier = int(_setting(conn, "gate_multiplier") or 1)
+    penalty = _setting(conn, "gate_penalty") or {}
+    due = bool(penalty) and (today or date.today()).isoformat() >= penalty.get("from_date", "9999-12-31")
+    multiplier = int(penalty.get("multiplier", 1)) if due else 1
     n = target_count(len(chunks), multiplier)
 
     bank = _bank(conn, session_id, round(BANK_SHARE * n))
@@ -222,6 +224,9 @@ def build_gate(conn: sqlite3.Connection, llm: LLMClient, session_id: int) -> dic
     else:
         fb_ids = []
 
+    if len(bank) + len(accepted) + len(fb_ids) == 0:
+        raise GateError("Jarvis could not build questions from this range. Try a longer reading range.")
+
     position = 0
     for r in bank:
         conn.execute(
@@ -242,6 +247,9 @@ def build_gate(conn: sqlite3.Connection, llm: LLMClient, session_id: int) -> dic
             (session_id, qid, position),
         )
         position += 1
+
+    if due:  # an emergency-skip penalty is used up by exactly one gate
+        conn.execute("delete from setting where key = 'gate_penalty'")
 
     meta = {"discarded": discarded, "fallback_used": fallback_used, "short_range": position < MIN_Q}
     conn.execute(

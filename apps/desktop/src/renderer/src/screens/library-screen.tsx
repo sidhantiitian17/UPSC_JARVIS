@@ -11,6 +11,7 @@ import { EmptyState } from '../components/empty-state'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
 import { SCREEN_META } from '../screens'
+import { useGate } from '../gate/gate-host'
 import { ReaderView } from '../reader/reader-view'
 
 function addError(e: unknown): string {
@@ -30,6 +31,8 @@ export function LibraryScreen(): React.JSX.Element {
   const [hits, setHits] = useState<SearchHit[] | null>(null)
   const [reloads, setReloads] = useState(0)
   const [openId, setOpenId] = useState<number | null>(null)
+  const [openPage, setOpenPage] = useState<number | undefined>(undefined)
+  const { readerRequest, clearReaderRequest } = useGate()
 
   useEffect(() => {
     let alive = true
@@ -83,7 +86,25 @@ export function LibraryScreen(): React.JSX.Element {
 
   const titleOf = (id: number): string => docs?.find((d) => d.id === id)?.title ?? `Document ${id}`
 
-  if (openId !== null) return <ReaderView documentId={openId} onBack={() => setOpenId(null)} />
+  // "Review page N" after a failed gate opens the book straight on that page.
+  const requested = readerRequest
+  if (requested && openId !== requested.documentId) {
+    setOpenId(requested.documentId)
+    setOpenPage(requested.page)
+    clearReaderRequest()
+  }
+
+  if (openId !== null)
+    return (
+      <ReaderView
+        documentId={openId}
+        initialPage={openPage}
+        onBack={() => {
+          setOpenId(null)
+          setOpenPage(undefined)
+        }}
+      />
+    )
 
   return (
     <section

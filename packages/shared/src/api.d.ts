@@ -210,6 +210,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/awaiting-gate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Awaiting Gate */
+        get: operations["awaiting_gate_sessions_awaiting_gate_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/cancel": {
         parameters: {
             query?: never;
@@ -256,6 +273,57 @@ export interface paths {
         put?: never;
         /** Create Gate */
         post: operations["create_gate_sessions__session_id__gate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/gate/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Answer */
+        post: operations["answer_sessions__session_id__gate_answer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/gate/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Finish */
+        post: operations["finish_sessions__session_id__gate_finish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/gate/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Skip */
+        post: operations["skip_sessions__session_id__gate_skip_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -374,6 +442,38 @@ export interface components {
             /** Text */
             text?: string | null;
         };
+        /** AnswerIn */
+        AnswerIn: {
+            /** Chosen Index */
+            chosen_index: number;
+            /** Confidence */
+            confidence: string;
+            /** Question Id */
+            question_id: number;
+            /** Time Ms */
+            time_ms?: number | null;
+        };
+        /** AnswerOut */
+        AnswerOut: {
+            /** Answer Index */
+            answer_index: number;
+            /** Chosen Index */
+            chosen_index: number;
+            /** Chunk Id */
+            chunk_id: number | null;
+            /** Correct */
+            correct: boolean;
+            /** Explanation */
+            explanation: string;
+            /** Ordinal */
+            ordinal: number | null;
+            /** Page */
+            page: number | null;
+            /** Question Id */
+            question_id: number;
+            /** Source Quote */
+            source_quote: string;
+        };
         /** BudgetAlert */
         BudgetAlert: {
             /** Node Id */
@@ -471,6 +571,13 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** NodeRef */
+        NodeRef: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+        };
         /** Point */
         Point: {
             /** Chunk Id */
@@ -523,6 +630,42 @@ export interface components {
             question_id: number;
             /** Status */
             status: string;
+        };
+        /** RestudyItem */
+        RestudyItem: {
+            /** Book */
+            book: string;
+            /** Chunk Id */
+            chunk_id: number;
+            /** Ordinal */
+            ordinal: number;
+            /** Page */
+            page: number;
+            /** Quote */
+            quote: string;
+        };
+        /** ResultOut */
+        ResultOut: {
+            /** Correct */
+            correct: number;
+            /** Nodes */
+            nodes: components["schemas"]["NodeRef"][];
+            /** Pass Mark */
+            pass_mark: number;
+            /** Passed */
+            passed: boolean;
+            /** Restudy */
+            restudy: components["schemas"]["RestudyItem"][];
+            /** Retention Pct */
+            retention_pct: number;
+            /** Session Id */
+            session_id: number;
+            /** Skipped */
+            skipped: boolean;
+            /** Total */
+            total: number;
+            /** Xp */
+            xp: number;
         };
         /** SearchHit */
         SearchHit: {
@@ -601,6 +744,14 @@ export interface components {
             providers: components["schemas"]["ProviderInfo"][];
             /** Vault Path */
             vault_path: string | null;
+        };
+        /** SkipIn */
+        SkipIn: {
+            /**
+             * Penalty
+             * @default true
+             */
+            penalty: boolean;
         };
         /** StartIn */
         StartIn: {
@@ -1070,6 +1221,26 @@ export interface operations {
             };
         };
     };
+    awaiting_gate_sessions_awaiting_gate_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"] | null;
+                };
+            };
+        };
+    };
     cancel_sessions__session_id__cancel_post: {
         parameters: {
             query?: never;
@@ -1185,6 +1356,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    answer_sessions__session_id__gate_answer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    finish_sessions__session_id__gate_finish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    skip_sessions__session_id__gate_skip_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SkipIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultOut"];
                 };
             };
             /** @description Validation Error */

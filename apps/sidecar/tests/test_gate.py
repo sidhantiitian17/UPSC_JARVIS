@@ -326,3 +326,15 @@ def test_pack_is_part_of_the_generation_prompt(tmp_path):
     client.post(f"/sessions/{sid}/gate", headers=H)
     gen = [c for c in llm.calls if "Write exactly " in c[-1].content]
     assert gen and all("STUDENT:" in c[0].content for c in gen)
+
+
+def test_a_range_that_yields_no_questions_is_an_error_not_an_empty_gate(tmp_path):
+    client = make(tmp_path, FakeLLM(error=ProviderError("unavailable", "down")))
+    sid, _ = finished_session(
+        client, tmp_path, "tiny", ["Title\nShort text without enough sentences to quiz."]
+    )
+    r = client.post(f"/sessions/{sid}/gate", headers=H)
+    assert r.status_code == 422 and "could not build" in r.json()["detail"].lower()
+    state = client.app.state.jarvis
+    assert state.conn.execute("select count(*) from question").fetchone()[0] == 0
+    assert state.conn.execute("select count(*) from gate_question").fetchone()[0] == 0

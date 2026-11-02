@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from jarvis.gate.scoring import awaiting_gate_session_id
 from jarvis.state import AppState
 from jarvis.study.sessions import (
     SessionConflict,
@@ -10,6 +11,7 @@ from jarvis.study.sessions import (
     active_session,
     cancel_session,
     end_session,
+    session_view,
     set_manual_tags,
     start_session,
 )
@@ -80,6 +82,14 @@ def build_router(state: AppState) -> APIRouter:
     @router.get("/active", response_model=SessionOut | None)
     def active() -> dict | None:
         return guarded(lambda: active_session(state.conn))
+
+    @router.get("/awaiting-gate", response_model=SessionOut | None)
+    def awaiting_gate() -> dict | None:
+        def find() -> dict | None:
+            sid = awaiting_gate_session_id(state.conn)
+            return session_view(state.conn, sid) if sid else None
+
+        return guarded(find)
 
     @router.post("", response_model=SessionOut)
     def start(body: StartIn) -> dict:

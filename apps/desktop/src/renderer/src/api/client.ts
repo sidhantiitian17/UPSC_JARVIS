@@ -71,3 +71,31 @@ export const cancelSession = (id: number): Promise<StudySession> =>
   api('POST', `/sessions/${id}/cancel`)
 export const setSessionTags = (id: number, node_ids: string[]): Promise<StudySession> =>
   api('PUT', `/sessions/${id}/tags`, { node_ids })
+
+export type Gate = Schemas['GateOut']
+export type GateQuestion = Schemas['GateQuestion']
+export type GateAnswer = Schemas['AnswerOut']
+export type GateResult = Schemas['ResultOut']
+export const createGate = (sessionId: number): Promise<Gate> =>
+  api('POST', `/sessions/${sessionId}/gate`)
+export const answerGate = (
+  sessionId: number,
+  question_id: number,
+  chosen_index: number,
+  confidence: 'G' | 'A' | 'R',
+  time_ms?: number
+): Promise<GateAnswer> =>
+  api('POST', `/sessions/${sessionId}/gate/answer`, {
+    question_id,
+    chosen_index,
+    confidence,
+    time_ms
+  })
+export const finishGate = (sessionId: number): Promise<GateResult> =>
+  api('POST', `/sessions/${sessionId}/gate/finish`)
+export const skipGate = (sessionId: number, penalty = true): Promise<GateResult> =>
+  api('POST', `/sessions/${sessionId}/gate/skip`, { penalty })
+export const reportQuestion = (questionId: number, reason = ''): Promise<unknown> =>
+  api('POST', `/questions/${questionId}/report`, { reason })
+export const getAwaitingGate = (): Promise<StudySession | null> =>
+  api('GET', '/sessions/awaiting-gate')

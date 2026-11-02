@@ -36,7 +36,7 @@ type Props = {
   /** focused seconds from the timer, sent with the end bookmark */
   focusedSeconds?: number
   onStarted?: () => void
-  onEnded?: () => void
+  onEnded?: (session: StudySession) => void
   onCancelled?: () => void
   /** true when a session of this document is running (also after an app restart) */
   onActive?: (running: boolean) => void
@@ -203,7 +203,7 @@ export function BookmarkPanel({
                   run(async () => {
                     const s = await endSession(here.id, c.id, focusedSeconds)
                     setActive(null)
-                    onEnded?.()
+                    onEnded?.(s)
                     setSaved(s)
                     setPick('')
                   })

@@ -110,8 +110,13 @@ try {
   writeFileSync(
     pdfPath,
     tinyPdf([
-      'Article 14 of the Constitution guarantees equality before law.',
-      'Article 21 protects life.'
+      'Article 14 of the Constitution guarantees equality before law to all persons.',
+      'The Lok Sabha has a maximum strength of 552 members elected by adults.',
+      'The Rajya Sabha is a permanent house whose members retire every second year.',
+      'The President appoints the Governor of each State for a term of five years.',
+      'The Election Commission supervises elections to Parliament and State Legislatures.',
+      'The Supreme Court can issue writs under Article 32 for Fundamental Rights.',
+      'The Finance Commission is constituted every fifth year under Article 280.'
     ])
   )
   const added = await win.evaluate(
@@ -172,6 +177,34 @@ try {
     .then(() => true)
     .catch(() => false)
   check('start/end bookmarks save a session', saved)
+  // The recall gate opens by itself; answer every question by keyboard (offline cloze quiz: no AI keys here).
+  const gateOpen = await win
+    .waitForSelector('[role="dialog"][aria-label="Recall gate"] >> text=/Question 1 of/', {
+      timeout: 30000
+    })
+    .then(() => true)
+    .catch(() => false)
+  check('recall gate opens after the end bookmark', gateOpen)
+  const total = Number((await win.textContent('text=/Question 1 of/')).match(/of (\d+)/)[1])
+  check('gate has questions from the range', total >= 3, String(total))
+  for (let i = 0; i < total; i++) {
+    await win.waitForSelector(`text=/Question ${i + 1} of/`)
+    await win.keyboard.press('1')
+    await win.keyboard.press('g')
+    await win.waitForSelector('[data-testid="verdict"]')
+    await win.keyboard.press('Enter')
+  }
+  const resultShown = await win
+    .waitForSelector('section[aria-label="Gate result"]', { timeout: 15000 })
+    .then(() => true)
+    .catch(() => false)
+  check('gate result is shown after the last answer', resultShown)
+  const noGateWaiting = await win.evaluate(async () => {
+    const r = await window.jarvis.api({ method: 'GET', path: '/sessions/awaiting-gate' })
+    return r.status === 200 && r.body === null
+  })
+  check('finished gate no longer awaits', noGateWaiting)
+  await win.click('button:has-text("Done")')
   const timerGone = await win.evaluate(() => document.querySelector('[role="timer"]') === null)
   check('timer stops when the session ends', timerGone)
   const sessionTags = await win.evaluate(async () => {
