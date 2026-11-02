@@ -18,6 +18,7 @@ from jarvis.routers import guards as guards_router
 from jarvis.routers import insights as insights_router
 from jarvis.routers import library as library_router
 from jarvis.routers import planner as planner_router
+from jarvis.routers import privacy as privacy_router
 from jarvis.routers import review as review_router
 from jarvis.routers import sessions as sessions_router
 from jarvis.routers import settings as settings_router
@@ -65,6 +66,7 @@ def create_app(
     app.include_router(guards_router.build_router(state), dependencies=[Depends(require_token)])
     app.include_router(planner_router.build_router(state), dependencies=[Depends(require_token)])
     app.include_router(insights_router.build_router(state), dependencies=[Depends(require_token)])
+    app.include_router(privacy_router.build_router(state), dependencies=[Depends(require_token)])
     env_dir = os.environ.get("JARVIS_SYLLABUS_DIR")
     syl_dir = syllabus_dir or (Path(env_dir) if env_dir else DEFAULT_SYLLABUS)
     try:  # a broken ontology must not stop the app; POST /syllabus/reload reports the error

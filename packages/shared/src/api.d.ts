@@ -294,6 +294,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privacy/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Summary */
+        get: operations["get_summary_privacy_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privacy/{category}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: operations["delete_privacy__category__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/questions/{question_id}/report": {
         parameters: {
             query?: never;
@@ -734,6 +768,23 @@ export interface components {
             /** Tag */
             tag: string;
         };
+        /** CategoryOut */
+        CategoryOut: {
+            /** Count */
+            count: number;
+            /** Description */
+            description: string;
+            /** Id */
+            id: string;
+            /** Retention */
+            retention: string;
+            /** Title */
+            title: string;
+            /** Warning */
+            warning: string;
+            /** Where */
+            where: string;
+        };
         /** ChunkOut */
         ChunkOut: {
             /** Char End */
@@ -888,6 +939,15 @@ export interface components {
             /** Minutes */
             minutes: number;
         };
+        /** LocationsOut */
+        LocationsOut: {
+            /** Data Dir */
+            data_dir: string | null;
+            /** Library Path */
+            library_path: string | null;
+            /** Vault Path */
+            vault_path: string | null;
+        };
         /** NextBlock */
         NextBlock: {
             /** Document Id */
@@ -954,6 +1014,14 @@ export interface components {
         PositionIn: {
             /** Page */
             page: number;
+        };
+        /** PrivacyOut */
+        PrivacyOut: {
+            /** Categories */
+            categories: components["schemas"]["CategoryOut"][];
+            locations: components["schemas"]["LocationsOut"];
+            /** Notes */
+            notes: string[];
         };
         /** ProgressOut */
         ProgressOut: {
@@ -1820,6 +1888,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StatusOut"];
+                };
+            };
+        };
+    };
+    get_summary_privacy_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivacyOut"];
+                };
+            };
+        };
+    };
+    delete_privacy__category__delete: {
+        parameters: {
+            query?: {
+                confirm?: string;
+            };
+            header?: never;
+            path: {
+                category: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivacyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

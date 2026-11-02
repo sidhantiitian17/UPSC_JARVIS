@@ -261,6 +261,15 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Insights shows claimed versus verified', insightsOk)
+  const privacy = await win.evaluate(() =>
+    window.jarvis.api({ method: 'GET', path: '/privacy/summary' })
+  )
+  check(
+    'privacy summary lists stored data categories',
+    privacy.status === 200 &&
+      privacy.body.categories.length === 4 &&
+      privacy.body.categories[1].count >= 1
+  )
   await win.click('nav[aria-label="Main"] >> text=Today')
   const nextBlock = await win
     .waitForSelector('text=/e2e-polity, page/', { timeout: 10000 })

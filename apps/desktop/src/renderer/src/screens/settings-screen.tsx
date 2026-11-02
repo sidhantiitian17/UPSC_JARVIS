@@ -3,6 +3,7 @@ import type { components } from '@jarvis/shared'
 import { ApiError, getSettings, putSettings, testAi } from '../api/client'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
+import { PrivacyPanel } from '../privacy/privacy-panel'
 
 type SettingsOut = components['schemas']['SettingsOut']
 type ProviderInfo = components['schemas']['ProviderInfo']
@@ -475,6 +476,8 @@ export function SettingsScreen(): React.JSX.Element {
           )}
         </div>
       </Card>
+
+      <PrivacyPanel />
     </section>
   )
 }

@@ -416,6 +416,49 @@
         "title": "Calibration",
         "type": "object"
       },
+      "CategoryOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "retention": {
+            "title": "Retention",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "warning": {
+            "title": "Warning",
+            "type": "string"
+          },
+          "where": {
+            "title": "Where",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "warning",
+          "count",
+          "where",
+          "retention"
+        ],
+        "title": "CategoryOut",
+        "type": "object"
+      },
       "ChunkOut": {
         "properties": {
           "char_end": {
@@ -854,6 +897,50 @@
         "title": "HeatDay",
         "type": "object"
       },
+      "LocationsOut": {
+        "properties": {
+          "data_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Dir"
+          },
+          "library_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Library Path"
+          },
+          "vault_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vault Path"
+          }
+        },
+        "required": [
+          "data_dir",
+          "vault_path",
+          "library_path"
+        ],
+        "title": "LocationsOut",
+        "type": "object"
+      },
       "NextBlock": {
         "properties": {
           "document_id": {
@@ -1052,6 +1139,34 @@
           "page"
         ],
         "title": "PositionIn",
+        "type": "object"
+      },
+      "PrivacyOut": {
+        "properties": {
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryOut"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "locations": {
+            "$ref": "#/components/schemas/LocationsOut"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "categories",
+          "locations",
+          "notes"
+        ],
+        "title": "PrivacyOut",
         "type": "object"
       },
       "ProgressOut": {
@@ -2874,6 +2989,79 @@
         "summary": "Status",
         "tags": [
           "planner"
+        ]
+      }
+    },
+    "/privacy/summary": {
+      "get": {
+        "operationId": "get_summary_privacy_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Summary",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/privacy/{category}": {
+      "delete": {
+        "operationId": "delete_privacy__category__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "confirm",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Confirm",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete",
+        "tags": [
+          "privacy"
         ]
       }
     },

@@ -24,6 +24,7 @@ class AppState:
         self, conn: sqlite3.Connection, routing: RoutingConfig, provider_builder: ProviderBuilder
     ) -> None:
         self.conn = conn
+        self.data_dir: Path | None = None  # set by create(); None for in-memory databases
         self.lock = threading.RLock()
         self.routing = routing
         self.secrets = SecretStore()
@@ -50,4 +51,6 @@ class AppState:
             data_dir.mkdir(parents=True, exist_ok=True)
             conn = connect(data_dir / "jarvis.db")
         migrate(conn)
-        return cls(conn, load_routing(routing_path or DEFAULT_ROUTING), provider_builder)
+        state = cls(conn, load_routing(routing_path or DEFAULT_ROUTING), provider_builder)
+        state.data_dir = data_dir
+        return state

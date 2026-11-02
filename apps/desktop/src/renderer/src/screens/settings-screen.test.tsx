@@ -61,6 +61,15 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
     db_version: 2
   }
   const api = vi.fn(async (req: { method: string; path: string; body?: unknown }) => {
+    if (req.method === 'GET' && req.path === '/privacy/summary')
+      return {
+        status: 200,
+        body: {
+          categories: [],
+          locations: { data_dir: null, vault_path: null, library_path: null },
+          notes: []
+        }
+      }
     if (req.method === 'GET' && req.path === '/settings') return { status: 200, body: settings }
     if (req.method === 'PUT' && req.path === '/settings') {
       settings = { ...settings, ...(req.body as object) }

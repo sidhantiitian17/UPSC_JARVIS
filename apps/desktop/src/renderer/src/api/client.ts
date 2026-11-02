@@ -132,3 +132,8 @@ export const getPlannerStatus = (): Promise<PlannerStatus> => api('GET', '/plann
 
 export type Truth = Schemas['TruthOut']
 export const getTruth = (): Promise<Truth> => api('GET', '/insights/truth')
+
+export type PrivacySummary = Schemas['PrivacyOut']
+export const getPrivacy = (): Promise<PrivacySummary> => api('GET', '/privacy/summary')
+export const deletePrivacyCategory = (id: string): Promise<PrivacySummary> =>
+  api('DELETE', `/privacy/${id}?confirm=yes`)
