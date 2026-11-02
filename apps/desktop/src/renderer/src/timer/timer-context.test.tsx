@@ -135,4 +135,17 @@ describe('TimerProvider', () => {
     expect(out('status')).toBe('idle')
     void userEvent
   })
+
+  it('tells the pet when the owner has gone idle', async () => {
+    const { idleSeconds } = bridge(0, 25)
+    const pet = vi.fn(async () => true)
+    ;(window as unknown as { jarvis: { pet: unknown } }).jarvis.pet = { event: pet }
+    await mount()
+    await act(async () => screen.getByText('start').click())
+    await advance(60_000)
+    idleSeconds.mockResolvedValue(180)
+    await advance(5_000)
+    expect(out('status')).toBe('paused')
+    expect(pet).toHaveBeenCalledWith('idle', undefined)
+  })
 })

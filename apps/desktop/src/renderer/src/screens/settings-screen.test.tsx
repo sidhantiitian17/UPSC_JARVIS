@@ -52,6 +52,7 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
     review_daily_limit: 40,
     exam_target: 'Prelims 2028',
     exam_date: null,
+    pet_mode: 'coach',
     sleep_guard_enabled: true,
     sleep_start: '23:30',
     sleep_end: '05:30',
@@ -269,5 +270,44 @@ describe('Settings screen', () => {
         body: { exam_date: '2028-05-28' }
       })
     )
+  })
+
+  it('shows the pet mode and status, saves a new mode and can say hello', async () => {
+    const { api } = setup()
+    const pet = {
+      event: vi.fn(),
+      setMode: vi.fn(async () => undefined),
+      status: vi.fn(async () => ({ available: true, mode: 'coach' })),
+      test: vi.fn(async () => true)
+    }
+    ;(window as unknown as { jarvis: { pet: unknown } }).jarvis.pet = pet
+    render(<SettingsScreen />)
+    expect(await screen.findByText(/pet is connected/i)).toBeInTheDocument()
+    const mode = screen.getByRole('combobox', { name: /pet mode/i })
+    expect(mode).toHaveValue('coach')
+    await userEvent.selectOptions(mode, 'strict')
+    await userEvent.click(screen.getByRole('button', { name: /save pet mode/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/settings',
+        body: { pet_mode: 'strict' }
+      })
+    )
+    expect(pet.setMode).toHaveBeenCalledWith('strict')
+    await userEvent.click(screen.getByRole('button', { name: /say hello/i }))
+    expect(pet.test).toHaveBeenCalled()
+  })
+
+  it('explains kindly when OpenPets is not running', async () => {
+    setup()
+    ;(window as unknown as { jarvis: { pet: unknown } }).jarvis.pet = {
+      event: vi.fn(),
+      setMode: vi.fn(),
+      status: vi.fn(async () => ({ available: false, mode: 'coach' })),
+      test: vi.fn(async () => false)
+    }
+    render(<SettingsScreen />)
+    expect(await screen.findByText(/openpets is not running/i)).toBeInTheDocument()
   })
 })

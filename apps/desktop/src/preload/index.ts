@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { ApiRequest, ApiResponse, SecretsApi, SidecarState } from '@jarvis/shared'
+import type { ApiRequest, ApiResponse, PetApi, SecretsApi, SidecarState } from '@jarvis/shared'
 
 // Sandbox-safe bridge. The renderer never sees the sidecar URL or token: main proxies every call.
 // Secrets are write-only from the renderer: main stores them encrypted and forwards them to the sidecar.
@@ -9,7 +9,15 @@ const secrets: SecretsApi = {
   names: () => ipcRenderer.invoke('secrets:names')
 }
 
+const pet: PetApi = {
+  event: (name, ctx) => ipcRenderer.invoke('pet:event', name, ctx),
+  setMode: (mode) => ipcRenderer.invoke('pet:setMode', mode),
+  status: () => ipcRenderer.invoke('pet:status'),
+  test: () => ipcRenderer.invoke('pet:test')
+}
+
 contextBridge.exposeInMainWorld('jarvis', {
+  pet,
   platform: process.platform,
   api: (req: ApiRequest): Promise<ApiResponse> => ipcRenderer.invoke('api:request', req),
   status: (): Promise<SidecarState> => ipcRenderer.invoke('api:status'),

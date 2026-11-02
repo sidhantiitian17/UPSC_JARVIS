@@ -3,6 +3,7 @@ import {
   ApiError,
   answerGate,
   createGate,
+  getProgress,
   finishGate,
   reportQuestion,
   skipGate,
@@ -12,6 +13,7 @@ import {
   type GateResult
 } from '../api/client'
 import { Button } from '../components/ui/button'
+import { petEvent } from '../lib/pet'
 
 export type GateClose = { openPage?: { documentId: number; page: number } } | undefined
 type Props = { sessionId: number; documentId: number; onClose: (r?: GateClose) => void }
@@ -53,11 +55,15 @@ export function GateView({ sessionId, documentId, onClose }: Props): React.JSX.E
   const [confirmSkip, setConfirmSkip] = useState(false)
   const [freeSkip, setFreeSkip] = useState(false)
   const shownAt = useRef(0)
+  const levelBefore = useRef<number | null>(null)
 
   const current = questions[index]
 
   useEffect(() => {
     let alive = true
+    getProgress()
+      .then((g) => (levelBefore.current = g.level))
+      .catch(() => undefined)
     createGate(sessionId)
       .then((g) => {
         if (!alive) return
@@ -101,8 +107,18 @@ export function GateView({ sessionId, documentId, onClose }: Props): React.JSX.E
   const finish = useCallback(async () => {
     setPhase('finishing')
     try {
-      setResult(await finishGate(sessionId))
+      const res = await finishGate(sessionId)
+      setResult(res)
       setPhase('result')
+      petEvent(res.passed ? 'gate_pass' : 'gate_not_passed', { retentionPct: res.retention_pct })
+      if (res.passed && levelBefore.current !== null) {
+        getProgress()
+          .then((g) => {
+            if (levelBefore.current !== null && g.level > levelBefore.current)
+              petEvent('level_up', { level: g.level })
+          })
+          .catch(() => undefined)
+      }
     } catch (e) {
       setError(errorText(e))
       setPhase('error')

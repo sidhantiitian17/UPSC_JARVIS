@@ -298,4 +298,79 @@ describe('GateView', () => {
     await userEvent.click(await screen.findByRole('button', { name: /^close$/i }))
     expect(onClose).toHaveBeenCalled()
   })
+
+  it('tells the pet about a pass, with the retention', async () => {
+    setup({})
+    const pet = vi.fn(async () => true)
+    ;(window as unknown as { jarvis: { pet: unknown } }).jarvis.pet = { event: pet }
+    open()
+    await screen.findByText('First question?')
+    await userEvent.keyboard('2g')
+    await screen.findByTestId('verdict')
+    await userEvent.keyboard('{Enter}')
+    await screen.findByText('Second question?')
+    await userEvent.keyboard('3g')
+    await screen.findByTestId('verdict')
+    await userEvent.keyboard('{Enter}')
+    await screen.findByRole('region', { name: /gate result/i })
+    expect(pet).toHaveBeenCalledWith('gate_pass', { retentionPct: 100 })
+  })
+
+  it('tells the pet when the gate was not passed', async () => {
+    setup({
+      result: {
+        session_id: 3,
+        total: 2,
+        correct: 0,
+        retention_pct: 0,
+        passed: false,
+        skipped: false,
+        xp: 0,
+        pass_mark: 70,
+        restudy: [],
+        nodes: []
+      }
+    })
+    const pet = vi.fn(async () => true)
+    ;(window as unknown as { jarvis: { pet: unknown } }).jarvis.pet = { event: pet }
+    open()
+    await screen.findByText('First question?')
+    await userEvent.keyboard('1a')
+    await screen.findByTestId('verdict')
+    await userEvent.keyboard('{Enter}')
+    await screen.findByText('Second question?')
+    await userEvent.keyboard('1a')
+    await screen.findByTestId('verdict')
+    await userEvent.keyboard('{Enter}')
+    await screen.findByRole('region', { name: /gate result/i })
+    expect(pet).toHaveBeenCalledWith('gate_not_passed', { retentionPct: 0 })
+  })
+
+  it('tells the pet about a level-up when the level rose during the gate', async () => {
+    const api = setup({})
+    const levels = [2, 3]
+    const base = (
+      window as unknown as { jarvis: { api: (r: { path: string }) => Promise<unknown> } }
+    ).jarvis.api
+    ;(window as unknown as { jarvis: { api: unknown; pet: unknown } }).jarvis.api = vi.fn(
+      async (req: { path: string; method: string; body?: unknown }) =>
+        req.path === '/gamification/progress'
+          ? { status: 200, body: { level: levels.shift() ?? 3 } }
+          : (api as unknown as (r: unknown) => Promise<unknown>)(req)
+    )
+    void base
+    const pet = vi.fn(async () => true)
+    ;(window as unknown as { jarvis: { pet: unknown } }).jarvis.pet = { event: pet }
+    open()
+    await screen.findByText('First question?')
+    await userEvent.keyboard('2g')
+    await screen.findByTestId('verdict')
+    await userEvent.keyboard('{Enter}')
+    await screen.findByText('Second question?')
+    await userEvent.keyboard('3g')
+    await screen.findByTestId('verdict')
+    await userEvent.keyboard('{Enter}')
+    await screen.findByRole('region', { name: /gate result/i })
+    await waitFor(() => expect(pet).toHaveBeenCalledWith('level_up', { level: 3 }))
+  })
 })

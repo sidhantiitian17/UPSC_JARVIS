@@ -15,5 +15,7 @@ export const SCREENS = [
 ] as const
 export type ScreenId = (typeof SCREENS)[number]
 
-export type { ApiMethod, ApiRequest, ApiResponse, SecretsApi, SidecarState } from './ipc'
+export type { ApiMethod, ApiRequest, ApiResponse, PetApi, SecretsApi, SidecarState } from './ipc'
 export type { components, paths } from './api'
+
+export * from './pet'

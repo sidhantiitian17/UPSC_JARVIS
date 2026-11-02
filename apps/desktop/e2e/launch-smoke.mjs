@@ -261,6 +261,12 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Insights shows claimed versus verified', insightsOk)
+  const petStatus = await win.evaluate(() => window.jarvis.pet.status())
+  check(
+    'pet bridge answers (OpenPets itself is optional)',
+    typeof petStatus.available === 'boolean' && petStatus.mode === 'coach',
+    JSON.stringify(petStatus)
+  )
   const privacy = await win.evaluate(() =>
     window.jarvis.api({ method: 'GET', path: '/privacy/summary' })
   )

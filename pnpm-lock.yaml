@@ -25,6 +25,9 @@ importers:
       '@jarvis/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@open-pets/client':
+        specifier: 4.1.0
+        version: 4.1.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -692,6 +695,9 @@ packages:
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
+
+  '@open-pets/client@4.1.0':
+    resolution: {integrity: sha512-8YXlZGwcVflKOKjdmCT6A91ZAmT2T2+evBrxmCNgTAm0eD3gi5q9rs1LcNDufLNww8BHTjkVLzJMIz0WmA5Kbw==}
 
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
@@ -4018,6 +4024,8 @@ snapshots:
     optional: true
 
   '@noble/hashes@1.8.0': {}
+
+  '@open-pets/client@4.1.0': {}
 
   '@oxc-project/types@0.156.0': {}
 

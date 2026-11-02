@@ -340,6 +340,80 @@ function SleepCard({
   )
 }
 
+function PetCard({
+  settings,
+  onSaved,
+  onError
+}: {
+  settings: SettingsOut
+  onSaved: (s: SettingsOut) => void
+  onError: (m: string) => void
+}): React.JSX.Element {
+  const [mode, setMode] = useState(settings.pet_mode)
+  const [available, setAvailable] = useState<boolean | null>(null)
+  const [hello, setHello] = useState<string | null>(null)
+
+  useEffect(() => {
+    let alive = true
+    Promise.resolve(window.jarvis?.pet?.status())
+      .then((s) => alive && setAvailable(s ? s.available : false))
+      .catch(() => alive && setAvailable(false))
+    return () => {
+      alive = false
+    }
+  }, [])
+
+  const save = async (): Promise<void> => {
+    try {
+      onSaved(await putSettings({ pet_mode: mode as 'coach' | 'strict' | 'silent' }))
+      await window.jarvis?.pet?.setMode(mode)
+    } catch (e) {
+      onError(describeError(e))
+    }
+  }
+  const sayHello = async (): Promise<void> => {
+    const shown = await Promise.resolve(window.jarvis?.pet?.test()).catch(() => false)
+    setHello(shown ? 'Your pet said hello.' : 'The pet did not answer. Is OpenPets running?')
+  }
+
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="text-xl font-semibold">Pet</h2>
+      <p className="text-sm text-muted">
+        {available === null
+          ? 'Checking the pet…'
+          : available
+            ? 'Your pet is connected.'
+            : 'OpenPets is not running. Start it and the pet will join in; JARVIS works fine without it.'}
+      </p>
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="flex flex-col gap-1 text-sm">
+          Pet mode
+          <select
+            aria-label="Pet mode"
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+            className="min-h-10 rounded-lg border border-line bg-app-bg px-3"
+          >
+            <option value="coach">Coach: warm and encouraging</option>
+            <option value="strict">Strict: short and factual</option>
+            <option value="silent">Silent: animations only</option>
+          </select>
+        </label>
+        <Button onClick={save} aria-label="Save pet mode">
+          Save
+        </Button>
+        <Button onClick={sayHello}>Say hello</Button>
+      </div>
+      {hello && (
+        <p role="status" className="text-sm">
+          {hello}
+        </p>
+      )}
+    </Card>
+  )
+}
+
 export function SettingsScreen(): React.JSX.Element {
   const [settings, setSettings] = useState<SettingsOut | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -423,6 +497,15 @@ export function SettingsScreen(): React.JSX.Element {
       {settings && (
         <ExamCard
           key={settings.exam_target}
+          settings={settings}
+          onSaved={setSettings}
+          onError={setError}
+        />
+      )}
+
+      {settings && (
+        <PetCard
+          key={settings.pet_mode}
           settings={settings}
           onSaved={setSettings}
           onError={setError}

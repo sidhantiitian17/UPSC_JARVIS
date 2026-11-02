@@ -1244,6 +1244,8 @@ export interface components {
             focus_minutes?: number | null;
             /** Library Path */
             library_path?: string | null;
+            /** Pet Mode */
+            pet_mode?: ("coach" | "strict" | "silent") | null;
             /** Review Daily Limit */
             review_daily_limit?: number | null;
             /** Sleep End */
@@ -1273,6 +1275,8 @@ export interface components {
             focus_minutes: number;
             /** Library Path */
             library_path: string | null;
+            /** Pet Mode */
+            pet_mode: string;
             /** Providers */
             providers: components["schemas"]["ProviderInfo"][];
             /** Review Daily Limit */

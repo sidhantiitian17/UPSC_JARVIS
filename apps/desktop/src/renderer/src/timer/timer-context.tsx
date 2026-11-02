@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components -- the provider and its hook belong together */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getSettings } from '../api/client'
+import { petEvent } from '../lib/pet'
 import {
   IDLE,
   focusedSeconds,
@@ -79,8 +80,10 @@ export function TimerProvider({ children }: { children: React.ReactNode }): Reac
       if (typeof probe !== 'function') return
       try {
         const idle = await probe()
-        if (idle >= IDLE_LIMIT_SECONDS)
+        if (idle >= IDLE_LIMIT_SECONDS) {
           setState((s) => pauseState(s, Date.now() - idle * 1000, 'idle'))
+          petEvent('idle')
+        }
       } catch {
         /* idle detection is best-effort */
       }

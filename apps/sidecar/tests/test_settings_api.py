@@ -154,3 +154,11 @@ def test_exam_target_defaults_to_prelims_2028_and_is_editable(tmp_path):
     assert out["exam_target"] == "Prelims 2029"
     assert c.put("/settings", headers=H, json={"exam_target": ""}).status_code == 422
     assert c.put("/settings", headers=H, json={"exam_target": "x" * 61}).status_code == 422
+
+
+def test_pet_mode_defaults_to_coach_and_accepts_only_known_modes(tmp_path):
+    c, _ = make_client(tmp_path)
+    assert c.get("/settings", headers=H).json()["pet_mode"] == "coach"
+    for mode in ("strict", "silent", "coach"):
+        assert c.put("/settings", headers=H, json={"pet_mode": mode}).json()["pet_mode"] == mode
+    assert c.put("/settings", headers=H, json={"pet_mode": "angry"}).status_code == 422

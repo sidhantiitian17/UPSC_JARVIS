@@ -6,6 +6,8 @@ import icon from '../../resources/icon.png?asset'
 import type { ApiRequest, SidecarState } from '@jarvis/shared'
 import { createApiProxy } from './api-proxy'
 import { createSecretStore } from './secret-store'
+import { createPetService } from './pet/pet-service'
+import { createOpenPetsTransport } from './pet/openpets-transport'
 import { resolveSidecarCommand, startSidecar, type RunningSidecar } from './sidecar'
 import { realSidecarDeps } from './sidecar-runtime'
 import { isTrustedSender } from './trusted-sender'
@@ -132,6 +134,26 @@ app.whenReady().then(() => {
     return res.canceled ? null : (res.filePaths[0] ?? null)
   })
 
+  const pet = createPetService({ transport: createOpenPetsTransport() })
+  ipcMain.handle(
+    'pet:event',
+    (event, name: string, ctx?: { retentionPct?: number; level?: number }) => {
+      assertTrusted(event.senderFrame?.url)
+      return pet.event(name as never, ctx)
+    }
+  )
+  ipcMain.handle('pet:setMode', (event, mode: string) => {
+    assertTrusted(event.senderFrame?.url)
+    pet.setMode(mode as never)
+  })
+  ipcMain.handle('pet:status', (event) => {
+    assertTrusted(event.senderFrame?.url)
+    return pet.status()
+  })
+  ipcMain.handle('pet:test', (event) => {
+    assertTrusted(event.senderFrame?.url)
+    return pet.test()
+  })
   ipcMain.handle('system:idleSeconds', (event) => {
     assertTrusted(event.senderFrame?.url)
     return powerMonitor.getSystemIdleTime()

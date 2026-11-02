@@ -11,3 +11,11 @@ export type SecretsApi = {
   delete: (name: string) => Promise<void>
   names: () => Promise<string[]>
 }
+
+/** Pet companion bridge. Every call is best-effort: the pet being absent must never break studying. */
+export type PetApi = {
+  event: (name: string, ctx?: { retentionPct?: number; level?: number }) => Promise<boolean>
+  setMode: (mode: string) => Promise<void>
+  status: () => Promise<{ available: boolean; mode: string }>
+  test: () => Promise<boolean>
+}

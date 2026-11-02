@@ -267,4 +267,19 @@ describe('BookmarkPanel', () => {
     render(<BookmarkPanel documentId={7} page={5} onActive={onActive} />)
     await waitFor(() => expect(onActive).toHaveBeenCalledWith(true))
   })
+
+  it('tells the pet when a session starts', async () => {
+    setup({
+      ...chunksRoute,
+      'GET /sessions/active': { status: 200, body: null },
+      'POST /sessions': { status: 200, body: session() }
+    })
+    const pet = vi.fn(async () => true)
+    ;(window as unknown as { jarvis: { pet: unknown } }).jarvis.pet = { event: pet }
+    render(<BookmarkPanel documentId={7} page={5} />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: /set start bookmark at paragraph 1/i })
+    )
+    await waitFor(() => expect(pet).toHaveBeenCalledWith('session_start', undefined))
+  })
 })

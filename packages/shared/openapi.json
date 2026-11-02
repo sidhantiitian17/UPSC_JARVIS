@@ -1822,6 +1822,22 @@
             ],
             "title": "Library Path"
           },
+          "pet_mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "coach",
+                  "strict",
+                  "silent"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pet Mode"
+          },
           "review_daily_limit": {
             "anyOf": [
               {
@@ -1933,6 +1949,10 @@
             ],
             "title": "Library Path"
           },
+          "pet_mode": {
+            "title": "Pet Mode",
+            "type": "string"
+          },
           "providers": {
             "items": {
               "$ref": "#/components/schemas/ProviderInfo"
@@ -1981,6 +2001,7 @@
           "sleep_start",
           "sleep_end",
           "exam_date",
+          "pet_mode",
           "providers",
           "db_version"
         ],

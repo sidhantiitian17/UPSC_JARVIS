@@ -13,6 +13,7 @@ import {
   type SyllabusNode
 } from '../api/client'
 import { Button } from '../components/ui/button'
+import { petEvent } from '../lib/pet'
 
 function messageOf(e: unknown): string {
   if (e instanceof ApiError) {
@@ -219,6 +220,7 @@ export function BookmarkPanel({
                   run(async () => {
                     setActive(await startSession(documentId, c.id))
                     setSaved(null)
+                    petEvent('session_start')
                     onStarted?.()
                   })
                 }

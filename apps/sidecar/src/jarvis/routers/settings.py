@@ -4,6 +4,7 @@ import json
 import uuid
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, field_validator
@@ -37,6 +38,7 @@ class SettingsOut(BaseModel):
     sleep_start: str
     sleep_end: str
     exam_date: str | None
+    pet_mode: str
     providers: list[ProviderInfo]
     db_version: int
 
@@ -51,6 +53,7 @@ class SettingsIn(BaseModel):
     daily_goal_minutes: int | None = Field(default=None, ge=10, le=600)
     bad_day_goal_minutes: int | None = Field(default=None, ge=5, le=300)
     sleep_guard_enabled: bool | None = None
+    pet_mode: Literal["coach", "strict", "silent"] | None = None
     exam_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     sleep_start: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
     sleep_end: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
@@ -125,6 +128,7 @@ def build_router(state: AppState) -> APIRouter:
             daily_goal_minutes=_get(state, "daily_goal_minutes") or 60,
             bad_day_goal_minutes=_get(state, "bad_day_goal_minutes") or 20,
             exam_date=_get(state, "exam_date"),
+            pet_mode=_get(state, "pet_mode") or "coach",
             sleep_guard_enabled=sleep_cfg["enabled"],
             sleep_start=sleep_cfg["start"],
             sleep_end=sleep_cfg["end"],
@@ -162,6 +166,7 @@ def build_router(state: AppState) -> APIRouter:
                 "bad_day_goal_minutes",
                 "sleep_guard_enabled",
                 "exam_date",
+                "pet_mode",
                 "sleep_start",
                 "sleep_end",
             ):

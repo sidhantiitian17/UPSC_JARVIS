@@ -1,4 +1,4 @@
-import type { ApiRequest, ApiResponse, SecretsApi, SidecarState } from '@jarvis/shared'
+import type { ApiRequest, ApiResponse, PetApi, SecretsApi, SidecarState } from '@jarvis/shared'
 
 declare global {
   interface Window {
@@ -7,6 +7,7 @@ declare global {
       api: (req: ApiRequest) => Promise<ApiResponse>
       status: () => Promise<SidecarState>
       secrets: SecretsApi
+      pet: PetApi
       pickFolder: () => Promise<string | null>
       pickPdf: () => Promise<string | null>
       idleSeconds: () => Promise<number>
