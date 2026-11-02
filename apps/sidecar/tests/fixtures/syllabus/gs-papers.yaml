@@ -1,6 +1,4 @@
-# Top-level structure of the four GS Mains papers. source: draft = written by the assistant from the
-# publicly known paper structure; the owner must verify against the official syllabus (WU-P02-002/003
-# add micro-themes and the owner review that sets `reviewed: true`).
+# Frozen copy of the starter ontology used by the sidecar tests, so they do not depend on the shipped data.
 version: 1
 nodes:
   - {id: gs1, title: "GS Paper I", kind: paper, paper: GS1, children: [

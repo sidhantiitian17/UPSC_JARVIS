@@ -1,0 +1,32 @@
+# DRAFT ontology. Written by the assistant from the publicly known wording of the UPSC syllabus
+# (the official PDF could not be fetched from the build environment). Every node is `source: draft`,
+# `reviewed: false` until the owner checks it against the official syllabus (WU-P02-002 / WU-P02-003).
+# Page targets are intentionally empty: the owner sets `target_pages` per topic after choosing books.
+version: 1
+nodes:
+- id: pre
+  title: Prelims GS Paper I
+  kind: paper
+  paper: PRE-GS1
+  children:
+  - id: pre.current
+    title: Current events of national and international importance
+    kind: subject
+  - id: pre.history
+    title: History of India and the Indian National Movement
+    kind: subject
+  - id: pre.geography
+    title: 'Indian and World Geography: physical, social, economic'
+    kind: subject
+  - id: pre.polity
+    title: 'Indian Polity and Governance: Constitution, political system, Panchayati Raj, public policy, rights issues'
+    kind: subject
+  - id: pre.economy
+    title: 'Economic and Social Development: sustainable development, poverty, inclusion, demographics, social sector initiatives'
+    kind: subject
+  - id: pre.environment
+    title: Environmental ecology, bio-diversity and climate change
+    kind: subject
+  - id: pre.science
+    title: General Science
+    kind: subject

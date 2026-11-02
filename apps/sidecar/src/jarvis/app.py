@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Literal
 
@@ -56,7 +57,8 @@ def create_app(
     app.include_router(gate_router.build_router(state), dependencies=[Depends(require_token)])
     app.include_router(review_router.build_router(state), dependencies=[Depends(require_token)])
     app.include_router(coverage_router.build_router(state), dependencies=[Depends(require_token)])
-    syl_dir = syllabus_dir or DEFAULT_SYLLABUS
+    env_dir = os.environ.get("JARVIS_SYLLABUS_DIR")
+    syl_dir = syllabus_dir or (Path(env_dir) if env_dir else DEFAULT_SYLLABUS)
     try:  # a broken ontology must not stop the app; POST /syllabus/reload reports the error
         sync_ontology(state.conn, load_ontology(syl_dir))
     except OntologyError:
