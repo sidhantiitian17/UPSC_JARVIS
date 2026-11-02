@@ -283,6 +283,53 @@
         "title": "BadDayOut",
         "type": "object"
       },
+      "Block": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "subject_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Id"
+          }
+        },
+        "required": [
+          "kind",
+          "subject_id",
+          "subject",
+          "minutes",
+          "reason"
+        ],
+        "title": "Block",
+        "type": "object"
+      },
       "BudgetAlert": {
         "properties": {
           "node_id": {
@@ -393,6 +440,32 @@
           "days_needed"
         ],
         "title": "Comeback",
+        "type": "object"
+      },
+      "Committed": {
+        "properties": {
+          "blocks": {
+            "items": {
+              "$ref": "#/components/schemas/Block"
+            },
+            "title": "Blocks",
+            "type": "array"
+          },
+          "free_minutes": {
+            "title": "Free Minutes",
+            "type": "integer"
+          },
+          "study_minutes": {
+            "title": "Study Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "free_minutes",
+          "study_minutes",
+          "blocks"
+        ],
+        "title": "Committed",
         "type": "object"
       },
       "DocumentOut": {
@@ -793,6 +866,60 @@
           "title"
         ],
         "title": "NodeRef",
+        "type": "object"
+      },
+      "PlanIn": {
+        "properties": {
+          "free_hours": {
+            "maximum": 16.0,
+            "minimum": 1.0,
+            "title": "Free Hours",
+            "type": "number"
+          }
+        },
+        "required": [
+          "free_hours"
+        ],
+        "title": "PlanIn",
+        "type": "object"
+      },
+      "PlanOut": {
+        "properties": {
+          "blocks": {
+            "items": {
+              "$ref": "#/components/schemas/Block"
+            },
+            "title": "Blocks",
+            "type": "array"
+          },
+          "catch_up": {
+            "title": "Catch Up",
+            "type": "boolean"
+          },
+          "free_minutes": {
+            "title": "Free Minutes",
+            "type": "integer"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "planned_minutes": {
+            "title": "Planned Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "free_minutes",
+          "planned_minutes",
+          "blocks",
+          "catch_up",
+          "notes"
+        ],
+        "title": "PlanOut",
         "type": "object"
       },
       "Point": {
@@ -1694,6 +1821,41 @@
         "title": "StartIn",
         "type": "object"
       },
+      "StatusOut": {
+        "properties": {
+          "catch_up_due": {
+            "title": "Catch Up Due",
+            "type": "boolean"
+          },
+          "committed_today": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Committed"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "yesterday": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Yesterday"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "committed_today",
+          "yesterday",
+          "catch_up_due"
+        ],
+        "title": "StatusOut",
+        "type": "object"
+      },
       "SyllabusNodeOut": {
         "properties": {
           "children": {
@@ -1891,6 +2053,29 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "Yesterday": {
+        "properties": {
+          "committed_minutes": {
+            "title": "Committed Minutes",
+            "type": "integer"
+          },
+          "missed": {
+            "title": "Missed",
+            "type": "boolean"
+          },
+          "verified_minutes": {
+            "title": "Verified Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "committed_minutes",
+          "verified_minutes",
+          "missed"
+        ],
+        "title": "Yesterday",
         "type": "object"
       }
     }
@@ -2376,6 +2561,109 @@
           }
         },
         "summary": "Llm Test"
+      }
+    },
+    "/planner/commit": {
+      "post": {
+        "operationId": "commit_planner_commit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Committed"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Commit",
+        "tags": [
+          "planner"
+        ]
+      }
+    },
+    "/planner/plan": {
+      "post": {
+        "operationId": "plan_planner_plan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plan",
+        "tags": [
+          "planner"
+        ]
+      }
+    },
+    "/planner/status": {
+      "get": {
+        "operationId": "status_planner_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Status",
+        "tags": [
+          "planner"
+        ]
       }
     },
     "/questions/{question_id}/report": {

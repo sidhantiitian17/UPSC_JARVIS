@@ -226,6 +226,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/planner/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Commit */
+        post: operations["commit_planner_commit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Plan */
+        post: operations["plan_planner_plan_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_planner_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/questions/{question_id}/report": {
         parameters: {
             query?: never;
@@ -622,6 +673,19 @@ export interface components {
             /** Today Active */
             today_active: boolean;
         };
+        /** Block */
+        Block: {
+            /** Kind */
+            kind: string;
+            /** Minutes */
+            minutes: number;
+            /** Reason */
+            reason: string;
+            /** Subject */
+            subject: string | null;
+            /** Subject Id */
+            subject_id: string | null;
+        };
         /** BudgetAlert */
         BudgetAlert: {
             /** Node Id */
@@ -665,6 +729,15 @@ export interface components {
             days_needed: number;
             /** Lost Streak */
             lost_streak: number;
+        };
+        /** Committed */
+        Committed: {
+            /** Blocks */
+            blocks: components["schemas"]["Block"][];
+            /** Free Minutes */
+            free_minutes: number;
+            /** Study Minutes */
+            study_minutes: number;
         };
         /** DocumentOut */
         DocumentOut: {
@@ -797,6 +870,24 @@ export interface components {
             id: string;
             /** Title */
             title: string;
+        };
+        /** PlanIn */
+        PlanIn: {
+            /** Free Hours */
+            free_hours: number;
+        };
+        /** PlanOut */
+        PlanOut: {
+            /** Blocks */
+            blocks: components["schemas"]["Block"][];
+            /** Catch Up */
+            catch_up: boolean;
+            /** Free Minutes */
+            free_minutes: number;
+            /** Notes */
+            notes: string[];
+            /** Planned Minutes */
+            planned_minutes: number;
         };
         /** Point */
         Point: {
@@ -1099,6 +1190,13 @@ export interface components {
             /** Start Chunk Id */
             start_chunk_id: number;
         };
+        /** StatusOut */
+        StatusOut: {
+            /** Catch Up Due */
+            catch_up_due: boolean;
+            committed_today: components["schemas"]["Committed"] | null;
+            yesterday: components["schemas"]["Yesterday"] | null;
+        };
         /** SyllabusNodeOut */
         SyllabusNodeOut: {
             /** Children */
@@ -1158,6 +1256,15 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** Yesterday */
+        Yesterday: {
+            /** Committed Minutes */
+            committed_minutes: number;
+            /** Missed */
+            missed: boolean;
+            /** Verified Minutes */
+            verified_minutes: number;
         };
     };
     responses: never;
@@ -1531,6 +1638,92 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiTestOut"];
+                };
+            };
+        };
+    };
+    commit_planner_commit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Committed"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_planner_plan_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    status_planner_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusOut"];
                 };
             };
         };

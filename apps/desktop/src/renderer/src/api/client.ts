@@ -121,3 +121,11 @@ export type GuardStatus = Schemas['GuardOut']
 export const getGuard = (): Promise<GuardStatus> => api('GET', '/guard/status')
 export const setBadDay = (active: boolean): Promise<GuardStatus> =>
   api('PUT', '/guard/bad-day', { active })
+
+export type DayPlan = Schemas['PlanOut']
+export type PlannerStatus = Schemas['StatusOut']
+export const makePlan = (free_hours: number): Promise<DayPlan> =>
+  api('POST', '/planner/plan', { free_hours })
+export const commitPlan = (free_hours: number): Promise<Schemas['Committed']> =>
+  api('POST', '/planner/commit', { free_hours })
+export const getPlannerStatus = (): Promise<PlannerStatus> => api('GET', '/planner/status')

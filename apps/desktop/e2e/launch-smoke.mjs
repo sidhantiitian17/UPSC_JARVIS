@@ -248,6 +248,13 @@ try {
     .catch(() => false)
   check('bad-day mode switches on from Today', badDayOn)
   await win.click('button:has-text("Back to the normal goal")')
+  await win.fill('input[aria-label="Free hours"]', '3')
+  await win.click('button:has-text("Make plan")')
+  const planShown = await win
+    .waitForSelector('ol[aria-label="Today\'s plan"] >> text=/min/', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('Plan my day builds an hour-wise plan', planShown)
   const nextBlock = await win
     .waitForSelector('text=/e2e-polity, page/', { timeout: 10000 })
     .then(() => true)

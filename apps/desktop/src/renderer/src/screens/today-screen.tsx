@@ -13,6 +13,7 @@ import { EmptyState } from '../components/empty-state'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
 import { useGate } from '../gate/gate-host'
+import { PlanCard } from '../planner/plan-card'
 import { ReviewSession } from '../review/review-session'
 import { SCREEN_META } from '../screens'
 
@@ -198,6 +199,8 @@ export function TodayScreen(): React.JSX.Element {
       )}
 
       {game && <ProgressCard g={game} />}
+
+      <PlanCard />
 
       {data && (
         <Card className="flex flex-col gap-2">
