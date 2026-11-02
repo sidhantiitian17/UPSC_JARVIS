@@ -25,6 +25,8 @@ class ProviderInfo(BaseModel):
 class SettingsOut(BaseModel):
     library_path: str | None
     vault_path: str | None
+    focus_minutes: int
+    break_minutes: int
     providers: list[ProviderInfo]
     db_version: int
 
@@ -32,6 +34,8 @@ class SettingsOut(BaseModel):
 class SettingsIn(BaseModel):
     library_path: str | None = None
     vault_path: str | None = None
+    focus_minutes: int | None = Field(default=None, ge=5, le=180)
+    break_minutes: int | None = Field(default=None, ge=1, le=60)
 
 
 class SecretIn(BaseModel):
@@ -52,14 +56,16 @@ class AiTestOut(BaseModel):
 
 
 FOLDER_KEYS = ("library_path", "vault_path")
+DEFAULT_FOCUS_MINUTES = 50
+DEFAULT_BREAK_MINUTES = 10
 
 
-def _get(state: AppState, key: str) -> str | None:
+def _get(state: AppState, key: str):  # noqa: ANN202 - JSON value (str or int)
     row = state.conn.execute("select value_json from setting where key = ?", (key,)).fetchone()
     return json.loads(row["value_json"]) if row else None
 
 
-def _put(state: AppState, key: str, value: str) -> None:
+def _put(state: AppState, key: str, value: str | int) -> None:
     state.conn.execute(
         "insert into setting(key,value_json) values (?,?) "
         "on conflict(key) do update set value_json = excluded.value_json",
@@ -85,6 +91,8 @@ def build_router(state: AppState) -> APIRouter:
         return SettingsOut(
             library_path=_get(state, "library_path"),
             vault_path=_get(state, "vault_path"),
+            focus_minutes=_get(state, "focus_minutes") or DEFAULT_FOCUS_MINUTES,
+            break_minutes=_get(state, "break_minutes") or DEFAULT_BREAK_MINUTES,
             providers=providers,
             db_version=current_version(state.conn),
         )
@@ -110,6 +118,9 @@ def build_router(state: AppState) -> APIRouter:
                 if not folder.is_dir():
                     raise HTTPException(status_code=422, detail=f"{key}: folder does not exist")
                 _put(state, key, str(folder.resolve()))
+            for key in ("focus_minutes", "break_minutes"):
+                if getattr(body, key) is not None:
+                    _put(state, key, getattr(body, key))
             return snapshot()
 
     @router.put("/secrets/{name}", response_model=SecretOut)

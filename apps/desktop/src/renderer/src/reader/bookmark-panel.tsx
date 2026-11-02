@@ -30,10 +30,28 @@ function leaves(nodes: SyllabusNode[]): SyllabusNode[] {
 
 const snippet = (t: string): string => (t.length > 140 ? `${t.slice(0, 140)}…` : t)
 
-type Props = { documentId: number; page: number }
+type Props = {
+  documentId: number
+  page: number
+  /** focused seconds from the timer, sent with the end bookmark */
+  focusedSeconds?: number
+  onStarted?: () => void
+  onEnded?: () => void
+  onCancelled?: () => void
+  /** true when a session of this document is running (also after an app restart) */
+  onActive?: (running: boolean) => void
+}
 
 /** Start/end bookmarks for the current page's chunks, plus the saved-session summary. */
-export function BookmarkPanel({ documentId, page }: Props): React.JSX.Element {
+export function BookmarkPanel({
+  documentId,
+  page,
+  focusedSeconds,
+  onStarted,
+  onEnded,
+  onCancelled,
+  onActive
+}: Props): React.JSX.Element {
   const [chunks, setChunks] = useState<ChunkInfo[] | null>(null)
   const [active, setActive] = useState<StudySession | null>(null)
   const [saved, setSaved] = useState<StudySession | null>(null)
@@ -44,12 +62,17 @@ export function BookmarkPanel({ documentId, page }: Props): React.JSX.Element {
   useEffect(() => {
     let alive = true
     getActiveSession()
-      .then((s) => alive && setActive(s))
+      .then((s) => {
+        if (!alive) return
+        setActive(s)
+        if (s && s.document_id === documentId) onActive?.(true)
+      })
       .catch((e) => alive && setError(messageOf(e)))
     return () => {
       alive = false
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load the running session once per document
+  }, [documentId])
 
   useEffect(() => {
     let alive = true
@@ -106,6 +129,7 @@ export function BookmarkPanel({ documentId, page }: Props): React.JSX.Element {
               run(async () => {
                 await cancelSession(active.id)
                 setActive(null)
+                onCancelled?.()
               })
             }
           >
@@ -177,8 +201,9 @@ export function BookmarkPanel({ documentId, page }: Props): React.JSX.Element {
                 aria-label={`Set end bookmark at paragraph ${c.ordinal + 1}`}
                 onClick={() =>
                   run(async () => {
-                    const s = await endSession(here.id, c.id)
+                    const s = await endSession(here.id, c.id, focusedSeconds)
                     setActive(null)
+                    onEnded?.()
                     setSaved(s)
                     setPick('')
                   })
@@ -194,6 +219,7 @@ export function BookmarkPanel({ documentId, page }: Props): React.JSX.Element {
                   run(async () => {
                     setActive(await startSession(documentId, c.id))
                     setSaved(null)
+                    onStarted?.()
                   })
                 }
               >

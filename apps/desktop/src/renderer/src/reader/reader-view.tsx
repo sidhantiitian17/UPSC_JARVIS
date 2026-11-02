@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { getDocumentFile, getDocumentInfo, savePosition, type LibraryDocument } from '../api/client'
 import { Button } from '../components/ui/button'
 import type { PdfDocHandle, PdfEngine } from './pdf-engine'
+import { useTimer } from '../timer/timer-context'
 import { BookmarkPanel } from './bookmark-panel'
 import { pdfjsEngine } from './pdfjs-engine'
 import { ZOOM_STEPS, clampPage, nextZoom } from './reader-state'
@@ -29,6 +30,9 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
   const [invert, setInvert] = useState(() => document.documentElement.dataset.theme !== 'light')
   const [error, setError] = useState<string | null>(null)
   const [pageText, setPageText] = useState('1')
+  const timer = useTimer()
+  const [sessionRunning, setSessionRunning] = useState(false)
+  const locked = timer.state.status === 'expired' && timer.state.kind === 'focus'
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -93,24 +97,27 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
 
   const goTo = useCallback(
     (p: number) => {
+      if (locked) return
       const next = clampPage(p, total)
       setPage(next)
       setPageText(String(next))
     },
-    [total]
+    [total, locked]
   )
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
       if ((e.target as HTMLElement | null)?.tagName === 'INPUT') return
+      if (locked) return
       if (e.key === 'ArrowRight' || e.key === 'PageDown') goTo(page + 1)
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') goTo(page - 1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [goTo, page])
+  }, [goTo, page, locked])
 
   const stepZoom = (dir: 1 | -1): void => {
+    if (locked) return
     const next = nextZoom(scale, dir)
     if (next !== undefined) setZoom(next)
   }
@@ -122,7 +129,11 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
       <header className="flex flex-wrap items-center gap-2">
         <Button onClick={onBack}>Back to library</Button>
         <h1 className="mr-auto text-xl font-semibold">{doc?.title ?? 'Reader'}</h1>
-        <Button aria-label="Previous page" disabled={page <= 1} onClick={() => goTo(page - 1)}>
+        <Button
+          aria-label="Previous page"
+          disabled={locked || page <= 1}
+          onClick={() => goTo(page - 1)}
+        >
           ‹
         </Button>
         <input
@@ -137,13 +148,17 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
           className="min-h-10 w-20 rounded-lg border border-line bg-app-bg px-2 text-center text-sm"
         />
         <span className="text-sm text-muted">of {total}</span>
-        <Button aria-label="Next page" disabled={page >= total} onClick={() => goTo(page + 1)}>
+        <Button
+          aria-label="Next page"
+          disabled={locked || page >= total}
+          onClick={() => goTo(page + 1)}
+        >
           ›
         </Button>
-        <Button aria-label="Zoom out" disabled={atMin} onClick={() => stepZoom(-1)}>
+        <Button aria-label="Zoom out" disabled={locked || atMin} onClick={() => stepZoom(-1)}>
           −
         </Button>
-        <Button aria-label="Zoom in" disabled={atMax} onClick={() => stepZoom(1)}>
+        <Button aria-label="Zoom in" disabled={locked || atMax} onClick={() => stepZoom(1)}>
           +
         </Button>
         <Button aria-label="Fit width" onClick={() => setZoom('fit')}>
@@ -160,11 +175,31 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
         </div>
       )}
 
+      {sessionRunning && timer.state.status === 'idle' && (
+        <div className="flex items-center gap-3 rounded-lg border border-line p-3 text-sm">
+          <span>A study session is running but its timer is not.</span>
+          <Button onClick={timer.startFocus}>Start focus timer</Button>
+        </div>
+      )}
+
       <div className="flex min-h-0 flex-1 gap-3">
         <div
           ref={scrollRef}
-          className="min-h-0 flex-1 overflow-auto rounded-card border border-line bg-surface-2 p-4"
+          className="relative min-h-0 flex-1 overflow-auto rounded-card border border-line bg-surface-2 p-4"
         >
+          {locked && (
+            <div
+              role="alertdialog"
+              aria-label="Time is up"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-app-bg/95 p-6 text-center"
+            >
+              <h2 className="text-2xl font-semibold">Time is up</h2>
+              <p className="max-w-sm text-muted">
+                Reading is locked. Set your end bookmark in the Bookmarks panel to finish this
+                session.
+              </p>
+            </div>
+          )}
           <div
             data-testid="page-stage"
             data-invert={String(invert)}
@@ -178,7 +213,24 @@ export function ReaderView({ documentId, onBack, engine = pdfjsEngine }: Props):
             <div ref={textRef} className="textLayer absolute left-0 top-0" />
           </div>
         </div>
-        <BookmarkPanel documentId={documentId} page={page} />
+        <BookmarkPanel
+          documentId={documentId}
+          page={page}
+          focusedSeconds={timer.focusedSeconds}
+          onActive={setSessionRunning}
+          onStarted={() => {
+            setSessionRunning(true)
+            timer.startFocus()
+          }}
+          onEnded={() => {
+            setSessionRunning(false)
+            timer.stop()
+          }}
+          onCancelled={() => {
+            setSessionRunning(false)
+            timer.stop()
+          }}
+        />
       </div>
     </section>
   )

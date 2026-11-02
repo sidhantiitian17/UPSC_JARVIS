@@ -1,11 +1,14 @@
 import { HashRouter } from 'react-router-dom'
 import { AppRoutes } from './routes'
+import { TimerProvider } from './timer/timer-context'
 
 function App(): React.JSX.Element {
   return (
-    <HashRouter>
-      <AppRoutes />
-    </HashRouter>
+    <TimerProvider>
+      <HashRouter>
+        <AppRoutes />
+      </HashRouter>
+    </TimerProvider>
   )
 }
 

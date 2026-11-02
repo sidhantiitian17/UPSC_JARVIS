@@ -494,6 +494,10 @@ export interface components {
         };
         /** SettingsIn */
         SettingsIn: {
+            /** Break Minutes */
+            break_minutes?: number | null;
+            /** Focus Minutes */
+            focus_minutes?: number | null;
             /** Library Path */
             library_path?: string | null;
             /** Vault Path */
@@ -501,8 +505,12 @@ export interface components {
         };
         /** SettingsOut */
         SettingsOut: {
+            /** Break Minutes */
+            break_minutes: number;
             /** Db Version */
             db_version: number;
+            /** Focus Minutes */
+            focus_minutes: number;
             /** Library Path */
             library_path: string | null;
             /** Providers */

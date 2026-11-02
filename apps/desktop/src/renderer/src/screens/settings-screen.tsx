@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { components } from '@jarvis/shared'
-import { getSettings, putSettings, testAi } from '../api/client'
+import { ApiError, getSettings, putSettings, testAi } from '../api/client'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
 
@@ -79,6 +79,62 @@ function ProviderRow({
         </div>
       )}
     </li>
+  )
+}
+
+function TimerCard({
+  settings,
+  onSaved,
+  onError
+}: {
+  settings: SettingsOut
+  onSaved: (s: SettingsOut) => void
+  onError: (m: string) => void
+}): React.JSX.Element {
+  const [focus, setFocus] = useState(String(settings.focus_minutes))
+  const [rest, setRest] = useState(String(settings.break_minutes))
+  const save = async (): Promise<void> => {
+    try {
+      onSaved(await putSettings({ focus_minutes: Number(focus), break_minutes: Number(rest) }))
+    } catch (e) {
+      onError(
+        e instanceof ApiError && e.status === 422
+          ? 'Focus must be 5–180 minutes and break 1–60 minutes.'
+          : describeError(e)
+      )
+    }
+  }
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="text-xl font-semibold">Focus timer</h2>
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="flex flex-col gap-1 text-sm">
+          Focus minutes
+          <input
+            type="number"
+            min={5}
+            max={180}
+            aria-label="Focus minutes"
+            value={focus}
+            onChange={(e) => setFocus(e.target.value)}
+            className="min-h-10 w-28 rounded-lg border border-line bg-app-bg px-3"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Break minutes
+          <input
+            type="number"
+            min={1}
+            max={60}
+            aria-label="Break minutes"
+            value={rest}
+            onChange={(e) => setRest(e.target.value)}
+            className="min-h-10 w-28 rounded-lg border border-line bg-app-bg px-3"
+          />
+        </label>
+        <Button onClick={save}>Save timer</Button>
+      </div>
+    </Card>
   )
 }
 
@@ -161,6 +217,15 @@ export function SettingsScreen(): React.JSX.Element {
           </div>
         ))}
       </Card>
+
+      {settings && (
+        <TimerCard
+          key={`${settings.focus_minutes}-${settings.break_minutes}`}
+          settings={settings}
+          onSaved={setSettings}
+          onError={setError}
+        />
+      )}
 
       <Card>
         <h2 className="mb-2 text-xl font-semibold">AI providers</h2>

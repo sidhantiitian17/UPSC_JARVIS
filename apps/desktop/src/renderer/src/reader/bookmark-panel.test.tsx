@@ -221,4 +221,50 @@ describe('BookmarkPanel', () => {
     render(<BookmarkPanel documentId={7} page={5} />)
     expect(await screen.findByText(/no readable text on this page/i)).toBeInTheDocument()
   })
+
+  it('tells the reader when a session starts, ends (with focused seconds) and is cancelled', async () => {
+    const onStarted = vi.fn()
+    const onEnded = vi.fn()
+    const onCancelled = vi.fn()
+    const api = setup({
+      ...chunksRoute,
+      'GET /sessions/active': { status: 200, body: null },
+      'POST /sessions': { status: 200, body: session() },
+      'POST /sessions/3/end': {
+        status: 200,
+        body: session({ status: 'gate', end: point(12, 5, 1) })
+      }
+    })
+    render(
+      <BookmarkPanel
+        documentId={7}
+        page={5}
+        focusedSeconds={1500}
+        onStarted={onStarted}
+        onEnded={onEnded}
+        onCancelled={onCancelled}
+      />
+    )
+    await userEvent.click(
+      await screen.findByRole('button', { name: /set start bookmark at paragraph 1/i })
+    )
+    await waitFor(() => expect(onStarted).toHaveBeenCalled())
+    await userEvent.click(
+      await screen.findByRole('button', { name: /set end bookmark at paragraph 2/i })
+    )
+    expect(api).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/sessions/3/end',
+      body: { end_chunk_id: 12, focused_seconds: 1500 }
+    })
+    await waitFor(() => expect(onEnded).toHaveBeenCalled())
+    expect(onCancelled).not.toHaveBeenCalled()
+  })
+
+  it('reports an already running session so the reader can lock when its timer expires', async () => {
+    const onActive = vi.fn()
+    setup({ ...chunksRoute, 'GET /sessions/active': { status: 200, body: session() } })
+    render(<BookmarkPanel documentId={7} page={5} onActive={onActive} />)
+    await waitFor(() => expect(onActive).toHaveBeenCalledWith(true))
+  })
 })

@@ -577,6 +577,32 @@
       },
       "SettingsIn": {
         "properties": {
+          "break_minutes": {
+            "anyOf": [
+              {
+                "maximum": 60.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Break Minutes"
+          },
+          "focus_minutes": {
+            "anyOf": [
+              {
+                "maximum": 180.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focus Minutes"
+          },
           "library_path": {
             "anyOf": [
               {
@@ -605,8 +631,16 @@
       },
       "SettingsOut": {
         "properties": {
+          "break_minutes": {
+            "title": "Break Minutes",
+            "type": "integer"
+          },
           "db_version": {
             "title": "Db Version",
+            "type": "integer"
+          },
+          "focus_minutes": {
+            "title": "Focus Minutes",
             "type": "integer"
           },
           "library_path": {
@@ -642,6 +676,8 @@
         "required": [
           "library_path",
           "vault_path",
+          "focus_minutes",
+          "break_minutes",
           "providers",
           "db_version"
         ],

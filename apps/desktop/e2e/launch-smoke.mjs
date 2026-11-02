@@ -155,12 +155,25 @@ try {
   check('reader canvas has painted pixels', painted)
   await win.click('button[aria-label="Set start bookmark at paragraph 1"]')
   await win.waitForSelector('[role="status"] >> text=Reading since page 1')
+  const timerShown = await win
+    .waitForSelector('[role="timer"] >> text=Focus', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('focus timer starts with the start bookmark', timerShown)
+  const idle = await win.evaluate(() => window.jarvis.idleSeconds())
+  check(
+    'system idle time is readable from main',
+    typeof idle === 'number' && idle >= 0,
+    String(idle)
+  )
   await win.click('button[aria-label="Set end bookmark at paragraph 1"]')
   const saved = await win
     .waitForSelector('section[aria-label="Session saved"]', { timeout: 30000 })
     .then(() => true)
     .catch(() => false)
   check('start/end bookmarks save a session', saved)
+  const timerGone = await win.evaluate(() => document.querySelector('[role="timer"]') === null)
+  check('timer stops when the session ends', timerGone)
   const sessionTags = await win.evaluate(async () => {
     const t = await window.jarvis.api({ method: 'GET', path: '/syllabus/tree' })
     return t.status

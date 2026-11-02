@@ -62,8 +62,11 @@ export const listChunks = (docId: number, page: number): Promise<ChunkInfo[]> =>
 export const getActiveSession = (): Promise<StudySession | null> => api('GET', '/sessions/active')
 export const startSession = (document_id: number, start_chunk_id: number): Promise<StudySession> =>
   api('POST', '/sessions', { document_id, start_chunk_id })
-export const endSession = (id: number, end_chunk_id: number): Promise<StudySession> =>
-  api('POST', `/sessions/${id}/end`, { end_chunk_id })
+export const endSession = (
+  id: number,
+  end_chunk_id: number,
+  focused_seconds?: number
+): Promise<StudySession> => api('POST', `/sessions/${id}/end`, { end_chunk_id, focused_seconds })
 export const cancelSession = (id: number): Promise<StudySession> =>
   api('POST', `/sessions/${id}/cancel`)
 export const setSessionTags = (id: number, node_ids: string[]): Promise<StudySession> =>

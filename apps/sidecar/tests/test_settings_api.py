@@ -125,3 +125,15 @@ def test_llm_test_reports_failure_without_crashing(tmp_path):
 def test_every_route_needs_the_token(tmp_path, method, path, kw):
     c, _ = make_client(tmp_path)
     assert c.request(method, path, **kw).status_code == 401
+
+
+def test_focus_and_break_minutes_default_validate_and_persist(tmp_path):
+    c, _ = make_client(tmp_path)
+    body = c.get("/settings", headers=H).json()
+    assert (body["focus_minutes"], body["break_minutes"]) == (50, 10)
+    out = c.put("/settings", headers=H, json={"focus_minutes": 25}).json()
+    assert (out["focus_minutes"], out["break_minutes"]) == (25, 10)
+    for bad in ({"focus_minutes": 4}, {"focus_minutes": 181}, {"break_minutes": 0}, {"break_minutes": 61}):
+        assert c.put("/settings", headers=H, json=bad).status_code == 422
+    c2, _ = make_client(tmp_path)  # same data dir: survives a restart
+    assert c2.get("/settings", headers=H).json()["focus_minutes"] == 25

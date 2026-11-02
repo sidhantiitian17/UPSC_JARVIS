@@ -9,6 +9,7 @@ declare global {
       secrets: SecretsApi
       pickFolder: () => Promise<string | null>
       pickPdf: () => Promise<string | null>
+      idleSeconds: () => Promise<number>
       pathForFile: (file: File) => string
     }
   }

@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, safeStorage, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, safeStorage, dialog, powerMonitor } from 'electron'
 import { existsSync } from 'fs'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -132,6 +132,10 @@ app.whenReady().then(() => {
     return res.canceled ? null : (res.filePaths[0] ?? null)
   })
 
+  ipcMain.handle('system:idleSeconds', (event) => {
+    assertTrusted(event.senderFrame?.url)
+    return powerMonitor.getSystemIdleTime()
+  })
   ipcMain.handle('dialog:pickPdf', async (event) => {
     assertTrusted(event.senderFrame?.url)
     const win = BrowserWindow.fromWebContents(event.sender)

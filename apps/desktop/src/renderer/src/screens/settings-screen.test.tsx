@@ -47,6 +47,8 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
   let settings = {
     library_path: null as string | null,
     vault_path: null as string | null,
+    focus_minutes: 50,
+    break_minutes: 10,
     providers,
     db_version: 2
   }
@@ -165,5 +167,23 @@ describe('Settings screen', () => {
       .getAllByRole('button')
       .filter((b) => b.getAttribute('data-variant') === 'primary')
     expect(primary).toHaveLength(1)
+  })
+
+  it('shows and saves the focus timer lengths', async () => {
+    const { api } = setup()
+    render(<SettingsScreen />)
+    const focus = await screen.findByRole('spinbutton', { name: /focus minutes/i })
+    expect(focus).toHaveValue(50)
+    expect(screen.getByRole('spinbutton', { name: /break minutes/i })).toHaveValue(10)
+    await userEvent.clear(focus)
+    await userEvent.type(focus, '25')
+    await userEvent.click(screen.getByRole('button', { name: /save timer/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/settings',
+        body: { focus_minutes: 25, break_minutes: 10 }
+      })
+    )
   })
 })

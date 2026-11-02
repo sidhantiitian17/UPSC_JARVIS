@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('jarvis', {
   status: (): Promise<SidecarState> => ipcRenderer.invoke('api:status'),
   secrets,
   pickFolder: (): Promise<string | null> => ipcRenderer.invoke('dialog:pickFolder'),
+  idleSeconds: (): Promise<number> => ipcRenderer.invoke('system:idleSeconds'),
   pickPdf: (): Promise<string | null> => ipcRenderer.invoke('dialog:pickPdf'),
   // Dropped files: the sandboxed renderer cannot read paths itself, so ask Electron's webUtils.
   pathForFile: (file: File): string => webUtils.getPathForFile(file)

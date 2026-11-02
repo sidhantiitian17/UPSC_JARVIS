@@ -2,6 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ReaderView } from './reader-view'
+import { TimerContext, type TimerApi } from '../timer/timer-context'
+import { IDLE } from '../timer/timer-machine'
 import type { PdfEngine } from './pdf-engine'
 
 const DOC = {
@@ -171,5 +173,53 @@ describe('ReaderView', () => {
     const { engine } = fakeEngine()
     render(<ReaderView documentId={7} engine={engine} onBack={() => {}} />)
     expect(await screen.findByRole('alert')).toHaveTextContent(/moved or deleted/i)
+  })
+
+  it('locks the page area when the focus timer expired during a session, keeping bookmarks usable', async () => {
+    setup()
+    const { engine } = fakeEngine()
+    const expired: TimerApi = {
+      state: { status: 'expired', kind: 'focus', totalMs: 3_000_000, focusedMs: 3_000_000 },
+      clock: '00:00',
+      focusedSeconds: 3000,
+      minutes: { focus: 50, break: 10 },
+      startFocus: () => {},
+      startBreak: () => {},
+      pause: () => {},
+      resume: () => {},
+      stop: () => {}
+    }
+    render(
+      <TimerContext.Provider value={expired}>
+        <ReaderView documentId={7} engine={engine} onBack={() => {}} />
+      </TimerContext.Provider>
+    )
+    expect(await screen.findByRole('alertdialog', { name: /time is up/i })).toBeInTheDocument()
+    expect(screen.getByText(/set your end bookmark/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /next page/i })).toBeDisabled()
+    expect(screen.getByRole('complementary', { name: /bookmarks/i })).toBeInTheDocument()
+  })
+
+  it('does not lock when the timer is idle', async () => {
+    setup()
+    const { engine, renders } = fakeEngine()
+    const idle: TimerApi = {
+      state: IDLE,
+      clock: '50:00',
+      focusedSeconds: 0,
+      minutes: { focus: 50, break: 10 },
+      startFocus: () => {},
+      startBreak: () => {},
+      pause: () => {},
+      resume: () => {},
+      stop: () => {}
+    }
+    render(
+      <TimerContext.Provider value={idle}>
+        <ReaderView documentId={7} engine={engine} onBack={() => {}} />
+      </TimerContext.Provider>
+    )
+    await waitFor(() => expect(renders.length).toBeGreaterThan(0))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 })
