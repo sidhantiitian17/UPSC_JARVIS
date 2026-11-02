@@ -301,6 +301,47 @@
         "title": "BadDayOut",
         "type": "object"
       },
+      "BatchIn": {
+        "properties": {
+          "limit": {
+            "default": 20,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "BatchIn",
+        "type": "object"
+      },
+      "BatchOut": {
+        "properties": {
+          "already_tagged": {
+            "title": "Already Tagged",
+            "type": "integer"
+          },
+          "remaining": {
+            "title": "Remaining",
+            "type": "integer"
+          },
+          "skipped_no_text": {
+            "title": "Skipped No Text",
+            "type": "integer"
+          },
+          "tagged": {
+            "title": "Tagged",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tagged",
+          "skipped_no_text",
+          "already_tagged",
+          "remaining"
+        ],
+        "title": "BatchOut",
+        "type": "object"
+      },
       "Block": {
         "properties": {
           "kind": {
@@ -618,6 +659,19 @@
           "distraction_minutes"
         ],
         "title": "DayOut",
+        "type": "object"
+      },
+      "DecisionIn": {
+        "properties": {
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "DecisionIn",
         "type": "object"
       },
       "DocumentOut": {
@@ -1110,6 +1164,19 @@
           "library_path"
         ],
         "title": "LocationsOut",
+        "type": "object"
+      },
+      "ManualTagIn": {
+        "properties": {
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id"
+        ],
+        "title": "ManualTagIn",
         "type": "object"
       },
       "NextBlock": {
@@ -1637,6 +1704,14 @@
             ],
             "title": "Suggested Answer"
           },
+          "tags": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PyqTagOut"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
           "year": {
             "title": "Year",
             "type": "integer"
@@ -1662,6 +1737,34 @@
           "source_sha256"
         ],
         "title": "PyqOut",
+        "type": "object"
+      },
+      "PyqTagOut": {
+        "properties": {
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id",
+          "title",
+          "status",
+          "source"
+        ],
+        "title": "PyqTagOut",
         "type": "object"
       },
       "RateIn": {
@@ -3938,6 +4041,173 @@
         ]
       }
     },
+    "/pyq/questions/{qid}/suggest-tags": {
+      "post": {
+        "operationId": "suggest_pyq_questions__qid__suggest_tags_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "title": "Qid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PyqTagOut"
+                  },
+                  "title": "Response Suggest Pyq Questions  Qid  Suggest Tags Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Suggest",
+        "tags": [
+          "pyq"
+        ]
+      }
+    },
+    "/pyq/questions/{qid}/tags": {
+      "post": {
+        "operationId": "add_tag_pyq_questions__qid__tags_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "title": "Qid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualTagIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PyqTagOut"
+                  },
+                  "title": "Response Add Tag Pyq Questions  Qid  Tags Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Tag",
+        "tags": [
+          "pyq"
+        ]
+      }
+    },
+    "/pyq/questions/{qid}/tags/{node_id}": {
+      "put": {
+        "operationId": "decide_tag_pyq_questions__qid__tags__node_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "title": "Qid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PyqTagOut"
+                  },
+                  "title": "Response Decide Tag Pyq Questions  Qid  Tags  Node Id  Put",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide Tag",
+        "tags": [
+          "pyq"
+        ]
+      }
+    },
     "/pyq/questions/{qid}/verify": {
       "post": {
         "operationId": "verify_pyq_questions__qid__verify_post",
@@ -3975,6 +4245,47 @@
           }
         },
         "summary": "Verify",
+        "tags": [
+          "pyq"
+        ]
+      }
+    },
+    "/pyq/suggest-tags": {
+      "post": {
+        "operationId": "batch_pyq_suggest_tags_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Batch",
         "tags": [
           "pyq"
         ]

@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from jarvis.pyq.importer import import_dataset
 from jarvis.pyq.service import (
@@ -14,6 +14,7 @@ from jarvis.pyq.service import (
     mark_verified,
     update_question,
 )
+from jarvis.pyq.tags import add_manual, decide, suggest_batch, suggest_tags
 from jarvis.state import DEFAULT_PYQ, AppState
 
 
@@ -26,6 +27,13 @@ class PaperOut(BaseModel):
     failed: int
     reviewed: int
     verified: int
+
+
+class PyqTagOut(BaseModel):
+    node_id: str
+    title: str
+    status: str
+    source: str
 
 
 class PyqOut(BaseModel):
@@ -46,6 +54,7 @@ class PyqOut(BaseModel):
     status: str
     source_url: str | None
     source_sha256: str | None
+    tags: list[PyqTagOut] = []
 
 
 class ImportIn(BaseModel):
@@ -58,6 +67,25 @@ class ImportOut(BaseModel):
     inserted: int
     updated: int
     kept_owner_edits: int
+
+
+class DecisionIn(BaseModel):
+    decision: str
+
+
+class ManualTagIn(BaseModel):
+    node_id: str
+
+
+class BatchIn(BaseModel):
+    limit: int = Field(default=20, ge=1, le=100)
+
+
+class BatchOut(BaseModel):
+    tagged: int
+    skipped_no_text: int
+    already_tagged: int
+    remaining: int
 
 
 class EditIn(BaseModel):
@@ -109,5 +137,21 @@ def build_router(state: AppState) -> APIRouter:
     @router.post("/questions/{qid}/verify", response_model=PyqOut)
     def verify(qid: str) -> dict:
         return guarded(lambda: mark_verified(state.conn, qid))
+
+    @router.post("/questions/{qid}/suggest-tags", response_model=list[PyqTagOut])
+    def suggest(qid: str) -> list[dict]:
+        return guarded(lambda: suggest_tags(state.conn, state.llm, qid))
+
+    @router.put("/questions/{qid}/tags/{node_id}", response_model=list[PyqTagOut])
+    def decide_tag(qid: str, node_id: str, body: DecisionIn) -> list[dict]:
+        return guarded(lambda: decide(state.conn, qid, node_id, body.decision))
+
+    @router.post("/questions/{qid}/tags", response_model=list[PyqTagOut])
+    def add_tag(qid: str, body: ManualTagIn) -> list[dict]:
+        return guarded(lambda: add_manual(state.conn, qid, body.node_id))
+
+    @router.post("/suggest-tags", response_model=BatchOut)
+    def batch(body: BatchIn) -> dict:
+        return guarded(lambda: suggest_batch(state.conn, state.llm, body.limit))
 
     return router

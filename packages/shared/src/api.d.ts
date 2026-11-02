@@ -431,6 +431,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/pyq/questions/{qid}/suggest-tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suggest */
+        post: operations["suggest_pyq_questions__qid__suggest_tags_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/questions/{qid}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Tag */
+        post: operations["add_tag_pyq_questions__qid__tags_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/questions/{qid}/tags/{node_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Decide Tag */
+        put: operations["decide_tag_pyq_questions__qid__tags__node_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/pyq/questions/{qid}/verify": {
         parameters: {
             query?: never;
@@ -442,6 +493,23 @@ export interface paths {
         put?: never;
         /** Verify */
         post: operations["verify_pyq_questions__qid__verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pyq/suggest-tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Batch */
+        post: operations["batch_pyq_suggest_tags_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -851,6 +919,25 @@ export interface components {
             /** Today Active */
             today_active: boolean;
         };
+        /** BatchIn */
+        BatchIn: {
+            /**
+             * Limit
+             * @default 20
+             */
+            limit: number;
+        };
+        /** BatchOut */
+        BatchOut: {
+            /** Already Tagged */
+            already_tagged: number;
+            /** Remaining */
+            remaining: number;
+            /** Skipped No Text */
+            skipped_no_text: number;
+            /** Tagged */
+            tagged: number;
+        };
         /** Block */
         Block: {
             /** Kind */
@@ -966,6 +1053,11 @@ export interface components {
             neutral_minutes: number;
             /** Study Minutes */
             study_minutes: number;
+        };
+        /** DecisionIn */
+        DecisionIn: {
+            /** Decision */
+            decision: string;
         };
         /** DocumentOut */
         DocumentOut: {
@@ -1122,6 +1214,11 @@ export interface components {
             library_path: string | null;
             /** Vault Path */
             vault_path: string | null;
+        };
+        /** ManualTagIn */
+        ManualTagIn: {
+            /** Node Id */
+            node_id: string;
         };
         /** NextBlock */
         NextBlock: {
@@ -1296,8 +1393,24 @@ export interface components {
             stem: string;
             /** Suggested Answer */
             suggested_answer: string | null;
+            /**
+             * Tags
+             * @default []
+             */
+            tags: components["schemas"]["PyqTagOut"][];
             /** Year */
             year: number;
+        };
+        /** PyqTagOut */
+        PyqTagOut: {
+            /** Node Id */
+            node_id: string;
+            /** Source */
+            source: string;
+            /** Status */
+            status: string;
+            /** Title */
+            title: string;
         };
         /** RateIn */
         RateIn: {
@@ -2434,6 +2547,108 @@ export interface operations {
             };
         };
     };
+    suggest_pyq_questions__qid__suggest_tags_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                qid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PyqTagOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_tag_pyq_questions__qid__tags_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                qid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualTagIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PyqTagOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_tag_pyq_questions__qid__tags__node_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                qid: string;
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PyqTagOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     verify_pyq_questions__qid__verify_post: {
         parameters: {
             query?: never;
@@ -2452,6 +2667,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PyqOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    batch_pyq_suggest_tags_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchOut"];
                 };
             };
             /** @description Validation Error */

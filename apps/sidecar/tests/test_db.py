@@ -19,6 +19,7 @@ EXPECTED_TABLES = {
     "gate_result",
     "focus_sample",
     "pyq",
+    "pyq_tag",
     "attempt",
     "card",
     "review_log",

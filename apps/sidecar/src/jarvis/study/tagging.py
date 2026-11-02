@@ -65,9 +65,14 @@ def _clip(passage: str) -> str:
 
 
 def tag_passage(llm: LLMClient, conn: sqlite3.Connection, passage: str) -> list[str]:
+    return tag_passage_detailed(llm, conn, passage)[0]
+
+
+def tag_passage_detailed(llm: LLMClient, conn: sqlite3.Connection, passage: str) -> tuple[list[str], str]:
+    """(node ids, source) where source is 'llm', 'keyword' or 'none'."""
     cands = candidate_nodes(conn, passage)
     if not cands:
-        return []
+        return [], "none"
     valid = {c.id for c in cands}
     listing = "\n".join(
         f"- {c.id}: {c.title[:90]}" for c in cands
@@ -86,7 +91,8 @@ def tag_passage(llm: LLMClient, conn: sqlite3.Connection, passage: str) -> list[
             if i not in seen:
                 seen.append(i)
         if seen:
-            return seen[:MAX_TAGS]
+            return seen[:MAX_TAGS], "llm"
     except AllProvidersFailed:
         pass
-    return keyword_tag(passage, cands)
+    ids = keyword_tag(passage, cands)
+    return ids, "keyword" if ids else "none"

@@ -278,6 +278,19 @@ try {
       pyqPapers.body.length === 22 &&
       pyqPapers.body.reduce((n, p) => n + p.total, 0) === 1587
   )
+  const tagged = await win.evaluate(async () => {
+    const sug = await window.jarvis.api({
+      method: 'POST',
+      path: '/pyq/questions/PRE-2023-GS1-010/suggest-tags'
+    })
+    const q = await window.jarvis.api({ method: 'GET', path: '/pyq/questions/PRE-2023-GS1-010' })
+    return { status: sug.status, tags: q.body.tags }
+  })
+  check(
+    'PYQ tag suggestions run offline (keyword fallback) and stay suggestions until accepted',
+    tagged.status === 200 && tagged.tags.every((t) => t.status === 'suggested'),
+    JSON.stringify(tagged.tags.map((t) => t.source))
+  )
   const petStatus = await win.evaluate(() => window.jarvis.pet.status())
   check(
     'pet bridge answers (OpenPets itself is optional)',

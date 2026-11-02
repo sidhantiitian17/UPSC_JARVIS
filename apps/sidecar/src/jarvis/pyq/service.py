@@ -17,11 +17,29 @@ def _row(r: sqlite3.Row) -> dict:
     return d
 
 
+def _attach_tags(conn: sqlite3.Connection, rows: list[dict]) -> list[dict]:
+    if not rows:
+        return rows
+    by_q: dict[str, list[dict]] = {r["id"]: [] for r in rows}
+    marks = ",".join("?" * len(by_q))
+    for t in conn.execute(
+        "select t.pyq_id, t.node_id, n.title, t.status, t.source from pyq_tag t "
+        f"join syllabus_node n on n.id = t.node_id where t.pyq_id in ({marks}) order by t.rowid",
+        list(by_q),
+    ):
+        by_q[t["pyq_id"]].append(
+            {"node_id": t["node_id"], "title": t["title"], "status": t["status"], "source": t["source"]}
+        )
+    for r in rows:
+        r["tags"] = by_q[r["id"]]
+    return rows
+
+
 def get_question(conn: sqlite3.Connection, qid: str) -> dict:
     r = conn.execute("select * from pyq where id = ?", (qid,)).fetchone()
     if r is None:
         raise KeyError(qid)
-    return _row(r)
+    return _attach_tags(conn, [_row(r)])[0]
 
 
 def list_papers(conn: sqlite3.Connection) -> list[dict]:
@@ -52,7 +70,7 @@ def list_questions(
             args.append(val)
     sql = "select * from pyq" + (f" where {' and '.join(where)}" if where else "")
     sql += " order by phase, year, paper, number limit ? offset ?"
-    return [_row(r) for r in conn.execute(sql, (*args, limit, offset))]
+    return _attach_tags(conn, [_row(r) for r in conn.execute(sql, (*args, limit, offset))])
 
 
 def update_question(

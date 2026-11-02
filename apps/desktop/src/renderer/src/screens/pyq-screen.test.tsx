@@ -32,6 +32,7 @@ const q = (over: object = {}): object => ({
   status: 'parsed',
   source_url: 'https://www.upsc.gov.in/x.pdf',
   source_sha256: 'a'.repeat(64),
+  tags: [],
   ...over
 })
 
@@ -68,6 +69,70 @@ function setup(
             options: [],
             raw_text: 'raw ocr text'
           })
+        ]
+      }
+    if (req.path === '/syllabus/tree')
+      return {
+        status: 200,
+        body: [
+          {
+            id: 'gs2',
+            parent_id: null,
+            title: 'GS Paper II',
+            kind: 'paper',
+            paper: 'GS2',
+            reviewed: false,
+            source: 'owner',
+            children: [
+              {
+                id: 'gs2.polity',
+                parent_id: 'gs2',
+                title: 'Constitution and Polity',
+                kind: 'subject',
+                paper: 'GS2',
+                reviewed: false,
+                source: 'owner',
+                children: []
+              }
+            ]
+          }
+        ]
+      }
+    if (req.path.endsWith('/suggest-tags'))
+      return {
+        status: 200,
+        body: [
+          {
+            node_id: 'gs2.polity',
+            title: 'Constitution and Polity',
+            status: 'suggested',
+            source: 'llm'
+          }
+        ]
+      }
+    if (req.method === 'PUT' && req.path.includes('/tags/'))
+      return {
+        status: 200,
+        body: [
+          {
+            node_id: 'gs2.polity',
+            title: 'Constitution and Polity',
+            status:
+              (req.body as { decision: string }).decision === 'accept' ? 'accepted' : 'rejected',
+            source: 'llm'
+          }
+        ]
+      }
+    if (req.method === 'POST' && req.path.endsWith('/tags'))
+      return {
+        status: 200,
+        body: [
+          {
+            node_id: (req.body as { node_id: string }).node_id,
+            title: 'Constitution and Polity',
+            status: 'accepted',
+            source: 'owner'
+          }
         ]
       }
     if (req.method === 'PUT')
@@ -203,5 +268,92 @@ describe('PYQ screen', () => {
     }
     render(<PyqScreen />)
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not load/i)
+  })
+
+  it('shows existing tags with their status and who proposed them', async () => {
+    setup({
+      papers: [paper()],
+      questions: [
+        q({
+          tags: [
+            {
+              node_id: 'gs2.polity',
+              title: 'Constitution and Polity',
+              status: 'accepted',
+              source: 'owner'
+            }
+          ]
+        })
+      ]
+    })
+    render(<PyqScreen />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: /review prelims 2023 gs-paper-1/i })
+    )
+    await userEvent.click(await screen.findByRole('button', { name: /open question 1/i }))
+    const list = await screen.findByRole('list', { name: /syllabus tags/i })
+    expect(within(list).getByText('Constitution and Polity')).toBeInTheDocument()
+    expect(within(list).getByText(/accepted/i)).toBeInTheDocument()
+    expect(within(list).getByText(/you added this/i)).toBeInTheDocument()
+  })
+
+  it('suggests tags, labelled as suggestions, and the owner accepts or rejects them', async () => {
+    const api = setup({ papers: [paper()] })
+    render(<PyqScreen />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: /review prelims 2023 gs-paper-1/i })
+    )
+    await userEvent.click(await screen.findByRole('button', { name: /open question 1/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /suggest tags/i }))
+    const list = await screen.findByRole('list', { name: /syllabus tags/i })
+    expect(within(list).getByText(/suggested by ai/i)).toBeInTheDocument()
+    await userEvent.click(
+      within(list).getByRole('button', { name: /accept constitution and polity/i })
+    )
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/pyq/questions/PRE-2023-GS1-001/tags/gs2.polity',
+        body: { decision: 'accept' }
+      })
+    )
+    expect(await within(list).findByText(/^accepted/i)).toBeInTheDocument()
+    await userEvent.click(
+      within(list).getByRole('button', { name: /reject constitution and polity/i })
+    )
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith(expect.objectContaining({ body: { decision: 'reject' } }))
+    )
+  })
+
+  it('lets the owner add a syllabus node by hand', async () => {
+    const api = setup({ papers: [paper()] })
+    render(<PyqScreen />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: /review prelims 2023 gs-paper-1/i })
+    )
+    await userEvent.click(await screen.findByRole('button', { name: /open question 1/i }))
+    await userEvent.selectOptions(
+      await screen.findByRole('combobox', { name: /add syllabus node/i }),
+      'gs2.polity'
+    )
+    await userEvent.click(screen.getByRole('button', { name: /add tag/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/pyq/questions/PRE-2023-GS1-001/tags',
+        body: { node_id: 'gs2.polity' }
+      })
+    )
+  })
+
+  it('cannot suggest tags for a question without text', async () => {
+    setup({ papers: [paper()] })
+    render(<PyqScreen />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: /review prelims 2023 gs-paper-1/i })
+    )
+    await userEvent.click(await screen.findByRole('button', { name: /open question 2/i }))
+    expect(await screen.findByRole('button', { name: /suggest tags/i })).toBeDisabled()
   })
 })

@@ -12,6 +12,7 @@ import {
 import { EmptyState } from '../components/empty-state'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
+import { TagPanel } from '../pyq/tag-panel'
 import { SCREEN_META } from '../screens'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -139,6 +140,7 @@ function Editor({
         {q.answer_source !== 'none' && ` Current source: ${q.answer_source}.`}
       </p>
       <p className="text-xs text-muted">Source: {q.source_url ?? 'unknown'}</p>
+      <TagPanel q={q} />
       <div className="flex gap-2">
         <Button variant="primary" onClick={() => void save()}>
           Save

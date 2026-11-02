@@ -162,3 +162,15 @@ export const savePyq = (
 ): Promise<PyqQuestion> => api('PUT', `/pyq/questions/${id}`, body)
 export const verifyPyq = (id: string): Promise<PyqQuestion> =>
   api('POST', `/pyq/questions/${id}/verify`)
+
+export type PyqTag = Schemas['PyqTagOut']
+export const suggestPyqTags = (id: string): Promise<PyqTag[]> =>
+  api('POST', `/pyq/questions/${id}/suggest-tags`)
+export const decidePyqTag = (
+  id: string,
+  node: string,
+  decision: 'accept' | 'reject'
+): Promise<PyqTag[]> =>
+  api('PUT', `/pyq/questions/${id}/tags/${encodeURIComponent(node)}`, { decision })
+export const addPyqTag = (id: string, node_id: string): Promise<PyqTag[]> =>
+  api('POST', `/pyq/questions/${id}/tags`, { node_id })
