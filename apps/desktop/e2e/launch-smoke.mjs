@@ -219,6 +219,15 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Today screen renders with review stats', todayOk)
+  const nextBlock = await win
+    .waitForSelector('text=/e2e-polity, page/', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('Today offers the next block from the last session', nextBlock)
+  const cov = await win.evaluate(() =>
+    window.jarvis.api({ method: 'GET', path: '/coverage/nodes' })
+  )
+  check('coverage endpoint serves every node', cov.status === 200 && cov.body.length > 0)
   const timerGone = await win.evaluate(() => document.querySelector('[role="timer"]') === null)
   check('timer stops when the session ends', timerGone)
   const sessionTags = await win.evaluate(async () => {

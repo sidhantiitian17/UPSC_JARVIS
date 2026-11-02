@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from jarvis import __version__
 from jarvis.llm.providers import build_providers
+from jarvis.routers import coverage as coverage_router
 from jarvis.routers import gate as gate_router
 from jarvis.routers import library as library_router
 from jarvis.routers import review as review_router
@@ -54,6 +55,7 @@ def create_app(
     app.include_router(sessions_router.build_router(state), dependencies=[Depends(require_token)])
     app.include_router(gate_router.build_router(state), dependencies=[Depends(require_token)])
     app.include_router(review_router.build_router(state), dependencies=[Depends(require_token)])
+    app.include_router(coverage_router.build_router(state), dependencies=[Depends(require_token)])
     syl_dir = syllabus_dir or DEFAULT_SYLLABUS
     try:  # a broken ontology must not stop the app; POST /syllabus/reload reports the error
         sync_ontology(state.conn, load_ontology(syl_dir))

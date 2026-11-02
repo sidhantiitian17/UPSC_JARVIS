@@ -4,6 +4,40 @@
  */
 
 export interface paths {
+    "/coverage/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Nodes */
+        get: operations["nodes_coverage_nodes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Today */
+        get: operations["today_dashboard_today_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -622,6 +656,41 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** HeatDay */
+        HeatDay: {
+            /** Date */
+            date: string;
+            /** Minutes */
+            minutes: number;
+        };
+        /** NextBlock */
+        NextBlock: {
+            /** Document Id */
+            document_id: number;
+            /** Page */
+            page: number;
+            /** Title */
+            title: string;
+        };
+        /** NodeCoverage */
+        NodeCoverage: {
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Parent Id */
+            parent_id: string | null;
+            /** Percent */
+            percent: number | null;
+            /** Sessions */
+            sessions: number;
+            /** Target Pages */
+            target_pages: number | null;
+            /** Title */
+            title: string;
+            /** Verified Pages */
+            verified_pages: number;
+        };
         /** NodeRef */
         NodeRef: {
             /** Id */
@@ -894,6 +963,22 @@ export interface components {
             /** Node Ids */
             node_ids: string[];
         };
+        /** TodayOut */
+        TodayOut: {
+            /** Awaiting Gate Session Id */
+            awaiting_gate_session_id: number | null;
+            /** Due Cards */
+            due_cards: number;
+            /** Heatmap */
+            heatmap: components["schemas"]["HeatDay"][];
+            next_block: components["schemas"]["NextBlock"] | null;
+            /** Review Remaining Today */
+            review_remaining_today: number;
+            /** Verified Minutes Today */
+            verified_minutes_today: number;
+            /** Verified Minutes Week */
+            verified_minutes_week: number;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -916,6 +1001,46 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    nodes_coverage_nodes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeCoverage"][];
+                };
+            };
+        };
+    };
+    today_dashboard_today_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TodayOut"];
+                };
+            };
+        };
+    };
     health_health_get: {
         parameters: {
             query?: never;

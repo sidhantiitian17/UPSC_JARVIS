@@ -534,6 +534,116 @@
         "title": "Health",
         "type": "object"
       },
+      "HeatDay": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "minutes"
+        ],
+        "title": "HeatDay",
+        "type": "object"
+      },
+      "NextBlock": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "integer"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "title",
+          "page"
+        ],
+        "title": "NextBlock",
+        "type": "object"
+      },
+      "NodeCoverage": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "percent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          },
+          "sessions": {
+            "title": "Sessions",
+            "type": "integer"
+          },
+          "target_pages": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Pages"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verified_pages": {
+            "title": "Verified Pages",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "parent_id",
+          "title",
+          "kind",
+          "verified_pages",
+          "target_pages",
+          "percent",
+          "sessions"
+        ],
+        "title": "NodeCoverage",
+        "type": "object"
+      },
       "NodeRef": {
         "properties": {
           "id": {
@@ -1327,6 +1437,65 @@
         "title": "TagsIn",
         "type": "object"
       },
+      "TodayOut": {
+        "properties": {
+          "awaiting_gate_session_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Awaiting Gate Session Id"
+          },
+          "due_cards": {
+            "title": "Due Cards",
+            "type": "integer"
+          },
+          "heatmap": {
+            "items": {
+              "$ref": "#/components/schemas/HeatDay"
+            },
+            "title": "Heatmap",
+            "type": "array"
+          },
+          "next_block": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextBlock"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "review_remaining_today": {
+            "title": "Review Remaining Today",
+            "type": "integer"
+          },
+          "verified_minutes_today": {
+            "title": "Verified Minutes Today",
+            "type": "integer"
+          },
+          "verified_minutes_week": {
+            "title": "Verified Minutes Week",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "verified_minutes_today",
+          "verified_minutes_week",
+          "heatmap",
+          "next_block",
+          "awaiting_gate_session_id",
+          "due_cards",
+          "review_remaining_today"
+        ],
+        "title": "TodayOut",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1375,6 +1544,52 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/coverage/nodes": {
+      "get": {
+        "operationId": "nodes_coverage_nodes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NodeCoverage"
+                  },
+                  "title": "Response Nodes Coverage Nodes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Nodes",
+        "tags": [
+          "coverage"
+        ]
+      }
+    },
+    "/dashboard/today": {
+      "get": {
+        "operationId": "today_dashboard_today_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Today",
+        "tags": [
+          "coverage"
+        ]
+      }
+    },
     "/health": {
       "get": {
         "operationId": "health_health_get",

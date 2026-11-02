@@ -46,10 +46,12 @@ const TREE: N[] = [
   ])
 ]
 
-function mockApi(res: { status: number; body: unknown }): void {
+function mockApi(res: { status: number; body: unknown }, coverage: object[] = []): void {
   ;(window as unknown as { jarvis: unknown }).jarvis = {
     platform: 'test',
-    api: vi.fn(async () => res),
+    api: vi.fn(async (req: { path: string }) =>
+      req.path === '/coverage/nodes' ? { status: 200, body: coverage } : res
+    ),
     status: async () => ({ ready: true })
   }
 }
@@ -107,10 +109,11 @@ describe('Syllabus screen', () => {
   })
 
   it('reload calls POST /syllabus/reload and shows validation errors', async () => {
-    const api = vi
-      .fn()
-      .mockResolvedValueOnce({ status: 200, body: TREE })
-      .mockResolvedValueOnce({ status: 422, body: { detail: 'a.yaml: invalid ontology (kind)' } })
+    const api = vi.fn(async (req: { method: string; path: string }) => {
+      if (req.path === '/syllabus/tree') return { status: 200, body: TREE }
+      if (req.path === '/coverage/nodes') return { status: 200, body: [] }
+      return { status: 422, body: { detail: 'a.yaml: invalid ontology (kind)' } }
+    })
     ;(window as unknown as { jarvis: unknown }).jarvis = {
       platform: 'test',
       api,
@@ -120,12 +123,38 @@ describe('Syllabus screen', () => {
     await screen.findByRole('tree')
     await userEvent.click(screen.getByRole('button', { name: /reload syllabus files/i }))
     await waitFor(() =>
-      expect(api).toHaveBeenLastCalledWith({
+      expect(api).toHaveBeenCalledWith({
         method: 'POST',
         path: '/syllabus/reload',
         body: undefined
       })
     )
     expect(await screen.findByRole('alert')).toHaveTextContent(/invalid ontology/)
+  })
+
+  it('shows verified progress per node: pages always, percent only when the target is known', async () => {
+    const cov = (id: string, over: object): object => ({
+      id,
+      parent_id: null,
+      title: id,
+      kind: 'subject',
+      verified_pages: 0,
+      target_pages: null,
+      percent: null,
+      sessions: 0,
+      ...over
+    })
+    mockApi({ status: 200, body: TREE }, [
+      cov('gs2', { verified_pages: 12.5, target_pages: 50, percent: 25, sessions: 3 }),
+      cov('gs2.polity', { verified_pages: 4, target_pages: null, percent: null, sessions: 1 })
+    ])
+    render(<SyllabusScreen />)
+    await screen.findByRole('tree')
+    const bar = await screen.findByRole('progressbar', { name: /GS Paper II verified/i })
+    expect(bar).toHaveAttribute('aria-valuenow', '25')
+    expect(screen.getByText('25% verified')).toBeInTheDocument()
+    expect(screen.getByText(/12.5 pages verified/i)).toBeInTheDocument()
+    expect(screen.getByText(/4 pages verified/i)).toBeInTheDocument()
+    expect(screen.queryAllByRole('progressbar')).toHaveLength(1)
   })
 })

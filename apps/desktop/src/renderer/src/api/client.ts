@@ -108,3 +108,8 @@ export const rateReviewCard = (
   cardId: number,
   rating: 1 | 2 | 3 | 4
 ): Promise<Schemas['RateOut']> => api('POST', `/review/cards/${cardId}/rate`, { rating })
+
+export type NodeCoverage = Schemas['NodeCoverage']
+export type TodayDashboard = Schemas['TodayOut']
+export const getCoverage = (): Promise<NodeCoverage[]> => api('GET', '/coverage/nodes')
+export const getToday = (): Promise<TodayDashboard> => api('GET', '/dashboard/today')

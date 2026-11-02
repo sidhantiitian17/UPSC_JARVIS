@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { ApiError, getSyllabusTree, reloadSyllabus, type SyllabusNode } from '../api/client'
+import {
+  ApiError,
+  getCoverage,
+  getSyllabusTree,
+  reloadSyllabus,
+  type NodeCoverage,
+  type SyllabusNode
+} from '../api/client'
 import { EmptyState } from '../components/empty-state'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
@@ -22,7 +29,47 @@ function reloadError(e: unknown): string {
   return 'Could not reload the syllabus files.'
 }
 
-function TreeNode({ node, depth }: { node: SyllabusNode; depth: number }): React.JSX.Element {
+type CoverageMap = Map<string, NodeCoverage>
+
+function Verified({
+  c,
+  title
+}: {
+  c: NodeCoverage | undefined
+  title: string
+}): React.JSX.Element | null {
+  if (!c || (c.verified_pages === 0 && c.percent === null)) return null
+  return (
+    <span className="ml-auto flex items-center gap-2 text-xs text-muted">
+      <span>{c.verified_pages} pages verified</span>
+      {c.percent !== null && (
+        <>
+          <span
+            role="progressbar"
+            aria-label={`${title} verified`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={c.percent}
+            className="inline-block h-2 w-24 overflow-hidden rounded-full bg-surface-2"
+          >
+            <span className="block h-full bg-accent" style={{ width: `${c.percent}%` }} />
+          </span>
+          <span>{c.percent}% verified</span>
+        </>
+      )}
+    </span>
+  )
+}
+
+function TreeNode({
+  node,
+  depth,
+  coverage
+}: {
+  node: SyllabusNode
+  depth: number
+  coverage: CoverageMap
+}): React.JSX.Element {
   const [open, setOpen] = useState(depth === 0)
   const hasChildren = node.children.length > 0
   return (
@@ -53,11 +100,12 @@ function TreeNode({ node, depth }: { node: SyllabusNode; depth: number }): React
         >
           {node.reviewed ? 'Reviewed' : 'Draft'}
         </span>
+        <Verified c={coverage.get(node.id)} title={node.title} />
       </div>
       {hasChildren && open && (
         <ul role="group">
           {node.children.map((c) => (
-            <TreeNode key={c.id} node={c} depth={depth + 1} />
+            <TreeNode key={c.id} node={c} depth={depth + 1} coverage={coverage} />
           ))}
         </ul>
       )}
@@ -70,12 +118,16 @@ export function SyllabusScreen(): React.JSX.Element {
   const [tree, setTree] = useState<SyllabusNode[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [reloading, setReloading] = useState(false)
+  const [coverage, setCoverage] = useState<CoverageMap>(new Map())
 
   useEffect(() => {
     let alive = true
     getSyllabusTree()
       .then((t) => alive && setTree(t))
       .catch(() => alive && setError('Could not load the syllabus. Is the local service running?'))
+    getCoverage()
+      .then((c) => alive && setCoverage(new Map(c.map((x) => [x.id, x]))))
+      .catch(() => undefined) // the tree is still useful without progress numbers
     return () => {
       alive = false
     }
@@ -87,6 +139,7 @@ export function SyllabusScreen(): React.JSX.Element {
     try {
       await reloadSyllabus()
       setTree(await getSyllabusTree())
+      setCoverage(new Map((await getCoverage()).map((x) => [x.id, x])))
     } catch (e) {
       setError(reloadError(e))
     } finally {
@@ -135,7 +188,7 @@ export function SyllabusScreen(): React.JSX.Element {
         <Card>
           <ul role="tree" aria-label="Syllabus">
             {tree.map((n) => (
-              <TreeNode key={n.id} node={n} depth={0} />
+              <TreeNode key={n.id} node={n} depth={0} coverage={coverage} />
             ))}
           </ul>
           <p className="mt-3 text-xs text-muted">

@@ -9,6 +9,8 @@ type ReaderRequest = { documentId: number; page: number }
 
 type GateApi = {
   openGate: (a: OpenArgs) => void
+  /** open a book on a page in the Study screen (used by Today's "Continue reading") */
+  requestReader: (r: ReaderRequest) => void
   /** set when the owner chose "review page N" after a failed gate; the Study screen consumes it */
   readerRequest: ReaderRequest | null
   clearReaderRequest: () => void
@@ -16,6 +18,7 @@ type GateApi = {
 
 const GateContext = createContext<GateApi>({
   openGate: () => undefined,
+  requestReader: () => undefined,
   readerRequest: null,
   clearReaderRequest: () => undefined
 })
@@ -52,10 +55,14 @@ export function GateProvider({ children }: { children: React.ReactNode }): React
   const api = useMemo<GateApi>(
     () => ({
       openGate: setOpen,
+      requestReader: (r) => {
+        setReaderRequest(r)
+        navigate('/study')
+      },
       readerRequest,
       clearReaderRequest: () => setReaderRequest(null)
     }),
-    [readerRequest]
+    [readerRequest, navigate]
   )
 
   return (
