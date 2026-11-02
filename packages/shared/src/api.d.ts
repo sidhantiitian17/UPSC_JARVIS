@@ -141,6 +141,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/questions/{question_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report */
+        post: operations["report_questions__question_id__report_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/secrets/{name}": {
         parameters: {
             query?: never;
@@ -221,6 +238,24 @@ export interface paths {
         put?: never;
         /** End */
         post: operations["end_sessions__session_id__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/gate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Gate */
+        get: operations["read_gate_sessions__session_id__gate_get"];
+        put?: never;
+        /** Create Gate */
+        post: operations["create_gate_sessions__session_id__gate_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -387,6 +422,40 @@ export interface components {
             /** Focused Seconds */
             focused_seconds?: number | null;
         };
+        /** GateOut */
+        GateOut: {
+            /** Discarded */
+            discarded: number;
+            /** Fallback Used */
+            fallback_used: boolean;
+            /** Questions */
+            questions: components["schemas"]["GateQuestion"][];
+            /** Session Id */
+            session_id: number;
+            /** Short Range */
+            short_range: boolean;
+        };
+        /** GateQuestion */
+        GateQuestion: {
+            /** Chunk Id */
+            chunk_id: number | null;
+            /** Id */
+            id: number;
+            /** Interleaved */
+            interleaved: boolean;
+            /** Options */
+            options: string[];
+            /** Ordinal */
+            ordinal: number | null;
+            /** Page */
+            page: number | null;
+            /** Source */
+            source: string;
+            /** Stem */
+            stem: string;
+            /** Style */
+            style: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -439,6 +508,21 @@ export interface components {
             pruned: number;
             /** Upserted */
             upserted: number;
+        };
+        /** ReportIn */
+        ReportIn: {
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+        };
+        /** ReportOut */
+        ReportOut: {
+            /** Question Id */
+            question_id: number;
+            /** Status */
+            status: string;
         };
         /** SearchHit */
         SearchHit: {
@@ -832,6 +916,41 @@ export interface operations {
             };
         };
     };
+    report_questions__question_id__report_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     put_secret_secrets__name__put: {
         parameters: {
             query?: never;
@@ -1004,6 +1123,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_gate_sessions__session_id__gate_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_gate_sessions__session_id__gate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GateOut"];
                 };
             };
             /** @description Validation Error */

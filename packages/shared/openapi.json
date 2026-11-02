@@ -276,6 +276,119 @@
         "title": "EndIn",
         "type": "object"
       },
+      "GateOut": {
+        "properties": {
+          "discarded": {
+            "title": "Discarded",
+            "type": "integer"
+          },
+          "fallback_used": {
+            "title": "Fallback Used",
+            "type": "boolean"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/GateQuestion"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "integer"
+          },
+          "short_range": {
+            "title": "Short Range",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "session_id",
+          "questions",
+          "discarded",
+          "fallback_used",
+          "short_range"
+        ],
+        "title": "GateOut",
+        "type": "object"
+      },
+      "GateQuestion": {
+        "properties": {
+          "chunk_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "interleaved": {
+            "title": "Interleaved",
+            "type": "boolean"
+          },
+          "options": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "ordinal": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordinal"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "stem": {
+            "title": "Stem",
+            "type": "string"
+          },
+          "style": {
+            "title": "Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "stem",
+          "options",
+          "style",
+          "source",
+          "interleaved",
+          "chunk_id",
+          "page",
+          "ordinal"
+        ],
+        "title": "GateQuestion",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -409,6 +522,36 @@
           "kept_linked"
         ],
         "title": "ReloadOut",
+        "type": "object"
+      },
+      "ReportIn": {
+        "properties": {
+          "reason": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "title": "ReportIn",
+        "type": "object"
+      },
+      "ReportOut": {
+        "properties": {
+          "question_id": {
+            "title": "Question Id",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question_id",
+          "status"
+        ],
+        "title": "ReportOut",
         "type": "object"
       },
       "SearchHit": {
@@ -1198,6 +1341,58 @@
         "summary": "Llm Test"
       }
     },
+    "/questions/{question_id}/report": {
+      "post": {
+        "operationId": "report_questions__question_id__report_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "question_id",
+            "required": true,
+            "schema": {
+              "title": "Question Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Report",
+        "tags": [
+          "gate"
+        ]
+      }
+    },
     "/secrets/{name}": {
       "delete": {
         "operationId": "delete_secret_secrets__name__delete",
@@ -1445,6 +1640,88 @@
         "summary": "End",
         "tags": [
           "sessions"
+        ]
+      }
+    },
+    "/sessions/{session_id}/gate": {
+      "get": {
+        "operationId": "read_gate_sessions__session_id__gate_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Gate",
+        "tags": [
+          "gate"
+        ]
+      },
+      "post": {
+        "operationId": "create_gate_sessions__session_id__gate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Gate",
+        "tags": [
+          "gate"
         ]
       }
     },

@@ -14,6 +14,8 @@ EXPECTED_TABLES = {
     "chunk_fts",
     "study_session",
     "question",
+    "gate_question",
+    "question_report",
     "attempt",
     "card",
     "review_log",
