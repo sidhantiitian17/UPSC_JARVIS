@@ -32,7 +32,7 @@ Mains PYQ, CA, LightRAG (trigger check hi hoga, build nahi).
 | ID | Goal | Acceptance | Scope | Deps | Verification | Status | Commit |
 |---|---|---|---|---|---|---|---|
 | WU-P04-001 | PYQ corpus importer + review UI | **Import the Phase 0 dataset** (`datasets/pyq/md`) into SQLite (idempotent, keeps `status`/`answer_source`); review UI over the Phase 0 verify workflow; owner marks verified | `config/pyq/`, sidecar pyq router, review UI | P3 accepted | scoped tests + manual check | ready-for-review | 36315b0 |
-| WU-P04-002 | Tag PYQ to syllabus nodes | LLM suggestion + owner accept/reject | sidecar pyq, review UI | prev WU | scoped tests + manual check | ready-for-review | this commit |
+| WU-P04-002 | Tag PYQ to syllabus nodes | LLM suggestion + owner accept/reject | sidecar pyq, review UI | prev WU | scoped tests + manual check | ready-for-review | 718c099 |
 | WU-P04-003 | Trend analysis + Direction Drift Alert | Weightage chart; drift rule uses time spent vs weightage | sidecar analytics, Insights | prev WU | scoped tests + manual check | planned | — |
 | WU-P04-004 | Source mapping (PYQ <-> paragraphs) | Embeddings (sqlite-vec) top-k; similarity threshold configurable; stored in `link` | sidecar mapping | prev WU | scoped tests + manual check | planned | — |
 | WU-P04-005 | Split-view compare + highlight | 2-3 pdf.js panes; open mapped page; highlight paragraph; PYQ tag + year | `apps/desktop` Compare | prev WU | scoped tests + manual check | planned | — |
