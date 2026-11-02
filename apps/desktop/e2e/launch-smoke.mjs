@@ -255,6 +255,13 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Plan my day builds an hour-wise plan', planShown)
+  await win.click('nav[aria-label="Main"] >> text=Insights')
+  const insightsOk = await win
+    .waitForSelector('section[aria-label="Claimed versus verified"]', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('Insights shows claimed versus verified', insightsOk)
+  await win.click('nav[aria-label="Main"] >> text=Today')
   const nextBlock = await win
     .waitForSelector('text=/e2e-polity, page/', { timeout: 10000 })
     .then(() => true)

@@ -51,6 +51,7 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
     break_minutes: 10,
     review_daily_limit: 40,
     exam_target: 'Prelims 2028',
+    exam_date: null,
     sleep_guard_enabled: true,
     sleep_start: '23:30',
     sleep_end: '05:30',
@@ -242,6 +243,21 @@ describe('Settings screen', () => {
         method: 'PUT',
         path: '/settings',
         body: { sleep_guard_enabled: false, sleep_start: '23:30', sleep_end: '05:30' }
+      })
+    )
+  })
+
+  it('saves the exam date', async () => {
+    const { api } = setup()
+    render(<SettingsScreen />)
+    const date = await screen.findByLabelText(/^exam date$/i)
+    await userEvent.type(date, '2028-05-28')
+    await userEvent.click(screen.getByRole('button', { name: /save exam date/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/settings',
+        body: { exam_date: '2028-05-28' }
       })
     )
   })

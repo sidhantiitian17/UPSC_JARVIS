@@ -129,3 +129,6 @@ export const makePlan = (free_hours: number): Promise<DayPlan> =>
 export const commitPlan = (free_hours: number): Promise<Schemas['Committed']> =>
   api('POST', '/planner/commit', { free_hours })
 export const getPlannerStatus = (): Promise<PlannerStatus> => api('GET', '/planner/status')
+
+export type Truth = Schemas['TruthOut']
+export const getTruth = (): Promise<Truth> => api('GET', '/insights/truth')

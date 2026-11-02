@@ -29,7 +29,10 @@ describe('app shell', () => {
   })
 
   it.each(
-    SCREENS.filter((s) => s !== 'settings' && s !== 'syllabus' && s !== 'study' && s !== 'today')
+    SCREENS.filter(
+      (s) =>
+        s !== 'settings' && s !== 'syllabus' && s !== 'study' && s !== 'today' && s !== 'insights'
+    )
   )('screen "%s" has a heading, an empty state and exactly one primary action', (id) => {
     renderAt(`/${id}`)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()

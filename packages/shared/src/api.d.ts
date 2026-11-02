@@ -106,6 +106,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/insights/truth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Truth */
+        get: operations["get_truth_insights_truth_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/library/documents": {
         parameters: {
             query?: never;
@@ -704,6 +721,19 @@ export interface components {
             /** Warning */
             warning: boolean;
         };
+        /** Calibration */
+        Calibration: {
+            /** Accuracy */
+            accuracy: number | null;
+            /** Answers */
+            answers: number;
+            /** Enough Data */
+            enough_data: boolean;
+            /** Expected */
+            expected: string;
+            /** Tag */
+            tag: string;
+        };
         /** ChunkOut */
         ChunkOut: {
             /** Char End */
@@ -739,6 +769,15 @@ export interface components {
             /** Study Minutes */
             study_minutes: number;
         };
+        /** Day */
+        Day: {
+            /** Claimed Hours */
+            claimed_hours: number;
+            /** Date */
+            date: string;
+            /** Verified Hours */
+            verified_hours: number;
+        };
         /** DocumentOut */
         DocumentOut: {
             /** Chunks */
@@ -771,6 +810,19 @@ export interface components {
             kind: string;
             /** Text */
             text: string;
+        };
+        /** Forecast */
+        Forecast: {
+            /** Assumed Exam Date */
+            assumed_exam_date: boolean;
+            /** Avg Daily Verified Minutes */
+            avg_daily_verified_minutes: number;
+            /** Days Left */
+            days_left: number;
+            /** Exam Date */
+            exam_date: string;
+            /** Projected Verified Hours */
+            projected_verified_hours: number;
         };
         /** GateOut */
         GateOut: {
@@ -1116,6 +1168,8 @@ export interface components {
             break_minutes?: number | null;
             /** Daily Goal Minutes */
             daily_goal_minutes?: number | null;
+            /** Exam Date */
+            exam_date?: string | null;
             /** Exam Target */
             exam_target?: string | null;
             /** Focus Minutes */
@@ -1143,6 +1197,8 @@ export interface components {
             daily_goal_minutes: number;
             /** Db Version */
             db_version: number;
+            /** Exam Date */
+            exam_date: string | null;
             /** Exam Target */
             exam_target: string;
             /** Focus Minutes */
@@ -1244,6 +1300,15 @@ export interface components {
             /** Verified Minutes Week */
             verified_minutes_week: number;
         };
+        /** TruthOut */
+        TruthOut: {
+            /** Calibration */
+            calibration: components["schemas"]["Calibration"][];
+            forecast: components["schemas"]["Forecast"];
+            /** Report */
+            report: string[];
+            weekly: components["schemas"]["Weekly"];
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -1256,6 +1321,17 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** Weekly */
+        Weekly: {
+            /** Claimed Hours */
+            claimed_hours: number;
+            /** Days */
+            days: components["schemas"]["Day"][];
+            /** Verified Hours */
+            verified_hours: number;
+            /** Verified Share */
+            verified_share: number | null;
         };
         /** Yesterday */
         Yesterday: {
@@ -1404,6 +1480,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Health"];
+                };
+            };
+        };
+    };
+    get_truth_insights_truth_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TruthOut"];
                 };
             };
         };

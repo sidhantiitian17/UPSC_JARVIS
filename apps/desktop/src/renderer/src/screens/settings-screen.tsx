@@ -148,6 +148,16 @@ function ExamCard({
   onError: (m: string) => void
 }): React.JSX.Element {
   const [target, setTarget] = useState(settings.exam_target)
+  const [date, setDate] = useState(settings.exam_date ?? '')
+  const saveDate = async (): Promise<void> => {
+    try {
+      onSaved(await putSettings({ exam_date: date }))
+    } catch (e) {
+      onError(
+        e instanceof ApiError && e.status === 422 ? 'Enter a valid exam date.' : describeError(e)
+      )
+    }
+  }
   const save = async (): Promise<void> => {
     try {
       onSaved(await putSettings({ exam_target: target.trim() }))
@@ -178,6 +188,25 @@ function ExamCard({
           Save
         </Button>
       </div>
+      <div className="flex items-end gap-4">
+        <label className="flex flex-col gap-1 text-sm">
+          Exam date
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="min-h-10 rounded-lg border border-line bg-app-bg px-3"
+          />
+        </label>
+        <Button onClick={saveDate} aria-label="Save exam date">
+          Save
+        </Button>
+      </div>
+      {!settings.exam_date && (
+        <p className="text-xs text-muted">
+          No date set yet: forecasts use an assumed date in 2028.
+        </p>
+      )}
     </Card>
   )
 }

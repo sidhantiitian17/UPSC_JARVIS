@@ -376,6 +376,46 @@
         "title": "BurnoutOut",
         "type": "object"
       },
+      "Calibration": {
+        "properties": {
+          "accuracy": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy"
+          },
+          "answers": {
+            "title": "Answers",
+            "type": "integer"
+          },
+          "enough_data": {
+            "title": "Enough Data",
+            "type": "boolean"
+          },
+          "expected": {
+            "title": "Expected",
+            "type": "string"
+          },
+          "tag": {
+            "title": "Tag",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag",
+          "answers",
+          "accuracy",
+          "enough_data",
+          "expected"
+        ],
+        "title": "Calibration",
+        "type": "object"
+      },
       "ChunkOut": {
         "properties": {
           "char_end": {
@@ -466,6 +506,29 @@
           "blocks"
         ],
         "title": "Committed",
+        "type": "object"
+      },
+      "Day": {
+        "properties": {
+          "claimed_hours": {
+            "title": "Claimed Hours",
+            "type": "number"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "verified_hours": {
+            "title": "Verified Hours",
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "claimed_hours",
+          "verified_hours"
+        ],
+        "title": "Day",
         "type": "object"
       },
       "DocumentOut": {
@@ -565,6 +628,39 @@
           "text"
         ],
         "title": "Event",
+        "type": "object"
+      },
+      "Forecast": {
+        "properties": {
+          "assumed_exam_date": {
+            "title": "Assumed Exam Date",
+            "type": "boolean"
+          },
+          "avg_daily_verified_minutes": {
+            "title": "Avg Daily Verified Minutes",
+            "type": "integer"
+          },
+          "days_left": {
+            "title": "Days Left",
+            "type": "integer"
+          },
+          "exam_date": {
+            "title": "Exam Date",
+            "type": "string"
+          },
+          "projected_verified_hours": {
+            "title": "Projected Verified Hours",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "exam_date",
+          "assumed_exam_date",
+          "days_left",
+          "avg_daily_verified_minutes",
+          "projected_verified_hours"
+        ],
+        "title": "Forecast",
         "type": "object"
       },
       "GateOut": {
@@ -1562,6 +1658,18 @@
             ],
             "title": "Daily Goal Minutes"
           },
+          "exam_date": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Date"
+          },
           "exam_target": {
             "anyOf": [
               {
@@ -1680,6 +1788,17 @@
             "title": "Db Version",
             "type": "integer"
           },
+          "exam_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Date"
+          },
           "exam_target": {
             "title": "Exam Target",
             "type": "string"
@@ -1746,6 +1865,7 @@
           "sleep_guard_enabled",
           "sleep_start",
           "sleep_end",
+          "exam_date",
           "providers",
           "db_version"
         ],
@@ -2015,6 +2135,38 @@
         "title": "TodayOut",
         "type": "object"
       },
+      "TruthOut": {
+        "properties": {
+          "calibration": {
+            "items": {
+              "$ref": "#/components/schemas/Calibration"
+            },
+            "title": "Calibration",
+            "type": "array"
+          },
+          "forecast": {
+            "$ref": "#/components/schemas/Forecast"
+          },
+          "report": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Report",
+            "type": "array"
+          },
+          "weekly": {
+            "$ref": "#/components/schemas/Weekly"
+          }
+        },
+        "required": [
+          "weekly",
+          "calibration",
+          "forecast",
+          "report"
+        ],
+        "title": "TruthOut",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -2053,6 +2205,44 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "Weekly": {
+        "properties": {
+          "claimed_hours": {
+            "title": "Claimed Hours",
+            "type": "number"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/Day"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "verified_hours": {
+            "title": "Verified Hours",
+            "type": "number"
+          },
+          "verified_share": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Share"
+          }
+        },
+        "required": [
+          "days",
+          "claimed_hours",
+          "verified_hours",
+          "verified_share"
+        ],
+        "title": "Weekly",
         "type": "object"
       },
       "Yesterday": {
@@ -2231,6 +2421,27 @@
           }
         },
         "summary": "Health"
+      }
+    },
+    "/insights/truth": {
+      "get": {
+        "operationId": "get_truth_insights_truth_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TruthOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Truth",
+        "tags": [
+          "insights"
+        ]
       }
     },
     "/library/documents": {

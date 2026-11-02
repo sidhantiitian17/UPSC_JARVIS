@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import uuid
+from datetime import date
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from jarvis.db.migrate import current_version
 from jarvis.guards.service import sleep_config
@@ -35,6 +36,7 @@ class SettingsOut(BaseModel):
     sleep_guard_enabled: bool
     sleep_start: str
     sleep_end: str
+    exam_date: str | None
     providers: list[ProviderInfo]
     db_version: int
 
@@ -49,8 +51,16 @@ class SettingsIn(BaseModel):
     daily_goal_minutes: int | None = Field(default=None, ge=10, le=600)
     bad_day_goal_minutes: int | None = Field(default=None, ge=5, le=300)
     sleep_guard_enabled: bool | None = None
+    exam_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     sleep_start: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
     sleep_end: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+
+    @field_validator("exam_date")
+    @classmethod
+    def _real_date(cls, v: str | None) -> str | None:
+        if v is not None:
+            date.fromisoformat(v)  # ValueError -> HTTP 422 (e.g. month 13)
+        return v
 
 
 class SecretIn(BaseModel):
@@ -114,6 +124,7 @@ def build_router(state: AppState) -> APIRouter:
             exam_target=_get(state, "exam_target") or DEFAULT_EXAM_TARGET,
             daily_goal_minutes=_get(state, "daily_goal_minutes") or 60,
             bad_day_goal_minutes=_get(state, "bad_day_goal_minutes") or 20,
+            exam_date=_get(state, "exam_date"),
             sleep_guard_enabled=sleep_cfg["enabled"],
             sleep_start=sleep_cfg["start"],
             sleep_end=sleep_cfg["end"],
@@ -150,6 +161,7 @@ def build_router(state: AppState) -> APIRouter:
                 "daily_goal_minutes",
                 "bad_day_goal_minutes",
                 "sleep_guard_enabled",
+                "exam_date",
                 "sleep_start",
                 "sleep_end",
             ):
