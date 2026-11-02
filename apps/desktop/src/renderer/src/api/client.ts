@@ -47,3 +47,10 @@ export const addDocument = (path: string): Promise<AddDocumentResult> =>
   api('POST', '/library/documents', { path })
 export const searchLibrary = (q: string): Promise<SearchHit[]> =>
   api('GET', `/library/search?q=${encodeURIComponent(q)}`)
+
+export const getDocumentInfo = (id: number): Promise<LibraryDocument> =>
+  api('GET', `/library/documents/${id}`)
+export const getDocumentFile = (id: number): Promise<{ contentType: string; base64: string }> =>
+  api('GET', `/library/documents/${id}/file`)
+export const savePosition = (id: number, page: number): Promise<LibraryDocument> =>
+  api('PUT', `/library/documents/${id}/position`, { page })

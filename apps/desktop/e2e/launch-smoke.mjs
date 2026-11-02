@@ -130,6 +130,27 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Study screen lists the document', listed)
+  await win.click('button[aria-label="Open e2e-polity"]')
+  const textOk = await win
+    .waitForFunction(
+      () => document.querySelector('.textLayer')?.textContent?.includes('equality'),
+      null,
+      {
+        timeout: 30000
+      }
+    )
+    .then(() => true)
+    .catch(() => false)
+  check('reader renders the page with a text layer (pdf.js + worker)', textOk)
+  const painted = await win.evaluate(() => {
+    const c = document.querySelector('canvas')
+    if (!c || c.width === 0) return false
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data
+    for (let i = 3; i < d.length; i += 4) if (d[i] !== 0) return true
+    return false
+  })
+  check('reader canvas has painted pixels', painted)
+  await win.click('text=Back to library')
   await win.click('text=Syllabus')
   const banner = await win.locator('[role=alert]').count()
   check('no error banner', banner === 0)

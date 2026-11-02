@@ -138,3 +138,47 @@ def test_library_api(tmp_path):
     (tmp_path / "x.txt").write_text("hi")
     bad = client.post("/library/documents", headers=h, json={"path": str(tmp_path / "x.txt")})
     assert bad.status_code == 422 and "PDF" in bad.json()["detail"]
+
+
+def _client(tmp_path):
+    from fastapi.testclient import TestClient
+
+    from jarvis.app import create_app
+
+    return TestClient(create_app("t" * 32, data_dir=tmp_path / "d")), {"Authorization": "Bearer " + "t" * 32}
+
+
+def _add(client, h, path):
+    return client.post("/library/documents", headers=h, json={"path": str(path)}).json()["id"]
+
+
+def test_file_endpoint_returns_pdf_bytes(tmp_path, pdf):
+    client, h = _client(tmp_path)
+    doc_id = _add(client, h, pdf)
+    r = client.get(f"/library/documents/{doc_id}/file", headers=h)
+    assert r.status_code == 200 and r.headers["content-type"] == "application/pdf"
+    assert r.content == pdf.read_bytes()
+    assert client.get(f"/library/documents/{doc_id}/file").status_code == 401
+
+
+def test_file_endpoint_unknown_and_moved(tmp_path, pdf):
+    client, h = _client(tmp_path)
+    assert client.get("/library/documents/99/file", headers=h).status_code == 404
+    doc_id = _add(client, h, pdf)
+    pdf.unlink()
+    r = client.get(f"/library/documents/{doc_id}/file", headers=h)
+    assert r.status_code == 410 and "moved or deleted" in r.json()["detail"]
+
+
+def test_position_is_saved_and_validated(tmp_path, pdf):
+    client, h = _client(tmp_path)
+    doc_id = _add(client, h, pdf)
+    ok = client.put(f"/library/documents/{doc_id}/position", headers=h, json={"page": 3})
+    assert ok.status_code == 200 and ok.json()["last_page"] == 3
+    assert client.get(f"/library/documents/{doc_id}", headers=h).json()["last_page"] == 3
+    for bad in (0, 4, -1):
+        assert (
+            client.put(f"/library/documents/{doc_id}/position", headers=h, json={"page": bad}).status_code
+            == 422
+        )
+    assert client.put("/library/documents/99/position", headers=h, json={"page": 1}).status_code == 404

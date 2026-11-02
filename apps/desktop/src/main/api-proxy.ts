@@ -29,6 +29,13 @@ export function createApiProxy({ baseUrl, token, fetchImpl }: Options) {
     } catch {
       throw new Error('sidecar unreachable')
     }
+    if ((res.headers.get('content-type') ?? '').startsWith('application/pdf')) {
+      const buf = Buffer.from(await res.arrayBuffer())
+      return {
+        status: res.status,
+        body: { contentType: 'application/pdf', base64: buf.toString('base64') }
+      }
+    }
     const text = await res.text()
     let body: unknown = text === '' ? null : text
     try {

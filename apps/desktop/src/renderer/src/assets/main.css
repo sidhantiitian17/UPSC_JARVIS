@@ -79,3 +79,21 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* pdf.js text layer: invisible but selectable text aligned over the page canvas. */
+.textLayer {
+  line-height: 1;
+  overflow: clip;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+}
+.textLayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0 0;
+}
+.textLayer ::selection {
+  background: rgb(108 124 255 / 0.35);
+}

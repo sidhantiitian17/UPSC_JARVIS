@@ -100,3 +100,13 @@ def search(conn: sqlite3.Connection, query: str, limit: int = 20) -> list[dict]:
         (fts, limit),
     ).fetchall()
     return [dict(r) for r in rows]
+
+
+def set_position(conn: sqlite3.Connection, doc_id: int, page: int) -> dict:
+    doc = get_document(conn, doc_id)
+    if doc is None:
+        raise KeyError(doc_id)
+    if not 1 <= page <= (doc["page_count"] or 0):
+        raise LibraryError(f"Page {page} is outside this document (1 to {doc['page_count']}).")
+    conn.execute("update document set last_page = ? where id = ?", (page, doc_id))
+    return _doc_row(conn, doc_id)

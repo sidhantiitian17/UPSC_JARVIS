@@ -11,6 +11,7 @@ import { EmptyState } from '../components/empty-state'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
 import { SCREEN_META } from '../screens'
+import { ReaderView } from '../reader/reader-view'
 
 function addError(e: unknown): string {
   if (e instanceof ApiError && e.status === 422) {
@@ -28,6 +29,7 @@ export function LibraryScreen(): React.JSX.Element {
   const [query, setQuery] = useState('')
   const [hits, setHits] = useState<SearchHit[] | null>(null)
   const [reloads, setReloads] = useState(0)
+  const [openId, setOpenId] = useState<number | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -80,6 +82,8 @@ export function LibraryScreen(): React.JSX.Element {
   }
 
   const titleOf = (id: number): string => docs?.find((d) => d.id === id)?.title ?? `Document ${id}`
+
+  if (openId !== null) return <ReaderView documentId={openId} onBack={() => setOpenId(null)} />
 
   return (
     <section
@@ -160,7 +164,15 @@ export function LibraryScreen(): React.JSX.Element {
                   key={d.id}
                   className="flex items-baseline justify-between gap-4 border-b border-line py-3 last:border-0"
                 >
-                  <span className="font-semibold">{d.title}</span>
+                  <button
+                    type="button"
+                    aria-label={`Open ${d.title}`}
+                    disabled={d.scanned}
+                    onClick={() => setOpenId(d.id)}
+                    className="text-left font-semibold underline-offset-4 hover:underline disabled:no-underline"
+                  >
+                    {d.title}
+                  </button>
                   <span className="text-sm text-muted">
                     {d.page_count} pages · {d.chunks} chunks
                     {d.scanned && (

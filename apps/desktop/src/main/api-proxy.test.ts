@@ -77,4 +77,19 @@ describe('api proxy (token never leaves the main process)', () => {
       })
     ).rejects.toThrow(/sidecar unreachable/)
   })
+
+  it('returns PDF responses as base64 so bytes survive IPC', async () => {
+    const bytes = new Uint8Array([37, 80, 68, 70, 0, 255, 128])
+    const f = vi.fn(
+      async () =>
+        new Response(bytes, { status: 200, headers: { 'content-type': 'application/pdf' } })
+    ) as unknown as typeof fetch
+    const proxy = createApiProxy({ baseUrl: BASE, token: TOKEN, fetchImpl: f })
+    const res = await proxy({ method: 'GET', path: '/library/documents/1/file' })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({
+      contentType: 'application/pdf',
+      base64: Buffer.from(bytes).toString('base64')
+    })
+  })
 })

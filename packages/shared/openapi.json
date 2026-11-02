@@ -221,6 +221,19 @@
         "title": "Health",
         "type": "object"
       },
+      "PositionIn": {
+        "properties": {
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page"
+        ],
+        "title": "PositionIn",
+        "type": "object"
+      },
       "ProviderInfo": {
         "properties": {
           "enabled": {
@@ -664,6 +677,98 @@
           }
         },
         "summary": "Document",
+        "tags": [
+          "library"
+        ]
+      }
+    },
+    "/library/documents/{doc_id}/file": {
+      "get": {
+        "operationId": "document_file_library_documents__doc_id__file_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "title": "Doc Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Document File",
+        "tags": [
+          "library"
+        ]
+      }
+    },
+    "/library/documents/{doc_id}/position": {
+      "put": {
+        "operationId": "position_library_documents__doc_id__position_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "title": "Doc Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PositionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Position",
         "tags": [
           "library"
         ]

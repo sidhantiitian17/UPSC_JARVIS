@@ -145,4 +145,12 @@ describe('Library screen', () => {
       screen.getByText(/Laxmikanth Polity/, { selector: '[data-testid="hit-doc"]' })
     ).toBeInTheDocument()
   })
+
+  it('opens the reader for a document and returns to the list', async () => {
+    setup({ docs: [DOC] })
+    render(<LibraryScreen />)
+    await userEvent.click(await screen.findByRole('button', { name: /open laxmikanth polity/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /back to library/i }))
+    expect(await screen.findByRole('list', { name: /documents/i })).toBeInTheDocument()
+  })
 })

@@ -127,3 +127,4 @@ PyYAML (MIT, already listed in G) is also used by the syllabus ontology loader (
 | Package | Licence | Role | WU |
 |---|---|---|---|
 | `pypdfium2` 5.14.0 | BSD-3-Clause OR Apache-2.0 (bundles PDFium, BSD-3-Clause) | PDF page text extraction in the sidecar | P02-004 |
+| `pdfjs-dist` 6.5.438 | Apache-2.0 (npm `license` field; mozilla/pdf.js LICENSE is Apache-2.0) | PDF page rendering + text layer in the renderer (P02-005) | P02-005 |
