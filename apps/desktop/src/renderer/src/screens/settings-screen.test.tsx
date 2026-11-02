@@ -49,6 +49,8 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
     vault_path: null as string | null,
     focus_minutes: 50,
     break_minutes: 10,
+    review_daily_limit: 40,
+    exam_target: 'Prelims 2028',
     providers,
     db_version: 2
   }
@@ -183,6 +185,23 @@ describe('Settings screen', () => {
         method: 'PUT',
         path: '/settings',
         body: { focus_minutes: 25, break_minutes: 10 }
+      })
+    )
+  })
+
+  it('shows the exam target (Prelims 2028 by default) and saves a change', async () => {
+    const { api } = setup()
+    render(<SettingsScreen />)
+    const input = await screen.findByRole('textbox', { name: /exam target/i })
+    expect(input).toHaveValue('Prelims 2028')
+    await userEvent.clear(input)
+    await userEvent.type(input, 'Prelims 2029')
+    await userEvent.click(screen.getByRole('button', { name: /save exam target/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/settings',
+        body: { exam_target: 'Prelims 2029' }
       })
     )
   })

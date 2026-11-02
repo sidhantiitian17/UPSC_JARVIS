@@ -891,6 +891,8 @@ export interface components {
         SettingsIn: {
             /** Break Minutes */
             break_minutes?: number | null;
+            /** Exam Target */
+            exam_target?: string | null;
             /** Focus Minutes */
             focus_minutes?: number | null;
             /** Library Path */
@@ -906,6 +908,8 @@ export interface components {
             break_minutes: number;
             /** Db Version */
             db_version: number;
+            /** Exam Target */
+            exam_target: string;
             /** Focus Minutes */
             focus_minutes: number;
             /** Library Path */

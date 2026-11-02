@@ -145,3 +145,12 @@ def test_review_daily_limit_default_validate_persist(tmp_path):
     assert c.put("/settings", headers=H, json={"review_daily_limit": 25}).json()["review_daily_limit"] == 25
     for bad in (4, 201):
         assert c.put("/settings", headers=H, json={"review_daily_limit": bad}).status_code == 422
+
+
+def test_exam_target_defaults_to_prelims_2028_and_is_editable(tmp_path):
+    c, _ = make_client(tmp_path)
+    assert c.get("/settings", headers=H).json()["exam_target"] == "Prelims 2028"
+    out = c.put("/settings", headers=H, json={"exam_target": "Prelims 2029"}).json()
+    assert out["exam_target"] == "Prelims 2029"
+    assert c.put("/settings", headers=H, json={"exam_target": ""}).status_code == 422
+    assert c.put("/settings", headers=H, json={"exam_target": "x" * 61}).status_code == 422

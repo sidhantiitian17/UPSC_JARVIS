@@ -28,6 +28,7 @@ class SettingsOut(BaseModel):
     focus_minutes: int
     break_minutes: int
     review_daily_limit: int
+    exam_target: str
     providers: list[ProviderInfo]
     db_version: int
 
@@ -38,6 +39,7 @@ class SettingsIn(BaseModel):
     focus_minutes: int | None = Field(default=None, ge=5, le=180)
     break_minutes: int | None = Field(default=None, ge=1, le=60)
     review_daily_limit: int | None = Field(default=None, ge=5, le=200)
+    exam_target: str | None = Field(default=None, min_length=1, max_length=60)
 
 
 class SecretIn(BaseModel):
@@ -60,6 +62,7 @@ class AiTestOut(BaseModel):
 FOLDER_KEYS = ("library_path", "vault_path")
 DEFAULT_FOCUS_MINUTES = 50
 DEFAULT_BREAK_MINUTES = 10
+DEFAULT_EXAM_TARGET = "Prelims 2028"
 
 
 def _get(state: AppState, key: str):  # noqa: ANN202 - JSON value (str or int)
@@ -96,6 +99,7 @@ def build_router(state: AppState) -> APIRouter:
             focus_minutes=_get(state, "focus_minutes") or DEFAULT_FOCUS_MINUTES,
             break_minutes=_get(state, "break_minutes") or DEFAULT_BREAK_MINUTES,
             review_daily_limit=_get(state, "review_daily_limit") or 40,
+            exam_target=_get(state, "exam_target") or DEFAULT_EXAM_TARGET,
             providers=providers,
             db_version=current_version(state.conn),
         )
@@ -121,7 +125,7 @@ def build_router(state: AppState) -> APIRouter:
                 if not folder.is_dir():
                     raise HTTPException(status_code=422, detail=f"{key}: folder does not exist")
                 _put(state, key, str(folder.resolve()))
-            for key in ("focus_minutes", "break_minutes", "review_daily_limit"):
+            for key in ("focus_minutes", "break_minutes", "review_daily_limit", "exam_target"):
                 if getattr(body, key) is not None:
                     _put(state, key, getattr(body, key))
             return snapshot()

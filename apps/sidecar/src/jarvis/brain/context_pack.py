@@ -16,7 +16,7 @@ def _setting(conn: sqlite3.Connection, key: str) -> object:
 
 
 def build_context_pack(conn: sqlite3.Connection) -> str:
-    exam = _setting(conn, "exam_target") or "not set"
+    exam = _setting(conn, "exam_target") or "Prelims 2028"
     lines = [f"STUDENT: exam={exam}  medium=EN"]
 
     weak = conn.execute(

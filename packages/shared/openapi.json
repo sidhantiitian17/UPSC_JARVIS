@@ -1196,6 +1196,19 @@
             ],
             "title": "Break Minutes"
           },
+          "exam_target": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Target"
+          },
           "focus_minutes": {
             "anyOf": [
               {
@@ -1258,6 +1271,10 @@
             "title": "Db Version",
             "type": "integer"
           },
+          "exam_target": {
+            "title": "Exam Target",
+            "type": "string"
+          },
           "focus_minutes": {
             "title": "Focus Minutes",
             "type": "integer"
@@ -1302,6 +1319,7 @@
           "focus_minutes",
           "break_minutes",
           "review_daily_limit",
+          "exam_target",
           "providers",
           "db_version"
         ],

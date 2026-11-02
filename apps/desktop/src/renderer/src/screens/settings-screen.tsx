@@ -138,6 +138,50 @@ function TimerCard({
   )
 }
 
+function ExamCard({
+  settings,
+  onSaved,
+  onError
+}: {
+  settings: SettingsOut
+  onSaved: (s: SettingsOut) => void
+  onError: (m: string) => void
+}): React.JSX.Element {
+  const [target, setTarget] = useState(settings.exam_target)
+  const save = async (): Promise<void> => {
+    try {
+      onSaved(await putSettings({ exam_target: target.trim() }))
+    } catch (e) {
+      onError(
+        e instanceof ApiError && e.status === 422
+          ? 'The exam target must be 1 to 60 characters.'
+          : describeError(e)
+      )
+    }
+  }
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="text-xl font-semibold">Exam target</h2>
+      <p className="text-sm text-muted">
+        Shown to the AI as part of your profile so feedback fits your timeline.
+      </p>
+      <div className="flex items-end gap-4">
+        <input
+          type="text"
+          aria-label="Exam target"
+          maxLength={60}
+          value={target}
+          onChange={(e) => setTarget(e.target.value)}
+          className="min-h-10 w-64 rounded-lg border border-line bg-app-bg px-3"
+        />
+        <Button onClick={save} aria-label="Save exam target">
+          Save
+        </Button>
+      </div>
+    </Card>
+  )
+}
+
 export function SettingsScreen(): React.JSX.Element {
   const [settings, setSettings] = useState<SettingsOut | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -217,6 +261,15 @@ export function SettingsScreen(): React.JSX.Element {
           </div>
         ))}
       </Card>
+
+      {settings && (
+        <ExamCard
+          key={settings.exam_target}
+          settings={settings}
+          onSaved={setSettings}
+          onError={setError}
+        />
+      )}
 
       {settings && (
         <TimerCard

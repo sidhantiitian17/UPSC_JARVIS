@@ -316,7 +316,7 @@ def test_context_pack_summarises_weak_nodes_and_mistakes(tmp_path):
 def test_empty_context_pack_is_still_valid(tmp_path):
     client = make(tmp_path, FakeLLM())
     pack = build_context_pack(client.app.state.jarvis.conn)
-    assert pack.startswith("STUDENT:") and "no attempts yet" in pack.lower()
+    assert pack.startswith("STUDENT:") and "Prelims 2028" in pack and "no attempts yet" in pack.lower()
 
 
 def test_pack_is_part_of_the_generation_prompt(tmp_path):
