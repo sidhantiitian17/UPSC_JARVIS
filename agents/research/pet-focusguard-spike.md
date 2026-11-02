@@ -33,7 +33,7 @@ Status: WU-P03-003 **blocked** (two owner/manual items open), WU-P03-005 **spike
 
 Limits found by bisection: **`say` max 140 characters**; Hindi (Devanagari) text is accepted. Valid reactions (`allowedReactions`): `idle, thinking, working, editing, running, testing, waiting, waving, success, error, celebrating`. `celebrate` and `sleepy` are rejected with `invalid_reaction`. IPC messages are line-delimited JSON, 16 KB max (docs/ipc.md).
 
-`shown:true` means the app accepted the command. **Whether the bubble was visible on screen was not checked by me** (no screenshot); the owner must confirm it.
+`shown:true` means the app accepted the command. **Whether the bubble was visible on screen was not checked by me** (no screenshot). The owner confirmed in chat on 2026-11-02 that it was visible.
 
 ## Official plugins (state file `%APPDATA%\@open-pets\desktop\openpets-plugin-state.json`)
 Enabled out of the box (bundled): Quick Reminders, Simple Timer, **Anxiety Aid Tools**, **Focus Buddy**, Launch Buddy, Daily Fortune Cookie. Bundled but disabled: Virtual Pet, System Resources.
