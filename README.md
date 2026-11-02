@@ -39,7 +39,7 @@ pnpm dev
 ```
 Pehli baar app khulne par:
 1. **Settings** mein *Library folder* aur *Vault folder* (Obsidian vault) chuno.
-2. **Settings > AI providers**: Gemini ya OmniRoute ki API key daalo (Windows ke secure storage mein encrypted save hoti hai), ya Ollama chalao. Phir **Test AI** dabao. Model naam `config/routing.yaml` mein placeholder hain, apne hisaab se badlo.
+2. **Settings > AI providers**: Gemini ya OmniRoute ki API key daalo (OmniRoute ke steps: `docs/09-OMNIROUTE-SETUP.md`) (Windows ke secure storage mein encrypted save hoti hai), ya Ollama chalao. Phir **Test AI** dabao. Model naam `config/routing.yaml` mein placeholder hain, apne hisaab se badlo.
 3. **Study** par PDF add karo (picker ya drag-drop), kholo, paragraph ke saamne **Start here** dabao (timer chalu), padho, phir **End here** dabao. Recall gate khud khulta hai.
 4. Bina AI key ke bhi gate chalta hai: tab text se *offline fill-in-the-blank* quiz banta hai.
 
