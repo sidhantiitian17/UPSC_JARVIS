@@ -2,7 +2,7 @@
 
 Local-first, free, gamified UPSC study OS: padho → bookmark → focus timer → **recall gate** → spaced repetition → **honest** syllabus progress. Baad mein: PYQ Lab, Mains evaluation, current affairs, interview practice, focus browser.
 
-> **Status:** planning complete, code abhi shuru nahi hua. Phase 1 se build shuru hoga.
+> **Status (2026-11-02):** Phase 1 (foundation) aur Phase 2 ka Study Loop code ban chuka hai: PDF library + reader, start/end bookmark, focus timer, recall gate, FSRS review, honest coverage, Today dashboard, Obsidian mirror. Sab `ready-for-review` hai, `accepted` nahi. Windows par abhi chalaya nahi gaya aur asli AI keys se test nahi hua. Packaged `.exe` abhi nahi hai (neeche dekho).
 
 ## Kahan se padhein (Hinglish)
 | Document | Kya hai |
@@ -25,6 +25,25 @@ Local-first, free, gamified UPSC study OS: padho → bookmark → focus timer �
 1. `docs/00-EVALUATION.md` §9 ke 4 bache hue sawal (RAM/GPU, prelims date, `upsc.gov.in` network, dataset publishing) ka jawab do.
 2. `docs/05-VIBE-CODING-PLAYBOOK.md` §1 aur §1b (Windows) ka setup karo.
 3. `agents/roadmap/PHASE_1.md` ka pehla WU (`WU-P01-001`) apne coding agent ko do. Saath mein Phase 0 (`PHASE_0.md`): PYQ dataset aur laya bake-off.
+
+## Windows laptop par chalane ka tareeka (source se)
+Zaroori: Node 22+, pnpm 10 (`corepack enable`), [uv](https://docs.astral.sh/uv/), Python 3.11+ (uv khud la dega), Git.
+
+```powershell
+git clone https://github.com/sidhantiitian17/UPSC_JARVIS
+cd UPSC_JARVIS
+git checkout claude/gallant-volta-orla5n
+pnpm install
+cd apps/sidecar; uv sync; cd ../..
+pnpm dev
+```
+Pehli baar app khulne par:
+1. **Settings** mein *Library folder* aur *Vault folder* (Obsidian vault) chuno.
+2. **Settings > AI providers**: Gemini ya OmniRoute ki API key daalo (Windows ke secure storage mein encrypted save hoti hai), ya Ollama chalao. Phir **Test AI** dabao. Model naam `config/routing.yaml` mein placeholder hain, apne hisaab se badlo.
+3. **Study** par PDF add karo (picker ya drag-drop), kholo, paragraph ke saamne **Start here** dabao (timer chalu), padho, phir **End here** dabao. Recall gate khud khulta hai.
+4. Bina AI key ke bhi gate chalta hai: tab text se *offline fill-in-the-blank* quiz banta hai.
+
+Jo abhi **nahi** hai: packaged installer (sidecar ko `.exe` mein bundle karna baaki), scanned PDF ka OCR, Sociology ontology (official syllabus chahiye), PYQ lab / Mains / Current Affairs / Interview / Browser / Pet (Phase 3+).
 
 ## Developer quick start (Phase 1 onwards)
 ```bash
