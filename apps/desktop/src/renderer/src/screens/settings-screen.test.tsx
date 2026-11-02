@@ -51,6 +51,8 @@ function setup(opts: { aiResult?: unknown; secretsError?: string; picked?: strin
     break_minutes: 10,
     review_daily_limit: 40,
     exam_target: 'Prelims 2028',
+    daily_goal_minutes: 60,
+    bad_day_goal_minutes: 20,
     providers,
     db_version: 2
   }
@@ -202,6 +204,24 @@ describe('Settings screen', () => {
         method: 'PUT',
         path: '/settings',
         body: { exam_target: 'Prelims 2029' }
+      })
+    )
+  })
+
+  it('shows and saves the daily goals that drive streaks', async () => {
+    const { api } = setup()
+    render(<SettingsScreen />)
+    const goal = await screen.findByRole('spinbutton', { name: /daily goal minutes/i })
+    expect(goal).toHaveValue(60)
+    expect(screen.getByRole('spinbutton', { name: /bad-day goal minutes/i })).toHaveValue(20)
+    await userEvent.clear(goal)
+    await userEvent.type(goal, '45')
+    await userEvent.click(screen.getByRole('button', { name: /save goals/i }))
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/settings',
+        body: { daily_goal_minutes: 45, bad_day_goal_minutes: 20 }
       })
     )
   })

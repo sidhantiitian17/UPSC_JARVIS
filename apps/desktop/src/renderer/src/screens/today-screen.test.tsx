@@ -20,10 +20,18 @@ const dash = (over: object = {}): object => ({
   ...over
 })
 
-function setup(d: object, queue: object[] = []): ReturnType<typeof vi.fn> {
+let progress: object | null = null
+function setup(
+  d: object,
+  queue: object[] = [],
+  prog: object | null = null
+): ReturnType<typeof vi.fn> {
+  progress = prog
   const api = vi.fn(async (req: { path: string }) => {
     if (req.path === '/dashboard/today') return { status: 200, body: d }
     if (req.path === '/review/queue') return { status: 200, body: queue }
+    if (req.path === '/gamification/progress')
+      return progress ? { status: 200, body: progress } : { status: 404, body: null }
     if (req.path.endsWith('/rate'))
       return { status: 200, body: { card_id: 1, due: 'x', interval_days: 1 } }
     return { status: 404, body: null }
@@ -35,6 +43,23 @@ function setup(d: object, queue: object[] = []): ReturnType<typeof vi.fn> {
   }
   return api
 }
+const prog = (over: object = {}): object => ({
+  xp_total: 250,
+  level: 2,
+  xp_into_level: 150,
+  xp_to_next_level: 50,
+  streak: 5,
+  best_streak: 9,
+  freezes: 1,
+  at_risk: false,
+  today_minutes: 40,
+  today_goal: 60,
+  daily_goal_minutes: 60,
+  bad_day_goal_minutes: 20,
+  comeback: { active: false, lost_streak: 0, days_done: 0, days_needed: 3 },
+  events: [],
+  ...over
+})
 const renderToday = (): void => {
   render(
     <MemoryRouter>
@@ -130,5 +155,44 @@ describe('Today screen', () => {
     await waitFor(() =>
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/today/i)
     )
+  })
+
+  it('shows level, XP towards the next level, streak and freezes, with honest wording', async () => {
+    setup(dash({ verified_minutes_today: 40 }), [], prog())
+    renderToday()
+    expect(await screen.findByText(/level 2/i)).toBeInTheDocument()
+    expect(screen.getByText(/250 xp/i)).toBeInTheDocument()
+    const bar = screen.getByRole('progressbar', { name: /xp to level 3/i })
+    expect(bar).toHaveAttribute('aria-valuenow', '75')
+    expect(screen.getByText(/5-day streak/i)).toBeInTheDocument()
+    expect(screen.getByText(/1 streak freeze/i)).toBeInTheDocument()
+    expect(screen.getByText(/40 of 60 min today/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/xp comes only from minutes that passed the recall gate/i)
+    ).toBeInTheDocument()
+  })
+
+  it('is supportive, never shaming, when the streak is at risk or paused', async () => {
+    setup(dash(), [], prog({ at_risk: true, today_minutes: 10 }))
+    renderToday()
+    expect(await screen.findByText(/50 more min keeps your streak going/i)).toBeInTheDocument()
+    expect(document.body.textContent?.toLowerCase()).not.toMatch(/lost|fail|lazy|shame|behind/)
+  })
+
+  it('shows an open comeback quest', async () => {
+    setup(
+      dash(),
+      [],
+      prog({ streak: 2, comeback: { active: true, lost_streak: 8, days_done: 2, days_needed: 3 } })
+    )
+    renderToday()
+    expect(await screen.findByText(/comeback quest: 2 of 3 goal days/i)).toBeInTheDocument()
+  })
+
+  it('keeps one primary action even with the progress card', async () => {
+    setup(dash({ due_cards: 3, review_remaining_today: 40 }), [], prog())
+    renderToday()
+    await screen.findByText(/level 2/i)
+    expect(primaries()).toHaveLength(1)
   })
 })

@@ -113,3 +113,6 @@ export type NodeCoverage = Schemas['NodeCoverage']
 export type TodayDashboard = Schemas['TodayOut']
 export const getCoverage = (): Promise<NodeCoverage[]> => api('GET', '/coverage/nodes')
 export const getToday = (): Promise<TodayDashboard> => api('GET', '/dashboard/today')
+
+export type GameProgress = Schemas['ProgressOut']
+export const getProgress = (): Promise<GameProgress> => api('GET', '/gamification/progress')

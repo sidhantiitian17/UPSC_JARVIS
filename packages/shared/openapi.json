@@ -313,6 +313,34 @@
         "title": "ChunkOut",
         "type": "object"
       },
+      "Comeback": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "days_done": {
+            "title": "Days Done",
+            "type": "integer"
+          },
+          "days_needed": {
+            "title": "Days Needed",
+            "type": "integer"
+          },
+          "lost_streak": {
+            "title": "Lost Streak",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "active",
+          "lost_streak",
+          "days_done",
+          "days_needed"
+        ],
+        "title": "Comeback",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "chunks": {
@@ -387,6 +415,29 @@
           "end_chunk_id"
         ],
         "title": "EndIn",
+        "type": "object"
+      },
+      "Event": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "kind",
+          "text"
+        ],
+        "title": "Event",
         "type": "object"
       },
       "GateOut": {
@@ -696,6 +747,86 @@
           "page"
         ],
         "title": "PositionIn",
+        "type": "object"
+      },
+      "ProgressOut": {
+        "properties": {
+          "at_risk": {
+            "title": "At Risk",
+            "type": "boolean"
+          },
+          "bad_day_goal_minutes": {
+            "title": "Bad Day Goal Minutes",
+            "type": "integer"
+          },
+          "best_streak": {
+            "title": "Best Streak",
+            "type": "integer"
+          },
+          "comeback": {
+            "$ref": "#/components/schemas/Comeback"
+          },
+          "daily_goal_minutes": {
+            "title": "Daily Goal Minutes",
+            "type": "integer"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "freezes": {
+            "title": "Freezes",
+            "type": "integer"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "streak": {
+            "title": "Streak",
+            "type": "integer"
+          },
+          "today_goal": {
+            "title": "Today Goal",
+            "type": "integer"
+          },
+          "today_minutes": {
+            "title": "Today Minutes",
+            "type": "integer"
+          },
+          "xp_into_level": {
+            "title": "Xp Into Level",
+            "type": "integer"
+          },
+          "xp_to_next_level": {
+            "title": "Xp To Next Level",
+            "type": "integer"
+          },
+          "xp_total": {
+            "title": "Xp Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "xp_total",
+          "level",
+          "xp_into_level",
+          "xp_to_next_level",
+          "streak",
+          "best_streak",
+          "freezes",
+          "at_risk",
+          "today_minutes",
+          "today_goal",
+          "daily_goal_minutes",
+          "bad_day_goal_minutes",
+          "comeback",
+          "events"
+        ],
+        "title": "ProgressOut",
         "type": "object"
       },
       "ProviderInfo": {
@@ -1183,6 +1314,19 @@
       },
       "SettingsIn": {
         "properties": {
+          "bad_day_goal_minutes": {
+            "anyOf": [
+              {
+                "maximum": 300.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bad Day Goal Minutes"
+          },
           "break_minutes": {
             "anyOf": [
               {
@@ -1195,6 +1339,19 @@
               }
             ],
             "title": "Break Minutes"
+          },
+          "daily_goal_minutes": {
+            "anyOf": [
+              {
+                "maximum": 600.0,
+                "minimum": 10.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Goal Minutes"
           },
           "exam_target": {
             "anyOf": [
@@ -1263,8 +1420,16 @@
       },
       "SettingsOut": {
         "properties": {
+          "bad_day_goal_minutes": {
+            "title": "Bad Day Goal Minutes",
+            "type": "integer"
+          },
           "break_minutes": {
             "title": "Break Minutes",
+            "type": "integer"
+          },
+          "daily_goal_minutes": {
+            "title": "Daily Goal Minutes",
             "type": "integer"
           },
           "db_version": {
@@ -1320,6 +1485,8 @@
           "break_minutes",
           "review_daily_limit",
           "exam_target",
+          "daily_goal_minutes",
+          "bad_day_goal_minutes",
           "providers",
           "db_version"
         ],
@@ -1605,6 +1772,27 @@
         "summary": "Today",
         "tags": [
           "coverage"
+        ]
+      }
+    },
+    "/gamification/progress": {
+      "get": {
+        "operationId": "get_progress_gamification_progress_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Progress",
+        "tags": [
+          "gamification"
         ]
       }
     },

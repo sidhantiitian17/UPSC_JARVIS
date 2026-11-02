@@ -236,6 +236,11 @@ try {
     .then(() => true)
     .catch(() => false)
   check('Today screen renders with review stats', todayOk)
+  const levelShown = await win
+    .waitForSelector('text=/Level \\d+/', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('Today shows the level and streak card', levelShown)
   const nextBlock = await win
     .waitForSelector('text=/e2e-polity, page/', { timeout: 10000 })
     .then(() => true)

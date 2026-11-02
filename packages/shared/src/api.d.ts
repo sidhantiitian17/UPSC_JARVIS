@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/gamification/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Progress */
+        get: operations["get_progress_gamification_progress_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -583,6 +600,17 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** Comeback */
+        Comeback: {
+            /** Active */
+            active: boolean;
+            /** Days Done */
+            days_done: number;
+            /** Days Needed */
+            days_needed: number;
+            /** Lost Streak */
+            lost_streak: number;
+        };
         /** DocumentOut */
         DocumentOut: {
             /** Chunks */
@@ -606,6 +634,15 @@ export interface components {
             end_chunk_id: number;
             /** Focused Seconds */
             focused_seconds?: number | null;
+        };
+        /** Event */
+        Event: {
+            /** Date */
+            date: string;
+            /** Kind */
+            kind: string;
+            /** Text */
+            text: string;
         };
         /** GateOut */
         GateOut: {
@@ -711,6 +748,36 @@ export interface components {
         PositionIn: {
             /** Page */
             page: number;
+        };
+        /** ProgressOut */
+        ProgressOut: {
+            /** At Risk */
+            at_risk: boolean;
+            /** Bad Day Goal Minutes */
+            bad_day_goal_minutes: number;
+            /** Best Streak */
+            best_streak: number;
+            comeback: components["schemas"]["Comeback"];
+            /** Daily Goal Minutes */
+            daily_goal_minutes: number;
+            /** Events */
+            events: components["schemas"]["Event"][];
+            /** Freezes */
+            freezes: number;
+            /** Level */
+            level: number;
+            /** Streak */
+            streak: number;
+            /** Today Goal */
+            today_goal: number;
+            /** Today Minutes */
+            today_minutes: number;
+            /** Xp Into Level */
+            xp_into_level: number;
+            /** Xp To Next Level */
+            xp_to_next_level: number;
+            /** Xp Total */
+            xp_total: number;
         };
         /** ProviderInfo */
         ProviderInfo: {
@@ -889,8 +956,12 @@ export interface components {
         };
         /** SettingsIn */
         SettingsIn: {
+            /** Bad Day Goal Minutes */
+            bad_day_goal_minutes?: number | null;
             /** Break Minutes */
             break_minutes?: number | null;
+            /** Daily Goal Minutes */
+            daily_goal_minutes?: number | null;
             /** Exam Target */
             exam_target?: string | null;
             /** Focus Minutes */
@@ -904,8 +975,12 @@ export interface components {
         };
         /** SettingsOut */
         SettingsOut: {
+            /** Bad Day Goal Minutes */
+            bad_day_goal_minutes: number;
             /** Break Minutes */
             break_minutes: number;
+            /** Daily Goal Minutes */
+            daily_goal_minutes: number;
             /** Db Version */
             db_version: number;
             /** Exam Target */
@@ -1041,6 +1116,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TodayOut"];
+                };
+            };
+        };
+    };
+    get_progress_gamification_progress_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgressOut"];
                 };
             };
         };

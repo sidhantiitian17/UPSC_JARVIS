@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getToday, type TodayDashboard } from '../api/client'
+import { getProgress, getToday, type GameProgress, type TodayDashboard } from '../api/client'
 import { EmptyState } from '../components/empty-state'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
@@ -34,11 +34,58 @@ function Heatmap({ days }: { days: TodayDashboard['heatmap'] }): React.JSX.Eleme
   )
 }
 
+function ProgressCard({ g }: { g: GameProgress }): React.JSX.Element {
+  const span = g.xp_into_level + g.xp_to_next_level
+  const pct = span > 0 ? Math.round((100 * g.xp_into_level) / span) : 0
+  const remaining = Math.max(0, g.today_goal - g.today_minutes)
+  return (
+    <Card className="flex flex-col gap-2">
+      <h2 className="text-xl font-semibold">Level {g.level}</h2>
+      <p>{g.xp_total} XP</p>
+      <div
+        role="progressbar"
+        aria-label={`XP to level ${g.level + 1}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+        className="h-2 overflow-hidden rounded-full bg-surface-2"
+      >
+        <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
+      </div>
+      <p className="text-sm text-muted">
+        {g.xp_to_next_level} XP to level {g.level + 1}
+      </p>
+      <p>
+        {g.streak}-day streak
+        {g.freezes > 0 && (
+          <span className="text-muted">
+            {' '}
+            · {g.freezes} streak {g.freezes === 1 ? 'freeze' : 'freezes'}
+          </span>
+        )}
+      </p>
+      <p className="text-sm">
+        {g.today_minutes} of {g.today_goal} min today
+        {g.at_risk && remaining > 0 && <span> · {remaining} more min keeps your streak going</span>}
+      </p>
+      {g.comeback.active && (
+        <p className="rounded-lg border border-line p-2 text-sm">
+          Comeback quest: {g.comeback.days_done} of {g.comeback.days_needed} goal days. Reach your
+          daily goal {g.comeback.days_needed - g.comeback.days_done} more time(s) in a row to win
+          your streak back.
+        </p>
+      )}
+      <p className="text-xs text-muted">XP comes only from minutes that passed the recall gate.</p>
+    </Card>
+  )
+}
+
 export function TodayScreen(): React.JSX.Element {
   const m = SCREEN_META.today
   const navigate = useNavigate()
   const gate = useGate()
   const [data, setData] = useState<TodayDashboard | null>(null)
+  const [game, setGame] = useState<GameProgress | null>(null)
   const [reviewing, setReviewing] = useState(false)
   const [reloads, setReloads] = useState(0)
 
@@ -47,6 +94,9 @@ export function TodayScreen(): React.JSX.Element {
     getToday()
       .then((d) => alive && setData(d))
       .catch(() => undefined) // the dashboard still renders its empty state without data
+    getProgress()
+      .then((g) => alive && setGame(g))
+      .catch(() => undefined)
     return () => {
       alive = false
     }
@@ -92,6 +142,8 @@ export function TodayScreen(): React.JSX.Element {
           </Button>
         </Card>
       )}
+
+      {game && <ProgressCard g={game} />}
 
       {data && (
         <Card className="flex flex-col gap-2">

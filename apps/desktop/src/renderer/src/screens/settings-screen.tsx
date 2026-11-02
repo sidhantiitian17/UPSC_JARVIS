@@ -182,6 +182,70 @@ function ExamCard({
   )
 }
 
+function GoalsCard({
+  settings,
+  onSaved,
+  onError
+}: {
+  settings: SettingsOut
+  onSaved: (s: SettingsOut) => void
+  onError: (m: string) => void
+}): React.JSX.Element {
+  const [goal, setGoal] = useState(String(settings.daily_goal_minutes))
+  const [bad, setBad] = useState(String(settings.bad_day_goal_minutes))
+  const save = async (): Promise<void> => {
+    try {
+      onSaved(
+        await putSettings({ daily_goal_minutes: Number(goal), bad_day_goal_minutes: Number(bad) })
+      )
+    } catch (e) {
+      onError(
+        e instanceof ApiError && e.status === 422
+          ? 'Daily goal must be 10–600 minutes and the bad-day goal 5–300 minutes.'
+          : describeError(e)
+      )
+    }
+  }
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="text-xl font-semibold">Daily goals</h2>
+      <p className="text-sm text-muted">
+        A day counts for your streak when this many minutes passed the recall gate. On a bad day the
+        smaller goal applies.
+      </p>
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="flex flex-col gap-1 text-sm">
+          Daily goal (verified min)
+          <input
+            type="number"
+            min={10}
+            max={600}
+            aria-label="Daily goal minutes"
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+            className="min-h-10 w-28 rounded-lg border border-line bg-app-bg px-3"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Bad-day goal (verified min)
+          <input
+            type="number"
+            min={5}
+            max={300}
+            aria-label="Bad-day goal minutes"
+            value={bad}
+            onChange={(e) => setBad(e.target.value)}
+            className="min-h-10 w-28 rounded-lg border border-line bg-app-bg px-3"
+          />
+        </label>
+        <Button onClick={save} aria-label="Save goals">
+          Save
+        </Button>
+      </div>
+    </Card>
+  )
+}
+
 export function SettingsScreen(): React.JSX.Element {
   const [settings, setSettings] = useState<SettingsOut | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -265,6 +329,15 @@ export function SettingsScreen(): React.JSX.Element {
       {settings && (
         <ExamCard
           key={settings.exam_target}
+          settings={settings}
+          onSaved={setSettings}
+          onError={setError}
+        />
+      )}
+
+      {settings && (
+        <GoalsCard
+          key={`${settings.daily_goal_minutes}-${settings.bad_day_goal_minutes}`}
           settings={settings}
           onSaved={setSettings}
           onError={setError}
