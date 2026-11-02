@@ -632,6 +632,42 @@
         "title": "ProviderInfo",
         "type": "object"
       },
+      "RateIn": {
+        "properties": {
+          "rating": {
+            "title": "Rating",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rating"
+        ],
+        "title": "RateIn",
+        "type": "object"
+      },
+      "RateOut": {
+        "properties": {
+          "card_id": {
+            "title": "Card Id",
+            "type": "integer"
+          },
+          "due": {
+            "title": "Due",
+            "type": "string"
+          },
+          "interval_days": {
+            "title": "Interval Days",
+            "type": "number"
+          }
+        },
+        "required": [
+          "card_id",
+          "due",
+          "interval_days"
+        ],
+        "title": "RateOut",
+        "type": "object"
+      },
       "ReloadOut": {
         "properties": {
           "kept_linked": {
@@ -780,6 +816,95 @@
           "nodes"
         ],
         "title": "ResultOut",
+        "type": "object"
+      },
+      "ReviewCard": {
+        "properties": {
+          "answer_index": {
+            "title": "Answer Index",
+            "type": "integer"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "integer"
+          },
+          "due": {
+            "title": "Due",
+            "type": "string"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "question_id": {
+            "title": "Question Id",
+            "type": "integer"
+          },
+          "source_quote": {
+            "title": "Source Quote",
+            "type": "string"
+          },
+          "stem": {
+            "title": "Stem",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "question_id",
+          "subject",
+          "due",
+          "stem",
+          "options",
+          "answer_index",
+          "explanation",
+          "source_quote"
+        ],
+        "title": "ReviewCard",
+        "type": "object"
+      },
+      "ReviewStats": {
+        "properties": {
+          "daily_limit": {
+            "title": "Daily Limit",
+            "type": "integer"
+          },
+          "due_now": {
+            "title": "Due Now",
+            "type": "integer"
+          },
+          "remaining_today": {
+            "title": "Remaining Today",
+            "type": "integer"
+          },
+          "reviewed_today": {
+            "title": "Reviewed Today",
+            "type": "integer"
+          },
+          "total_cards": {
+            "title": "Total Cards",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "due_now",
+          "daily_limit",
+          "reviewed_today",
+          "remaining_today",
+          "total_cards"
+        ],
+        "title": "ReviewStats",
         "type": "object"
       },
       "SearchHit": {
@@ -985,6 +1110,19 @@
             ],
             "title": "Library Path"
           },
+          "review_daily_limit": {
+            "anyOf": [
+              {
+                "maximum": 200.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Daily Limit"
+          },
           "vault_path": {
             "anyOf": [
               {
@@ -1032,6 +1170,10 @@
             "title": "Providers",
             "type": "array"
           },
+          "review_daily_limit": {
+            "title": "Review Daily Limit",
+            "type": "integer"
+          },
           "vault_path": {
             "anyOf": [
               {
@@ -1049,6 +1191,7 @@
           "vault_path",
           "focus_minutes",
           "break_minutes",
+          "review_daily_limit",
           "providers",
           "db_version"
         ],
@@ -1629,6 +1772,104 @@
         "summary": "Report",
         "tags": [
           "gate"
+        ]
+      }
+    },
+    "/review/cards/{card_id}/rate": {
+      "post": {
+        "operationId": "rate_review_cards__card_id__rate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_id",
+            "required": true,
+            "schema": {
+              "title": "Card Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rate",
+        "tags": [
+          "review"
+        ]
+      }
+    },
+    "/review/queue": {
+      "get": {
+        "operationId": "get_queue_review_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReviewCard"
+                  },
+                  "title": "Response Get Queue Review Queue Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Queue",
+        "tags": [
+          "review"
+        ]
+      }
+    },
+    "/review/stats": {
+      "get": {
+        "operationId": "get_stats_review_stats_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewStats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Stats",
+        "tags": [
+          "review"
         ]
       }
     },

@@ -27,6 +27,7 @@ class SettingsOut(BaseModel):
     vault_path: str | None
     focus_minutes: int
     break_minutes: int
+    review_daily_limit: int
     providers: list[ProviderInfo]
     db_version: int
 
@@ -36,6 +37,7 @@ class SettingsIn(BaseModel):
     vault_path: str | None = None
     focus_minutes: int | None = Field(default=None, ge=5, le=180)
     break_minutes: int | None = Field(default=None, ge=1, le=60)
+    review_daily_limit: int | None = Field(default=None, ge=5, le=200)
 
 
 class SecretIn(BaseModel):
@@ -93,6 +95,7 @@ def build_router(state: AppState) -> APIRouter:
             vault_path=_get(state, "vault_path"),
             focus_minutes=_get(state, "focus_minutes") or DEFAULT_FOCUS_MINUTES,
             break_minutes=_get(state, "break_minutes") or DEFAULT_BREAK_MINUTES,
+            review_daily_limit=_get(state, "review_daily_limit") or 40,
             providers=providers,
             db_version=current_version(state.conn),
         )
@@ -118,7 +121,7 @@ def build_router(state: AppState) -> APIRouter:
                 if not folder.is_dir():
                     raise HTTPException(status_code=422, detail=f"{key}: folder does not exist")
                 _put(state, key, str(folder.resolve()))
-            for key in ("focus_minutes", "break_minutes"):
+            for key in ("focus_minutes", "break_minutes", "review_daily_limit"):
                 if getattr(body, key) is not None:
                     _put(state, key, getattr(body, key))
             return snapshot()

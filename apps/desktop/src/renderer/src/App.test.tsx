@@ -28,18 +28,17 @@ describe('app shell', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/today/i)
   })
 
-  it.each(SCREENS.filter((s) => s !== 'settings' && s !== 'syllabus' && s !== 'study'))(
-    'screen "%s" has a heading, an empty state and exactly one primary action',
-    (id) => {
-      renderAt(`/${id}`)
-      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
-      expect(screen.getByTestId('empty-state')).toBeInTheDocument()
-      const primary = screen
-        .getAllByRole('button')
-        .filter((b) => b.getAttribute('data-variant') === 'primary')
-      expect(primary).toHaveLength(1)
-    }
-  )
+  it.each(
+    SCREENS.filter((s) => s !== 'settings' && s !== 'syllabus' && s !== 'study' && s !== 'today')
+  )('screen "%s" has a heading, an empty state and exactly one primary action', (id) => {
+    renderAt(`/${id}`)
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument()
+    const primary = screen
+      .getAllByRole('button')
+      .filter((b) => b.getAttribute('data-variant') === 'primary')
+    expect(primary).toHaveLength(1)
+  })
 
   it('navigates when a sidebar link is clicked and marks it current', async () => {
     renderAt('/today')

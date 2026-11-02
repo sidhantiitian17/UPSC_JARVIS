@@ -6,6 +6,7 @@ import json
 import sqlite3
 from datetime import UTC, date, datetime, timedelta
 
+from jarvis.review.fsrs_service import create_or_lapse_card, subject_for_session
 from jarvis.study.sessions import SessionConflict
 
 PASS_PERCENT = 70
@@ -161,6 +162,12 @@ def finish_gate(conn: sqlite3.Connection, session_id: int) -> dict:
         (session_id, total, correct, round(100 * correct / total), int(passed), xp, _now()),
     )
     conn.execute("update study_session set status = 'done' where id = ?", (session_id,))
+    # Every wrongly answered question comes back through the FSRS review queue.
+    subject = subject_for_session(conn, session_id)
+    for w in conn.execute(
+        "select question_id from attempt where session_id = ? and correct = 0", (session_id,)
+    ).fetchall():
+        create_or_lapse_card(conn, w["question_id"], subject)
     return _result_view(conn, session_id)
 
 

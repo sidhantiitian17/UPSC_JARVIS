@@ -99,3 +99,12 @@ export const reportQuestion = (questionId: number, reason = ''): Promise<unknown
   api('POST', `/questions/${questionId}/report`, { reason })
 export const getAwaitingGate = (): Promise<StudySession | null> =>
   api('GET', '/sessions/awaiting-gate')
+
+export type ReviewCard = Schemas['ReviewCard']
+export type ReviewStats = Schemas['ReviewStats']
+export const getReviewQueue = (): Promise<ReviewCard[]> => api('GET', '/review/queue')
+export const getReviewStats = (): Promise<ReviewStats> => api('GET', '/review/stats')
+export const rateReviewCard = (
+  cardId: number,
+  rating: 1 | 2 | 3 | 4
+): Promise<Schemas['RateOut']> => api('POST', `/review/cards/${cardId}/rate`, { rating })

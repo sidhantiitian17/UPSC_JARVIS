@@ -205,6 +205,20 @@ try {
   })
   check('finished gate no longer awaits', noGateWaiting)
   await win.click('button:has-text("Done")')
+  const stats = await win.evaluate(() =>
+    window.jarvis.api({ method: 'GET', path: '/review/stats' })
+  )
+  check(
+    'wrong gate answers became FSRS cards',
+    stats.status === 200 && stats.body.total_cards >= 1,
+    JSON.stringify(stats.body)
+  )
+  await win.click('nav[aria-label="Main"] >> text=Today')
+  const todayOk = await win
+    .waitForSelector('h1:has-text("Today")', { timeout: 10000 })
+    .then(() => true)
+    .catch(() => false)
+  check('Today screen renders with review stats', todayOk)
   const timerGone = await win.evaluate(() => document.querySelector('[role="timer"]') === null)
   check('timer stops when the session ends', timerGone)
   const sessionTags = await win.evaluate(async () => {

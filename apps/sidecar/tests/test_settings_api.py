@@ -137,3 +137,11 @@ def test_focus_and_break_minutes_default_validate_and_persist(tmp_path):
         assert c.put("/settings", headers=H, json=bad).status_code == 422
     c2, _ = make_client(tmp_path)  # same data dir: survives a restart
     assert c2.get("/settings", headers=H).json()["focus_minutes"] == 25
+
+
+def test_review_daily_limit_default_validate_persist(tmp_path):
+    c, _ = make_client(tmp_path)
+    assert c.get("/settings", headers=H).json()["review_daily_limit"] == 40
+    assert c.put("/settings", headers=H, json={"review_daily_limit": 25}).json()["review_daily_limit"] == 25
+    for bad in (4, 201):
+        assert c.put("/settings", headers=H, json={"review_daily_limit": bad}).status_code == 422

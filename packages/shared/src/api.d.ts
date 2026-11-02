@@ -158,6 +158,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/review/cards/{card_id}/rate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rate */
+        post: operations["rate_review_cards__card_id__rate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/review/queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Queue */
+        get: operations["get_queue_review_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/review/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Stats */
+        get: operations["get_stats_review_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/secrets/{name}": {
         parameters: {
             query?: never;
@@ -607,6 +658,20 @@ export interface components {
             /** Secret Name */
             secret_name?: string | null;
         };
+        /** RateIn */
+        RateIn: {
+            /** Rating */
+            rating: number;
+        };
+        /** RateOut */
+        RateOut: {
+            /** Card Id */
+            card_id: number;
+            /** Due */
+            due: string;
+            /** Interval Days */
+            interval_days: number;
+        };
         /** ReloadOut */
         ReloadOut: {
             /** Kept Linked */
@@ -666,6 +731,40 @@ export interface components {
             total: number;
             /** Xp */
             xp: number;
+        };
+        /** ReviewCard */
+        ReviewCard: {
+            /** Answer Index */
+            answer_index: number;
+            /** Card Id */
+            card_id: number;
+            /** Due */
+            due: string;
+            /** Explanation */
+            explanation: string;
+            /** Options */
+            options: string[];
+            /** Question Id */
+            question_id: number;
+            /** Source Quote */
+            source_quote: string;
+            /** Stem */
+            stem: string;
+            /** Subject */
+            subject: string;
+        };
+        /** ReviewStats */
+        ReviewStats: {
+            /** Daily Limit */
+            daily_limit: number;
+            /** Due Now */
+            due_now: number;
+            /** Remaining Today */
+            remaining_today: number;
+            /** Reviewed Today */
+            reviewed_today: number;
+            /** Total Cards */
+            total_cards: number;
         };
         /** SearchHit */
         SearchHit: {
@@ -727,6 +826,8 @@ export interface components {
             focus_minutes?: number | null;
             /** Library Path */
             library_path?: string | null;
+            /** Review Daily Limit */
+            review_daily_limit?: number | null;
             /** Vault Path */
             vault_path?: string | null;
         };
@@ -742,6 +843,8 @@ export interface components {
             library_path: string | null;
             /** Providers */
             providers: components["schemas"]["ProviderInfo"][];
+            /** Review Daily Limit */
+            review_daily_limit: number;
             /** Vault Path */
             vault_path: string | null;
         };
@@ -1098,6 +1201,81 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rate_review_cards__card_id__rate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                card_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_queue_review_queue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewCard"][];
+                };
+            };
+        };
+    };
+    get_stats_review_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewStats"];
                 };
             };
         };

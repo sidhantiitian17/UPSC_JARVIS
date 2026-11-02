@@ -12,6 +12,7 @@ dependencies = [
   "jsonschema>=4.21",
   "sqlite-vec>=0.1.9",
   "pypdfium2>=5.14.0",
+  "fsrs>=6.3.2",
 ]
 
 [dependency-groups]
