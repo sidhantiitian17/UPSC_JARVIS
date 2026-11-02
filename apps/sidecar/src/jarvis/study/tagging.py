@@ -69,7 +69,9 @@ def tag_passage(llm: LLMClient, conn: sqlite3.Connection, passage: str) -> list[
     if not cands:
         return []
     valid = {c.id for c in cands}
-    listing = "\n".join(f"- {c.id}: {c.title}" for c in cands)
+    listing = "\n".join(
+        f"- {c.id}: {c.title[:90]}" for c in cands
+    )  # long official points: keep prompts small
     messages = [
         Message("system", _SYSTEM),
         Message("user", f"Candidates:\n{listing}\n\nPassage:\n{_clip(passage)}"),
