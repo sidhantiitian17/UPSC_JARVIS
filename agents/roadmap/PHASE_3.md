@@ -39,7 +39,7 @@ PYQ, Mains, CA, Telegram, browser, interview, mobile.
 | WU-P03-005 | Focus Guard (opt-in) | **ActivityWatch** (MPL-2.0, sidecar; verify Windows behaviour) or `active-win` as fallback — spike decides; categories study/neutral/distraction (rules first; head H8 later); stored locally; off by default | desktop main + sidecar | P2 | tests with fake window titles; privacy check | planned | — |
 | WU-P03-006 | Sleep guard + burnout guard + bad-day mode | Configurable sleep window; ≥12h-day detector; bad-day minimum plan keeps streak | sidecar rules | 001 | pytest | ready-for-review | e9a7418 |
 | WU-P03-007 | Daily planner v1 + commitment contract | Free hours input → subject-wise hour-wise plan from weak nodes + due cards; missed plan → tomorrow catch-up gate | sidecar planner, Today UI | P2 | pytest: plan constraints; UI | ready-for-review | 536f9a8 |
-| WU-P03-008 | Truth Dashboard + weekly honesty report + forecast | Verified Retained Minutes, calibration chart, claimed vs verified hours, completion forecast vs exam date | desktop Insights | P2 | pytest: metrics; UI | ready-for-review | this commit |
+| WU-P03-008 | Truth Dashboard + weekly honesty report + forecast | Verified Retained Minutes, calibration chart, claimed vs verified hours, completion forecast vs exam date | desktop Insights | P2 | pytest: metrics; UI | ready-for-review | 03ca7c0 |
 | WU-P03-009 | Privacy panel | Shows what is stored, where, retention; one-click delete per category | desktop Settings | 005 | UI test | planned | — |
 
 ## Verification Strategy
